@@ -6,6 +6,9 @@
 -keepclassmembers class dev.hotwire.core.turbo.session.TurboSession {
     @android.webkit.JavascriptInterface <methods>;
 }
+-keepclassmembers class dev.hotwire.core.bridge.Bridge {
+    @android.webkit.JavascriptInterface <methods>;
+}
 -keepattributes JavascriptInterface
 
 -keep class dev.hotwire.core.** { *; }

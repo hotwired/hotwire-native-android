@@ -1,12 +1,14 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
     namespace = "dev.hotwire.core"
     compileSdk = 34
     testOptions.unitTests.isIncludeAndroidResources = true
+    testOptions.unitTests.isReturnDefaultValues = true
 
     defaultConfig {
         minSdk = 28
@@ -53,11 +55,12 @@ dependencies {
 
     // AndroidX
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common:2.7.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // JSON
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Networking/API
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
