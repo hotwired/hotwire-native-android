@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "hotwire-native-android"
 include(":core")
+include(":demo")

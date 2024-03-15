@@ -1,0 +1,76 @@
+{
+  "settings": {
+    "screenshots_enabled": true
+  },
+  "rules": [
+    {
+      "patterns": [
+        ".*"
+      ],
+      "properties": {
+        "context": "default",
+        "uri": "turbo://fragment/web",
+        "fallback_uri": "turbo://fragment/web",
+        "pull_to_refresh_enabled": true
+      }
+    },
+    {
+      "patterns": [
+        "^$",
+        "^/$"
+      ],
+      "properties": {
+        "uri": "turbo://fragment/web/home",
+        "presentation": "replace_root"
+      }
+    },
+    {
+      "patterns": [
+        "/signin$",
+        "/strada-form$"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "turbo://fragment/web/modal",
+        "pull_to_refresh_enabled": false
+      }
+    },
+    {
+      "patterns": [
+        "/new$"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "turbo://fragment/web/modal/sheet",
+        "pull_to_refresh_enabled": false
+      }
+    },
+    {
+      "patterns": [
+        "/numbers$"
+      ],
+      "properties": {
+        "uri": "turbo://fragment/numbers",
+        "title": "Numbers"
+      }
+    },
+    {
+      "patterns": [
+        "/numbers/[0-9]+$"
+      ],
+      "properties": {
+        "uri": "turbo://fragment/numbers/sheet",
+        "title": "Number",
+        "description": "This is a native bottom sheet fragment"
+      }
+    },
+    {
+      "patterns": [
+        ".+\\.(?:bmp|gif|heic|jpg|jpeg|png|svg|webp)"
+      ],
+      "properties": {
+        "uri": "turbo://fragment/image_viewer"
+      }
+    }
+  ]
+}

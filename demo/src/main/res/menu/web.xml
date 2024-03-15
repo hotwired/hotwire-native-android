@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/menu_progress"
+        android:title="@string/menu_progress"
+        android:visible="false"
+        app:actionLayout="@layout/toolbar_progress"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+    <item
+        android:id="@+id/overflow"
+        android:icon="@drawable/ic_overflow"
+        android:orderInCategory="999"
+        android:visible="false"
+        app:iconTint="?colorControlNormal"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+</menu>
