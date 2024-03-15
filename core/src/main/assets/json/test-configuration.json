@@ -1,0 +1,99 @@
+{
+  "settings": {
+    "custom_app_feature_enabled": true
+  },
+  "rules": [
+    {
+      "patterns": [
+        ".*"
+      ],
+      "properties": {
+        "context": "default",
+        "uri": "turbo://fragment/web",
+        "pull_to_refresh_enabled": true
+      }
+    },
+    {
+      "patterns": [
+        "^$",
+        "/home"
+      ],
+      "properties": {
+        "uri": "turbo://fragment/web/home",
+        "presentation": "clear_all"
+      }
+    },
+    {
+      "patterns": [
+        "/new-home"
+      ],
+      "properties": {
+        "uri": "turbo://fragment/web/home",
+        "presentation": "replace_root"
+      }
+    },
+    {
+      "patterns": [
+        "/feature"
+      ],
+      "properties": {
+        "query_string_presentation": "replace"
+      }
+    },
+    {
+      "patterns": [
+        "/new$",
+        "/edit$"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "turbo://fragment/web/modal",
+        "query_string_presentation": "default",
+        "pull_to_refresh_enabled": false
+      }
+    },
+    {
+      "patterns": [
+        ".+\\.(?:bmp|gif|heic|jpg|jpeg|png|svg|webp)"
+      ],
+      "properties": {
+        "uri": "turbo://fragment/image_viewer",
+        "title": "Image Viewer"
+      }
+    },
+    {
+      "patterns": [
+        "/custom/recede"
+      ],
+      "properties": {
+        "presentation": "pop"
+      }
+    },
+    {
+      "patterns": [
+        "/custom/refresh"
+      ],
+      "properties": {
+        "presentation": "refresh"
+      }
+    },
+    {
+      "patterns": [
+        "/custom/resume"
+      ],
+      "properties": {
+        "presentation": "none"
+      }
+    },
+    {
+      "patterns": [
+        "/custom/modal"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "turbo://fragment/web/modal",
+        "presentation": "replace_root"
+      }
+    }
+  ]
+}
