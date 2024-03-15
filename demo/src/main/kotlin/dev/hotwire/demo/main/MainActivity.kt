@@ -5,9 +5,8 @@ import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.KotlinXJsonConverter
-import dev.hotwire.core.bridge.Strada
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.activities.TurboActivity
-import dev.hotwire.core.turbo.config.Turbo
 import dev.hotwire.core.turbo.delegates.TurboActivityDelegate
 import dev.hotwire.demo.R
 
@@ -23,11 +22,10 @@ class MainActivity : AppCompatActivity(), TurboActivity {
     }
 
     private fun configApp() {
-        Strada.config.jsonConverter = KotlinXJsonConverter()
+        Hotwire.config.jsonConverter = KotlinXJsonConverter()
 
         if (BuildConfig.DEBUG) {
-            Turbo.config.debugLoggingEnabled = true
-            Strada.config.debugLoggingEnabled = true
+            Hotwire.config.debugLoggingEnabled = true
             WebView.setWebContentsDebuggingEnabled(true)
         }
     }

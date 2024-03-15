@@ -1,7 +1,7 @@
 package dev.hotwire.core.turbo.http
 
 import android.content.Context
-import dev.hotwire.core.turbo.config.Turbo
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.util.logError
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -60,7 +60,7 @@ object TurboHttpClient {
             builder.cache(it)
         }
 
-        if (Turbo.config.debugLoggingEnabled) {
+        if (Hotwire.config.debugLoggingEnabled) {
             builder.addInterceptor(loggingInterceptor)
         }
 
