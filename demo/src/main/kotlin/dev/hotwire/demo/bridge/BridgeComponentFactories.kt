@@ -1,4 +1,4 @@
-package dev.hotwire.demo.strada
+package dev.hotwire.demo.bridge
 
 import dev.hotwire.core.bridge.BridgeComponentFactory
 

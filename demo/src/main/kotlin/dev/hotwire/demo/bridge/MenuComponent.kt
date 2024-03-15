@@ -1,4 +1,4 @@
-package dev.hotwire.demo.strada
+package dev.hotwire.demo.bridge
 
 import android.util.Log
 import android.view.LayoutInflater

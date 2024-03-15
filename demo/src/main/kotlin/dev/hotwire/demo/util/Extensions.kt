@@ -9,7 +9,7 @@ import androidx.webkit.WebViewFeature
 import dev.hotwire.core.bridge.Strada
 import dev.hotwire.core.turbo.config.Turbo
 import dev.hotwire.core.turbo.config.TurboPathConfigurationProperties
-import dev.hotwire.demo.strada.bridgeComponentFactories
+import dev.hotwire.demo.bridge.bridgeComponentFactories
 
 val TurboPathConfigurationProperties.description: String?
     get() = get("description")

@@ -12,7 +12,7 @@ import dev.hotwire.core.turbo.visit.TurboVisitAction.REPLACE
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 import dev.hotwire.demo.R
 import dev.hotwire.demo.base.NavDestination
-import dev.hotwire.demo.strada.bridgeComponentFactories
+import dev.hotwire.demo.bridge.bridgeComponentFactories
 import dev.hotwire.demo.util.SIGN_IN_URL
 
 @TurboNavGraphDestination(uri = "turbo://fragment/web")
