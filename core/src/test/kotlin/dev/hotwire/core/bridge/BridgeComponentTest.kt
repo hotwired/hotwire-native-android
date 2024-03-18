@@ -11,7 +11,7 @@ import org.junit.Test
 
 class BridgeComponentTest {
     private lateinit var component: TestData.OneBridgeComponent
-    private val delegate: BridgeDelegate<TestData.AppBridgeDestination> = mock()
+    private val delegate: BridgeDelegate = mock()
 
     private val message = Message(
         id = "1",

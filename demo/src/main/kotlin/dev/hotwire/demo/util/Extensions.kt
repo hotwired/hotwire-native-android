@@ -6,9 +6,7 @@ import android.os.Build
 import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.TurboPathConfigurationProperties
-import dev.hotwire.demo.bridge.bridgeComponentFactories
 
 val TurboPathConfigurationProperties.description: String?
     get() = get("description")
@@ -28,12 +26,6 @@ fun WebView.initDayNightTheme() {
         }
     }
 }
-
-val WebView.customUserAgent: String
-    get() {
-        val substring = Hotwire.userAgentSubstring(bridgeComponentFactories)
-        return "$substring ${settings.userAgentString}"
-    }
 
 private fun isNightModeEnabled(context: Context): Boolean {
     val currentNightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK

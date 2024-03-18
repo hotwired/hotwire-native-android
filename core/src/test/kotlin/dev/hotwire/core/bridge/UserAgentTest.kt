@@ -12,7 +12,9 @@ class UserAgentTest {
             BridgeComponentFactory("two", TestData::TwoBridgeComponent)
         )
 
-        val userAgentSubstring = Hotwire.userAgentSubstring(factories)
+        Hotwire.registerBridgeComponentFactories(factories)
+
+        val userAgentSubstring = Hotwire.userAgentSubstring()
         assertTrue(userAgentSubstring.endsWith("bridge-components: [one two];"))
     }
 }

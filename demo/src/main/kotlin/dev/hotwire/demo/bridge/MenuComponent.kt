@@ -7,9 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeDelegate
-import dev.hotwire.demo.databinding.MenuComponentBottomSheetBinding
 import dev.hotwire.core.bridge.Message
-import dev.hotwire.demo.base.NavDestination
+import dev.hotwire.demo.databinding.MenuComponentBottomSheetBinding
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,8 +18,8 @@ import kotlinx.serialization.Serializable
  */
 class MenuComponent(
     name: String,
-    private val delegate: BridgeDelegate<NavDestination>
-) : BridgeComponent<NavDestination>(name, delegate) {
+    private val delegate: BridgeDelegate
+) : BridgeComponent(name, delegate) {
 
     private val fragment: Fragment
         get() = delegate.destination.fragment

@@ -8,10 +8,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeDelegate
+import dev.hotwire.core.bridge.Message
 import dev.hotwire.demo.R
 import dev.hotwire.demo.databinding.FormComponentSubmitBinding
-import dev.hotwire.core.bridge.Message
-import dev.hotwire.demo.base.NavDestination
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -21,8 +20,8 @@ import kotlinx.serialization.Serializable
  */
 class FormComponent(
     name: String,
-    private val delegate: BridgeDelegate<NavDestination>
-) : BridgeComponent<NavDestination>(name, delegate) {
+    private val delegate: BridgeDelegate
+) : BridgeComponent(name, delegate) {
 
     private val submitButtonItemId = 37
     private var submitMenuItem: MenuItem? = null

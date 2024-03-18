@@ -16,7 +16,7 @@ class BridgeTest {
     private val webView: WebView = mock()
     private val context: Context = mock()
     private val repository: Repository = mock()
-    private val delegate: BridgeDelegate<TestData.AppBridgeDestination> = mock()
+    private val delegate: BridgeDelegate = mock()
 
     @Before
     fun setup() {

@@ -1,12 +1,11 @@
 package dev.hotwire.demo.main
 
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import dev.hotwire.core.bridge.Bridge
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
-import dev.hotwire.demo.util.HOME_URL
-import dev.hotwire.demo.util.customUserAgent
-import dev.hotwire.demo.util.initDayNightTheme
 import dev.hotwire.demo.features.imageviewer.ImageViewerFragment
 import dev.hotwire.demo.features.numbers.NumberBottomSheetFragment
 import dev.hotwire.demo.features.numbers.NumbersFragment
@@ -14,6 +13,8 @@ import dev.hotwire.demo.features.web.WebBottomSheetFragment
 import dev.hotwire.demo.features.web.WebFragment
 import dev.hotwire.demo.features.web.WebHomeFragment
 import dev.hotwire.demo.features.web.WebModalFragment
+import dev.hotwire.demo.util.HOME_URL
+import dev.hotwire.demo.util.initDayNightTheme
 import kotlin.reflect.KClass
 
 @Suppress("unused")
@@ -48,4 +49,10 @@ class MainSessionNavHostFragment : TurboSessionNavHostFragment() {
         // Initialize Strada bridge with new WebView instance
         Bridge.initialize(session.webView)
     }
+
+    private val WebView.customUserAgent: String
+        get() {
+            val substring = Hotwire.userAgentSubstring()
+            return "$substring ${settings.userAgentString}"
+        }
 }
