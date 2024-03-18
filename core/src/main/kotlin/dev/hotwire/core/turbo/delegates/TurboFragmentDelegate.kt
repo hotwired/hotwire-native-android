@@ -1,5 +1,6 @@
 package dev.hotwire.core.turbo.delegates
 
+import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.nav.TurboNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavigator
@@ -7,7 +8,6 @@ import dev.hotwire.core.turbo.session.TurboSessionModalResult
 import dev.hotwire.core.turbo.session.TurboSessionViewModel
 import dev.hotwire.core.turbo.util.displayBackButton
 import dev.hotwire.core.turbo.util.displayBackButtonAsCloseIcon
-import dev.hotwire.core.turbo.util.logEvent
 
 /**
  * Provides all the hooks for a Fragment to delegate its lifecycle events

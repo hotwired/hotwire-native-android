@@ -1,5 +1,7 @@
 package dev.hotwire.core.bridge
 
+import dev.hotwire.core.logging.logWarning
+
 abstract class BridgeComponent<in D : BridgeDestination>(
     val name: String,
     private val delegate: BridgeDelegate<D>

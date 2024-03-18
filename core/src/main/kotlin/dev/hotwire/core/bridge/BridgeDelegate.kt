@@ -3,6 +3,8 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logWarning
 
 @Suppress("unused")
 class BridgeDelegate<D : BridgeDestination>(

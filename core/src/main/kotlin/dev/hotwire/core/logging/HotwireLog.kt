@@ -1,11 +1,10 @@
-package dev.hotwire.core.bridge
+package dev.hotwire.core.logging
 
 import android.util.Log
 import dev.hotwire.core.config.Hotwire
 
-@Suppress("unused")
-internal object StradaLog {
-    private const val DEFAULT_TAG = "StradaLog"
+internal object HotwireLog {
+    private const val DEFAULT_TAG = "Hotwire"
 
     private val debugEnabled get() = Hotwire.config.debugLoggingEnabled
 
@@ -24,14 +23,23 @@ internal object StradaLog {
     }
 }
 
+private const val PAD_END_LENGTH = 35
+
 internal fun logEvent(event: String, details: String = "") {
-    StradaLog.d("$event ".padEnd(35, '.') + " [$details]")
+    HotwireLog.d("$event ".padEnd(PAD_END_LENGTH, '.') + " [$details]")
+}
+
+internal fun logEvent(event: String, attributes: List<Pair<String, Any>>) {
+    val description = attributes.joinToString(prefix = "[", postfix = "]", separator = ", ") {
+        "${it.first}: ${it.second}"
+    }
+    HotwireLog.d("$event ".padEnd(PAD_END_LENGTH, '.') + " $description")
 }
 
 internal fun logWarning(event: String, details: String) {
-    StradaLog.w("$event ".padEnd(35, '.') + " [$details]")
+    HotwireLog.w("$event ".padEnd(PAD_END_LENGTH, '.') + " [$details]")
 }
 
 internal fun logError(event: String, error: Exception) {
-    StradaLog.e("$event: ${error.stackTraceToString()}")
+    HotwireLog.e("$event: ${error.stackTraceToString()}")
 }

@@ -2,9 +2,9 @@ package dev.hotwire.core.turbo.http
 
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.session.TurboSession
 import dev.hotwire.core.turbo.util.isHttpGetRequest
-import dev.hotwire.core.turbo.util.logEvent
 
 internal class TurboWebViewRequestInterceptor(val session: TurboSession) {
     private val offlineRequestHandler get() = session.offlineRequestHandler

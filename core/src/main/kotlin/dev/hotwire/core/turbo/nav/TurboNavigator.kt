@@ -7,8 +7,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
+import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.util.location
-import dev.hotwire.core.turbo.util.logEvent
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
 internal class TurboNavigator(private val navDestination: TurboNavDestination) {

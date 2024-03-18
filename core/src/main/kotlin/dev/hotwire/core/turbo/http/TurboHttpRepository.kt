@@ -3,8 +3,8 @@ package dev.hotwire.core.turbo.http
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import dev.hotwire.core.logging.logError
 import dev.hotwire.core.turbo.util.dispatcherProvider
-import dev.hotwire.core.turbo.util.logError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore

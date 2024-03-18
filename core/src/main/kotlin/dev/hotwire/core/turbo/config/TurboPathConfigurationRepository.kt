@@ -3,9 +3,9 @@ package dev.hotwire.core.turbo.config
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import dev.hotwire.core.logging.logError
 import dev.hotwire.core.turbo.http.TurboHttpClient
 import dev.hotwire.core.turbo.util.dispatcherProvider
-import dev.hotwire.core.turbo.util.logError
 import dev.hotwire.core.turbo.util.toJson
 import kotlinx.coroutines.withContext
 import okhttp3.Request
