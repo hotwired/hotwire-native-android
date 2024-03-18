@@ -1,6 +1,5 @@
 package dev.hotwire.demo.main
 
-import dev.hotwire.core.bridge.Bridge
 import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
 import dev.hotwire.demo.util.HOME_URL
 import dev.hotwire.demo.util.initDayNightTheme
@@ -16,8 +15,5 @@ class MainSessionNavHostFragment : TurboSessionNavHostFragment() {
 
         // Configure WebView
         session.webView.initDayNightTheme()
-
-        // Initialize Strada bridge with new WebView instance
-        Bridge.initialize(session.webView)
     }
 }

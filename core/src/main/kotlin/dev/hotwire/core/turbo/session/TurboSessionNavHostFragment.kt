@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import dev.hotwire.core.bridge.Bridge
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.nav.TurboNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
@@ -55,6 +56,11 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
      */
     open fun onSessionCreated() {
         session.pathConfiguration.load(Hotwire.config.pathConfigurationLocation)
+
+        // Initialize bridge with new WebView instance
+        if (Hotwire.registeredBridgeComponentFactories.isNotEmpty()) {
+            Bridge.initialize(session.webView)
+        }
     }
 
     /**
