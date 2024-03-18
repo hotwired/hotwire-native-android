@@ -1,12 +1,13 @@
 package dev.hotwire.core.bridge
 
 import android.util.Log
+import dev.hotwire.core.config.Hotwire
 
 @Suppress("unused")
 internal object StradaLog {
     private const val DEFAULT_TAG = "StradaLog"
 
-    private val debugEnabled get() = Strada.config.debugLoggingEnabled
+    private val debugEnabled get() = Hotwire.config.debugLoggingEnabled
 
     internal fun d(msg: String) = log(Log.DEBUG, msg)
 

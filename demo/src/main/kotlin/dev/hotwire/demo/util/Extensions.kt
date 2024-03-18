@@ -6,8 +6,7 @@ import android.os.Build
 import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import dev.hotwire.core.bridge.Strada
-import dev.hotwire.core.turbo.config.Turbo
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.TurboPathConfigurationProperties
 import dev.hotwire.demo.bridge.bridgeComponentFactories
 
@@ -32,9 +31,8 @@ fun WebView.initDayNightTheme() {
 
 val WebView.customUserAgent: String
     get() {
-        val turboSubstring = Turbo.userAgentSubstring()
-        val stradaSubstring = Strada.userAgentSubstring(bridgeComponentFactories)
-        return "$turboSubstring; $stradaSubstring; ${settings.userAgentString}"
+        val substring = Hotwire.userAgentSubstring(bridgeComponentFactories)
+        return "$substring ${settings.userAgentString}"
     }
 
 private fun isNightModeEnabled(context: Context): Boolean {

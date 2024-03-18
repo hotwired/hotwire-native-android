@@ -1,12 +1,12 @@
 package dev.hotwire.core.turbo.util
 
 import android.util.Log
-import dev.hotwire.core.turbo.config.Turbo
+import dev.hotwire.core.config.Hotwire
 
 internal object TurboLog {
     private const val DEFAULT_TAG = "TurboLog"
 
-    private val debugEnabled get() = Turbo.config.debugLoggingEnabled
+    private val debugEnabled get() = Hotwire.config.debugLoggingEnabled
 
     internal fun d(msg: String) = log(Log.DEBUG, msg)
 
