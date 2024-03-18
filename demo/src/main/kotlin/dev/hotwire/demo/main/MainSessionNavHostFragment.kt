@@ -2,7 +2,6 @@ package dev.hotwire.demo.main
 
 import androidx.fragment.app.Fragment
 import dev.hotwire.core.bridge.Bridge
-import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
 import dev.hotwire.demo.features.imageviewer.ImageViewerFragment
 import dev.hotwire.demo.features.numbers.NumberBottomSheetFragment
@@ -30,11 +29,6 @@ class MainSessionNavHostFragment : TurboSessionNavHostFragment() {
             NumbersFragment::class,
             NumberBottomSheetFragment::class,
             ImageViewerFragment::class
-        )
-
-    override val pathConfigurationLocation: TurboPathConfiguration.Location
-        get() = TurboPathConfiguration.Location(
-            assetFilePath = "json/configuration.json"
         )
 
     override fun onSessionCreated() {

@@ -7,6 +7,7 @@ import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.activities.TurboActivity
+import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.core.turbo.delegates.TurboActivityDelegate
 import dev.hotwire.demo.R
 import dev.hotwire.demo.bridge.FormComponent
@@ -37,5 +38,8 @@ class MainActivity : AppCompatActivity(), TurboActivity {
         Hotwire.config.userAgent = "Hotwire Demo; ${Hotwire.config.userAgentSubstring()}"
         Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
+        Hotwire.config.pathConfigurationLocation = TurboPathConfiguration.Location(
+            assetFilePath = "json/configuration.json"
+        )
     }
 }

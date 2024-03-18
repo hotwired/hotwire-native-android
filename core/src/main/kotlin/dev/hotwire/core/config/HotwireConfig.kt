@@ -2,6 +2,7 @@ package dev.hotwire.core.config
 
 import android.webkit.WebView
 import dev.hotwire.core.bridge.StradaJsonConverter
+import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.core.turbo.http.TurboHttpClient
 
 class HotwireConfig internal constructor() {
@@ -35,6 +36,12 @@ class HotwireConfig internal constructor() {
             field = value
             WebView.setWebContentsDebuggingEnabled(value)
         }
+
+    /**
+     * The location of your [TurboPathConfiguration] JSON file(s) to configure
+     * navigation rules.
+     */
+    var pathConfigurationLocation = TurboPathConfiguration.Location()
 
     /**
      * Provides a standard substring to be included in your WebView's user agent
