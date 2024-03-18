@@ -120,7 +120,7 @@ class Bridge internal constructor(webView: WebView) {
     companion object {
         private val instances = mutableListOf<Bridge>()
 
-        fun initialize(webView: WebView) {
+        internal fun initialize(webView: WebView) {
             if (getBridgeFor(webView) == null) {
                 initialize(Bridge(webView))
             }
