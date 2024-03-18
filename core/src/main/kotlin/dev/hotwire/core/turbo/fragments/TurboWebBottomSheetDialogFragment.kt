@@ -21,7 +21,6 @@ import dev.hotwire.core.turbo.views.TurboWebChromeClient
  *
  * For native bottom sheet fragments, refer to [TurboBottomSheetDialogFragment].
  */
-@Suppress("unused")
 abstract class TurboWebBottomSheetDialogFragment : TurboBottomSheetDialogFragment(),
     TurboWebFragmentCallback {
     private lateinit var webDelegate: TurboWebFragmentDelegate

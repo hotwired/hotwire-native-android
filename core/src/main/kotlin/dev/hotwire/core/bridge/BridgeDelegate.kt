@@ -5,20 +5,21 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.turbo.nav.TurboNavDestination
 
 @Suppress("unused")
-class BridgeDelegate<D : BridgeDestination>(
+class BridgeDelegate(
     val location: String,
-    val destination: D,
-    private val componentFactories: List<BridgeComponentFactory<D, BridgeComponent<D>>>
+    val destination: TurboNavDestination,
+    private val componentFactories: List<BridgeComponentFactory<BridgeComponent>>
 ) : DefaultLifecycleObserver {
     internal var bridge: Bridge? = null
     private var destinationIsActive: Boolean = false
-    private val initializedComponents = hashMapOf<String, BridgeComponent<D>>()
+    private val initializedComponents = hashMapOf<String, BridgeComponent>()
     private val resolvedLocation: String
         get() = bridge?.webView?.url ?: location
 
-    val activeComponents: List<BridgeComponent<D>>
+    val activeComponents: List<BridgeComponent>
         get() = initializedComponents.map { it.value }.takeIf { destinationIsActive }.orEmpty()
 
     fun onColdBootPageCompleted() {
@@ -73,7 +74,7 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     private fun shouldReloadBridge(): Boolean {
-        return destination.bridgeWebViewIsReady() && bridge?.isReady() == false
+        return destination.session.isReady && bridge?.isReady() == false
     }
 
     // Lifecycle events
@@ -105,7 +106,7 @@ class BridgeDelegate<D : BridgeDestination>(
         activeComponents.filterIsInstance<C>().forEach { action(it) }
     }
 
-    private fun getOrCreateComponent(name: String): BridgeComponent<D>? {
+    private fun getOrCreateComponent(name: String): BridgeComponent? {
         val factory = componentFactories.firstOrNull { it.name == name } ?: return null
         return initializedComponents.getOrPut(name) { factory.create(this) }
     }

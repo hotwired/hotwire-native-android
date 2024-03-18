@@ -4,26 +4,38 @@ import android.os.Bundle
 import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.BuildConfig
+import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.activities.TurboActivity
 import dev.hotwire.core.turbo.delegates.TurboActivityDelegate
 import dev.hotwire.demo.R
+import dev.hotwire.demo.bridge.FormComponent
+import dev.hotwire.demo.bridge.MenuComponent
+import dev.hotwire.demo.bridge.OverflowMenuComponent
 
 class MainActivity : AppCompatActivity(), TurboActivity {
     override lateinit var delegate: TurboActivityDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        delegate = TurboActivityDelegate(this, R.id.main_nav_host)
         configApp()
+        setContentView(R.layout.activity_main)
+        delegate = TurboActivityDelegate(this, R.id.main_nav_host)
     }
 
     private fun configApp() {
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
 
+        // Register bridge components
+        Hotwire.registerBridgeComponentFactories(listOf(
+            BridgeComponentFactory("form", ::FormComponent),
+            BridgeComponentFactory("menu", ::MenuComponent),
+            BridgeComponentFactory("overflow-menu", ::OverflowMenuComponent)
+        ))
+
+        // Enable debugging
         if (BuildConfig.DEBUG) {
             Hotwire.config.debugLoggingEnabled = true
             WebView.setWebContentsDebuggingEnabled(true)

@@ -17,8 +17,8 @@ import kotlinx.serialization.Serializable
  */
 class OverflowMenuComponent(
     name: String,
-    private val delegate: BridgeDelegate<NavDestination>
-) : BridgeComponent<NavDestination>(name, delegate) {
+    private val delegate: BridgeDelegate
+) : BridgeComponent(name, delegate) {
 
     private val fragment: Fragment
         get() = delegate.destination.fragment

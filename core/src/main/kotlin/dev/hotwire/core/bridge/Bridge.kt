@@ -18,7 +18,7 @@ class Bridge internal constructor(webView: WebView) {
 
     internal val webView: WebView? get() = webViewRef.get()
     internal var repository = Repository()
-    internal var delegate: BridgeDelegate<*>? = null
+    internal var delegate: BridgeDelegate? = null
 
     init {
         // Use a weak reference in case the WebView is no longer being

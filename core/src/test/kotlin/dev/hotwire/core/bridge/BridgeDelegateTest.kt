@@ -7,6 +7,8 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.session.TurboSession
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -14,10 +16,12 @@ import org.junit.Test
 import org.mockito.Mockito.verify
 
 class BridgeDelegateTest {
-    private lateinit var delegate: BridgeDelegate<TestData.AppBridgeDestination>
+    private lateinit var delegate: BridgeDelegate
     private lateinit var lifecycleOwner: TestLifecycleOwner
     private val bridge: Bridge = mock()
     private val webView: WebView = mock()
+    private val destination: TurboNavDestination = mock()
+    private val session: TurboSession = mock()
 
     private val factories = listOf(
         BridgeComponentFactory("one", TestData::OneBridgeComponent),
@@ -31,11 +35,13 @@ class BridgeDelegateTest {
     @Before
     fun setup() {
         whenever(bridge.webView).thenReturn(webView)
+        whenever(destination.session).thenReturn(session)
+        whenever(session.isReady).thenReturn(true)
         Bridge.initialize(bridge)
 
         delegate = BridgeDelegate(
             location = "https://37signals.com",
-            destination = TestData.AppBridgeDestination(),
+            destination = destination,
             componentFactories = factories
         )
         delegate.bridge = bridge

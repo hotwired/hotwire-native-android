@@ -6,14 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.textview.MaterialTextView
-import dev.hotwire.core.turbo.fragments.TurboBottomSheetDialogFragment
+import dev.hotwire.core.navigation.fragments.HotwireBottomSheetFragment
 import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.demo.R
-import dev.hotwire.demo.util.description
 import dev.hotwire.demo.base.NavDestination
+import dev.hotwire.demo.util.description
 
 @TurboNavGraphDestination(uri = "turbo://fragment/numbers/sheet")
-class NumberBottomSheetFragment : TurboBottomSheetDialogFragment(), NavDestination {
+class NumberBottomSheetFragment : HotwireBottomSheetFragment(), NavDestination {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_number_bottom_sheet, container, false)
     }
