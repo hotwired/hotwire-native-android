@@ -13,6 +13,13 @@ import dev.hotwire.demo.R
 import dev.hotwire.demo.bridge.FormComponent
 import dev.hotwire.demo.bridge.MenuComponent
 import dev.hotwire.demo.bridge.OverflowMenuComponent
+import dev.hotwire.demo.features.imageviewer.ImageViewerFragment
+import dev.hotwire.demo.features.numbers.NumberBottomSheetFragment
+import dev.hotwire.demo.features.numbers.NumbersFragment
+import dev.hotwire.demo.features.web.WebBottomSheetFragment
+import dev.hotwire.demo.features.web.WebFragment
+import dev.hotwire.demo.features.web.WebHomeFragment
+import dev.hotwire.demo.features.web.WebModalFragment
 
 class MainActivity : AppCompatActivity(), TurboActivity {
     override lateinit var delegate: TurboActivityDelegate
@@ -26,6 +33,17 @@ class MainActivity : AppCompatActivity(), TurboActivity {
     }
 
     private fun configApp() {
+        // Register fragment destinations
+        Hotwire.registerFragmentDestinations(listOf(
+            WebFragment::class,
+            WebHomeFragment::class,
+            WebModalFragment::class,
+            WebBottomSheetFragment::class,
+            NumbersFragment::class,
+            NumberBottomSheetFragment::class,
+            ImageViewerFragment::class
+        ))
+
         // Register bridge components
         Hotwire.registerBridgeComponentFactories(listOf(
             BridgeComponentFactory("form", ::FormComponent),
