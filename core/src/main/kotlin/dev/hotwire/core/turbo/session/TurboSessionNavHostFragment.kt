@@ -3,7 +3,6 @@ package dev.hotwire.core.turbo.session
 import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire
@@ -23,12 +22,6 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
      * The url of a starting location when your app starts up.
      */
     abstract val startLocation: String
-
-    /**
-     * A list of registered fragments that can be navigated to. Every possible
-     * [dev.hotwire.core.turbo.fragments.TurboFragment] destination must be listed here.
-     */
-    abstract val registeredFragments: List<KClass<out Fragment>>
 
     /**
      * A list of registered Activities that can be navigated to. This is optional.
@@ -107,7 +100,7 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
                 navController = findNavController()
             ).build(
                 registeredActivities = registeredActivities,
-                registeredFragments = registeredFragments
+                registeredFragments = Hotwire.registeredFragmentDestinations
             )
         }
     }
