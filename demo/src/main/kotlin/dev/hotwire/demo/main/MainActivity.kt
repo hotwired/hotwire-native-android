@@ -1,7 +1,6 @@
 package dev.hotwire.demo.main
 
 import android.os.Bundle
-import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.BridgeComponentFactory
@@ -36,11 +35,7 @@ class MainActivity : AppCompatActivity(), TurboActivity {
         // Set configuration options
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
         Hotwire.config.userAgent = "Hotwire Demo; ${Hotwire.config.userAgentSubstring()}"
-
-        // Enable debugging
-        if (BuildConfig.DEBUG) {
-            Hotwire.config.debugLoggingEnabled = true
-            WebView.setWebContentsDebuggingEnabled(true)
-        }
+        Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
+        Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
     }
 }

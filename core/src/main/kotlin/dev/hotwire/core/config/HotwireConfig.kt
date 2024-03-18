@@ -1,5 +1,6 @@
 package dev.hotwire.core.config
 
+import android.webkit.WebView
 import dev.hotwire.core.bridge.StradaJsonConverter
 import dev.hotwire.core.turbo.http.TurboHttpClient
 
@@ -15,11 +16,24 @@ class HotwireConfig internal constructor() {
      * Enables/disables debug logging. This should be disabled in production environments.
      * Disabled by default.
      *
+     * Important: You should not enable debug logging in production release builds.
      */
     var debugLoggingEnabled = false
         set(value) {
             field = value
             TurboHttpClient.reset()
+        }
+
+    /**
+     * Enables/disables debugging of web contents loaded into WebViews.
+     * Disabled by default.
+     *
+     * Important: You should not enable debugging in production release builds.
+     */
+    var webViewDebuggingEnabled = false
+        set(value) {
+            field = value
+            WebView.setWebContentsDebuggingEnabled(value)
         }
 
     /**

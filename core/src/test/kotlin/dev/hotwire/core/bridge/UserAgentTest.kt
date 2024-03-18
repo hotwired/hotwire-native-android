@@ -28,8 +28,8 @@ class UserAgentTest {
 
         Hotwire.registerBridgeComponentFactories(factories)
         Hotwire.config.userAgent = "Test; ${Hotwire.config.userAgentSubstring()}"
-        val userAgent = Hotwire.config.userAgent
 
+        val userAgent = Hotwire.config.userAgent
         assertEquals(userAgent, "Test; Turbo Native Android; bridge-components: [one two];")
     }
 }
