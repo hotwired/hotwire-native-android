@@ -21,4 +21,24 @@ class HotwireConfig internal constructor() {
             field = value
             TurboHttpClient.reset()
         }
+
+    /**
+     * Provides a standard substring to be included in your WebView's user agent
+     * to identify itself as a Hotwire Native app.
+     *
+     * Important: Ensure that you've registered your bridge components before
+     * calling this so the bridge component names are included in your user agent.
+     */
+    fun userAgentSubstring(): String {
+        val components = Hotwire.registeredBridgeComponentFactories.joinToString(" ") { it.name }
+        return "Turbo Native Android; bridge-components: [$components];"
+    }
+
+    /**
+     * Set a custom user agent for every WebView instance.
+     *
+     * Important: Include `Hotwire.userAgentSubstring()` as part of your
+     * custom user agent for compatibility with your server.
+     */
+    var userAgent: String = userAgentSubstring()
 }

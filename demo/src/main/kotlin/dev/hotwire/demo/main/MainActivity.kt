@@ -26,14 +26,16 @@ class MainActivity : AppCompatActivity(), TurboActivity {
     }
 
     private fun configApp() {
-        Hotwire.config.jsonConverter = KotlinXJsonConverter()
-
         // Register bridge components
         Hotwire.registerBridgeComponentFactories(listOf(
             BridgeComponentFactory("form", ::FormComponent),
             BridgeComponentFactory("menu", ::MenuComponent),
             BridgeComponentFactory("overflow-menu", ::OverflowMenuComponent)
         ))
+
+        // Set configuration options
+        Hotwire.config.jsonConverter = KotlinXJsonConverter()
+        Hotwire.config.userAgent = "Hotwire Demo; ${Hotwire.config.userAgentSubstring()}"
 
         // Enable debugging
         if (BuildConfig.DEBUG) {

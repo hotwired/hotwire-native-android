@@ -13,13 +13,4 @@ object Hotwire {
     fun registerBridgeComponentFactories(factories: List<BridgeComponentFactory<BridgeComponent>>) {
         registeredBridgeComponentFactories = factories
     }
-
-    /**
-     * Provides a standard substring to be included in your WebView's user agent
-     * to identify itself as a Hotwire Native app.
-     */
-    fun userAgentSubstring(): String {
-        val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
-        return "Turbo Native Android; bridge-components: [$components];"
-    }
 }
