@@ -9,6 +9,7 @@ import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import androidx.webkit.WebViewCompat
 import com.google.gson.GsonBuilder
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.util.contentFromAsset
 import dev.hotwire.core.turbo.util.runOnUiThread
 import dev.hotwire.core.turbo.util.toJson
@@ -29,6 +30,7 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
         id = View.generateViewId()
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
+        settings.userAgentString = "${Hotwire.config.userAgent} ${settings.userAgentString}"
         settings.setSupportMultipleWindows(true)
         layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
     }
