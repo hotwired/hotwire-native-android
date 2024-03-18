@@ -1,7 +1,6 @@
 package dev.hotwire.core.turbo.nav
 
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -22,12 +21,6 @@ internal class TurboNavGraphBuilder(
     private val navController: NavController,
     private val pathConfiguration: TurboPathConfiguration
 ) {
-    private data class ActivityDestination(
-        val route: String,
-        val uri: Uri,
-        val kClass: KClass<out AppCompatActivity>
-    )
-
     private data class FragmentDestination(
         val route: String,
         val uri: Uri,
@@ -35,18 +28,9 @@ internal class TurboNavGraphBuilder(
     )
 
     fun build(
-        registeredActivities: List<KClass<out AppCompatActivity>>,
         registeredFragments: List<KClass<out Fragment>>
     ): NavGraph {
         var currentRoute = 1
-
-        val activityDestinations = registeredActivities.map {
-            ActivityDestination(
-                route = currentRoute.also { currentRoute++ }.toString(),
-                uri = it.turboAnnotation().uri.toUri(),
-                kClass = it
-            )
-        }
 
         val fragmentDestinations = registeredFragments.map {
             FragmentDestination(
@@ -57,7 +41,6 @@ internal class TurboNavGraphBuilder(
         }
 
         return createGraph(
-            activityDestinations,
             fragmentDestinations,
             fragmentDestinations.startDestination().route
         )
@@ -65,18 +48,10 @@ internal class TurboNavGraphBuilder(
 
     @Suppress("UNCHECKED_CAST")
     private fun createGraph(
-        activityDestinations: List<ActivityDestination>,
         fragmentDestinations: List<FragmentDestination>,
         startDestinationRoute: String
     ): NavGraph {
         return navController.createGraph(startDestination = startDestinationRoute) {
-            activityDestinations.forEach {
-                activity(it.route) {
-                    activityClass = it.kClass
-                    deepLink(it.uri.toString())
-                }
-            }
-
             fragmentDestinations.withoutDialogs().forEach {
                 fragment(it.route, it.kClass) {
                     deepLink(it.uri.toString())
