@@ -1,6 +1,7 @@
 package dev.hotwire.core.bridge
 
-import org.junit.Assert.assertEquals
+import dev.hotwire.core.config.Hotwire
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UserAgentTest {
@@ -11,7 +12,7 @@ class UserAgentTest {
             BridgeComponentFactory("two", TestData::TwoBridgeComponent)
         )
 
-        val userAgentSubstring = Strada.userAgentSubstring(factories)
-        assertEquals(userAgentSubstring, "bridge-components: [one two]")
+        val userAgentSubstring = Hotwire.userAgentSubstring(factories)
+        assertTrue(userAgentSubstring.endsWith("bridge-components: [one two];"))
     }
 }
