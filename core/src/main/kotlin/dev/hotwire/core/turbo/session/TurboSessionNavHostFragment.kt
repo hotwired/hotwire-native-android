@@ -10,7 +10,6 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.nav.TurboNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
 import dev.hotwire.core.turbo.views.TurboWebView
-import kotlin.reflect.KClass
 
 abstract class TurboSessionNavHostFragment : NavHostFragment() {
     /**
@@ -23,11 +22,6 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
      * The url of a starting location when your app starts up.
      */
     abstract val startLocation: String
-
-    /**
-     * A list of registered Activities that can be navigated to. This is optional.
-     */
-    open val registeredActivities: List<KClass<out AppCompatActivity>> = emptyList()
 
     /**
      * The [TurboSession] instance that is shared with all destinations that are
@@ -105,7 +99,6 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
                 pathConfiguration = session.pathConfiguration,
                 navController = findNavController()
             ).build(
-                registeredActivities = registeredActivities,
                 registeredFragments = Hotwire.registeredFragmentDestinations
             )
         }
