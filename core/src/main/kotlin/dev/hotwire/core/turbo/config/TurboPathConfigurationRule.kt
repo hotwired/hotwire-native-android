@@ -2,7 +2,7 @@ package dev.hotwire.core.turbo.config
 
 import com.google.gson.annotations.SerializedName
 import dev.hotwire.core.BuildConfig
-import dev.hotwire.core.turbo.util.logError
+import dev.hotwire.core.logging.logError
 import java.util.regex.PatternSyntaxException
 
 internal data class TurboPathConfigurationRule(
