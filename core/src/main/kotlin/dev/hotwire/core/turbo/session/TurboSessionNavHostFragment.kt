@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import dev.hotwire.core.turbo.config.TurboPathConfiguration
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.nav.TurboNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
 import dev.hotwire.core.turbo.views.TurboWebView
@@ -23,12 +23,6 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
      * The url of a starting location when your app starts up.
      */
     abstract val startLocation: String
-
-    /**
-     * The location of your [TurboPathConfiguration] JSON file(s) to configure
-     * navigation rules.
-     */
-    abstract val pathConfigurationLocation: TurboPathConfiguration.Location
 
     /**
      * A list of registered fragments that can be navigated to. Every possible
@@ -67,7 +61,7 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
      * WebView instance is required.
      */
     open fun onSessionCreated() {
-        session.pathConfiguration.load(pathConfigurationLocation)
+        session.pathConfiguration.load(Hotwire.config.pathConfigurationLocation)
     }
 
     /**
