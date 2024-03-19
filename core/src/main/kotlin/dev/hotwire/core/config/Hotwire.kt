@@ -16,10 +16,10 @@ object Hotwire {
     val config: HotwireConfig = HotwireConfig()
 
     /**
-     * Register bridge component factories that the app supports. Every possible bridge
-     * component must be provided here.
+     * Register bridge components that the app supports. Every possible bridge
+     * component, wrapped in a [BridgeComponentFactory], must be provided here.
      */
-    fun registerBridgeComponentFactories(factories: List<BridgeComponentFactory<BridgeComponent>>) {
+    fun registerBridgeComponents(factories: List<BridgeComponentFactory<BridgeComponent>>) {
         registeredBridgeComponentFactories = factories
     }
 

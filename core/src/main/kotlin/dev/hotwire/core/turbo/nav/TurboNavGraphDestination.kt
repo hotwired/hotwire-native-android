@@ -1,8 +1,7 @@
 package dev.hotwire.core.turbo.nav
 
 /**
- * Annotation for each Fragment or Activity that will be registered
- * as a navigation destination.
+ * Annotation for each Fragment that will be registered as a navigation destination.
  *
  * For example:
  *  `@TurboNavGraphDestination(uri = "turbo://fragment/search")`

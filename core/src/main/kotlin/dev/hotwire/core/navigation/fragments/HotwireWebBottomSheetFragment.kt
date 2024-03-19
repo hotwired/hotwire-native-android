@@ -3,7 +3,6 @@ package dev.hotwire.core.navigation.fragments
 import android.os.Bundle
 import android.view.View
 import dev.hotwire.core.bridge.BridgeDelegate
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.fragments.TurboWebBottomSheetDialogFragment
 import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.core.turbo.views.TurboWebView
@@ -11,11 +10,7 @@ import dev.hotwire.core.turbo.views.TurboWebView
 @TurboNavGraphDestination(uri = "turbo://fragment/web/modal/sheet")
 open class HotwireWebBottomSheetFragment : TurboWebBottomSheetDialogFragment() {
     private val bridgeDelegate by lazy {
-        BridgeDelegate(
-            location = location,
-            destination = this,
-            componentFactories = Hotwire.registeredBridgeComponentFactories
-        )
+        BridgeDelegate(location = location, destination = this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

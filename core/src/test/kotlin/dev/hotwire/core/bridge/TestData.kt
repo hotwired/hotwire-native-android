@@ -13,8 +13,7 @@ object TestData {
 
     val bridgeDelegate = BridgeDelegate(
         location = "https://37signals.com",
-        destination = mockNavDestination,
-        componentFactories = componentFactories
+        destination = mockNavDestination
     )
 
     abstract class AppBridgeComponent(

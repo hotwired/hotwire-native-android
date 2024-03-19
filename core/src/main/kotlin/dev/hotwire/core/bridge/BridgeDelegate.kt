@@ -3,6 +3,7 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.nav.TurboNavDestination
@@ -10,11 +11,11 @@ import dev.hotwire.core.turbo.nav.TurboNavDestination
 @Suppress("unused")
 class BridgeDelegate(
     val location: String,
-    val destination: TurboNavDestination,
-    private val componentFactories: List<BridgeComponentFactory<BridgeComponent>>
+    val destination: TurboNavDestination
 ) : DefaultLifecycleObserver {
     internal var bridge: Bridge? = null
     private var destinationIsActive: Boolean = false
+    private val componentFactories = Hotwire.registeredBridgeComponentFactories
     private val initializedComponents = hashMapOf<String, BridgeComponent>()
     private val resolvedLocation: String
         get() = bridge?.webView?.url ?: location

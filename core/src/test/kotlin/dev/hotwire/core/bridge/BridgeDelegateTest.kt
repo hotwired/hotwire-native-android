@@ -7,6 +7,7 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.nav.TurboNavDestination
 import dev.hotwire.core.turbo.session.TurboSession
 import org.junit.Assert.*
@@ -23,11 +24,6 @@ class BridgeDelegateTest {
     private val destination: TurboNavDestination = mock()
     private val session: TurboSession = mock()
 
-    private val factories = listOf(
-        BridgeComponentFactory("one", TestData::OneBridgeComponent),
-        BridgeComponentFactory("two", TestData::TwoBridgeComponent)
-    )
-
     @Rule
     @JvmField
     var coroutinesTestRule = CoroutinesTestRule()
@@ -37,13 +33,11 @@ class BridgeDelegateTest {
         whenever(bridge.webView).thenReturn(webView)
         whenever(destination.session).thenReturn(session)
         whenever(session.isReady).thenReturn(true)
+
+        Hotwire.registerBridgeComponents(TestData.componentFactories)
         Bridge.initialize(bridge)
 
-        delegate = BridgeDelegate(
-            location = "https://37signals.com",
-            destination = destination,
-            componentFactories = factories
-        )
+        delegate = BridgeDelegate(location = "https://37signals.com", destination = destination)
         delegate.bridge = bridge
 
         lifecycleOwner = TestLifecycleOwner(Lifecycle.State.STARTED)

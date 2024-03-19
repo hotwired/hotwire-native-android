@@ -36,7 +36,7 @@ class DemoApplication : Application() {
         ))
 
         // Register bridge components
-        Hotwire.registerBridgeComponentFactories(listOf(
+        Hotwire.registerBridgeComponents(listOf(
             BridgeComponentFactory("form", ::FormComponent),
             BridgeComponentFactory("menu", ::MenuComponent),
             BridgeComponentFactory("overflow-menu", ::OverflowMenuComponent)
