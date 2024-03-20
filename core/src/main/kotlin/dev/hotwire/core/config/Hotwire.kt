@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.navigation.routing.BrowserRoute
-import dev.hotwire.core.navigation.routing.NavigationRoute
+import dev.hotwire.core.navigation.routing.AppNavigationRoute
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import kotlin.reflect.KClass
@@ -19,7 +19,7 @@ object Hotwire {
         private set
 
     internal var router = Router(listOf(
-        NavigationRoute(),
+        AppNavigationRoute(),
         BrowserRoute()
     ))
 

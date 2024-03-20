@@ -3,8 +3,8 @@ package dev.hotwire.core.navigation.routing
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 
-class NavigationRoute : Router.Route {
-    override val name = "navigation"
+class AppNavigationRoute : Router.Route {
+    override val name = "app-navigation"
 
     override val result = Router.RouteResult.NAVIGATE
 

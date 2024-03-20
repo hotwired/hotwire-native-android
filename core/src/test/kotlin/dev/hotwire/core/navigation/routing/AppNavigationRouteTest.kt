@@ -8,8 +8,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class NavigationRouteTest {
-    private val route = NavigationRoute()
+class AppNavigationRouteTest {
+    private val route = AppNavigationRoute()
 
     @Before
     fun setup() {
