@@ -11,8 +11,8 @@ import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.util.location
-import dev.hotwire.core.turbo.visit.TurboVisitAction
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 internal class TurboNavigator(private val navDestination: HotwireNavDestination) {
     private val fragment = navDestination.fragment
@@ -49,7 +49,7 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
 
     fun navigate(
         location: String,
-        options: TurboVisitOptions,
+        options: VisitOptions,
         bundle: Bundle? = null,
         extras: FragmentNavigator.Extras? = null
     ) {
@@ -87,7 +87,7 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
                 navigateWithinContext(rule)
             }
             TurboNavMode.REFRESH -> {
-                navigate(rule.currentLocation, TurboVisitOptions())
+                navigate(rule.currentLocation, VisitOptions())
             }
             TurboNavMode.NONE -> {
                 // Do nothing
@@ -285,7 +285,7 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         return result
     }
 
-    private fun navOptions(location: String, action: TurboVisitAction): NavOptions {
+    private fun navOptions(location: String, action: VisitAction): NavOptions {
         val properties = pathConfiguration.properties(location)
 
         return navDestination.getNavigationOptions(

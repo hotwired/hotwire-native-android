@@ -13,7 +13,7 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.turbo.config.PathConfiguration
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitOptions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Before
@@ -382,7 +382,7 @@ class TurboNavRuleTest {
 
     private fun getNavigatorRule(
         location: String,
-        visitOptions: TurboVisitOptions = TurboVisitOptions(),
+        visitOptions: VisitOptions = VisitOptions(),
         bundle: Bundle? = null
     ): TurboNavRule {
         return TurboNavRule(

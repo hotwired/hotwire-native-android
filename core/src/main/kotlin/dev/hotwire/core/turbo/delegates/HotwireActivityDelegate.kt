@@ -9,7 +9,7 @@ import androidx.navigation.NavController
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
 import dev.hotwire.core.turbo.session.SessionNavHostFragment
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**
  * Initializes the Activity for Turbo navigation and provides all the hooks for an
@@ -119,7 +119,7 @@ class HotwireActivityDelegate(
      */
     fun navigate(
         location: String,
-        options: TurboVisitOptions = TurboVisitOptions(),
+        options: VisitOptions = VisitOptions(),
         bundle: Bundle? = null
     ) {
         currentNavDestination?.navigate(location, options, bundle)

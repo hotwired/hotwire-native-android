@@ -24,9 +24,9 @@ import dev.hotwire.core.turbo.http.*
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.*
 import dev.hotwire.core.turbo.views.TurboWebView
-import dev.hotwire.core.turbo.visit.TurboVisit
-import dev.hotwire.core.turbo.visit.TurboVisitAction
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitOptions
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -45,7 +45,7 @@ class Session internal constructor(
     private val activity: AppCompatActivity,
     val webView: TurboWebView
 ) {
-    internal var currentVisit: TurboVisit? = null
+    internal var currentVisit: Visit? = null
     internal var coldBootVisitIdentifier = ""
     internal var previousOverrideUrlTime = 0L
     internal var isColdBooting = false
@@ -124,7 +124,7 @@ class Session internal constructor(
 
     // Internal
 
-    internal fun visit(visit: TurboVisit) {
+    internal fun visit(visit: Visit) {
         this.currentVisit = visit
         callback { it.visitLocationStarted(visit.location) }
 
@@ -182,11 +182,11 @@ class Session internal constructor(
      * You should never call this directly as it could lead to unintended behavior.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [TurboVisitOptions].
+     * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
     @JavascriptInterface
     fun visitProposedToLocation(location: String, optionsJson: String) {
-        val options = TurboVisitOptions.fromJSON(optionsJson) ?: return
+        val options = VisitOptions.fromJSON(optionsJson) ?: return
 
         logEvent("visitProposedToLocation", "location" to location, "options" to options)
         callback { it.visitProposedToLocation(location, options) }
@@ -200,11 +200,11 @@ class Session internal constructor(
      * You should never call this directly as it could lead to unintended behavior.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [TurboVisitOptions].
+     * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
     @JavascriptInterface
     fun visitProposalRefreshingPage(location: String, optionsJson: String) {
-        val options = TurboVisitOptions.fromJSON(optionsJson) ?: return
+        val options = VisitOptions.fromJSON(optionsJson) ?: return
         logEvent("visitProposalRefreshingPage", "location" to location, "options" to options)
     }
 
@@ -216,11 +216,11 @@ class Session internal constructor(
      * You should never call this directly as it could lead to unintended behavior.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [TurboVisitOptions].
+     * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
     @JavascriptInterface
     fun visitProposalScrollingToAnchor(location: String, optionsJson: String) {
-        val options = TurboVisitOptions.fromJSON(optionsJson) ?: return
+        val options = VisitOptions.fromJSON(optionsJson) ?: return
         logEvent("visitProposalScrollingToAnchor", "location" to location, "options" to options)
     }
 
@@ -511,15 +511,15 @@ class Session internal constructor(
 
     // Private
 
-    private fun visitLocation(visit: TurboVisit) {
+    private fun visitLocation(visit: Visit) {
         val restorationIdentifier = when (visit.options.action) {
-            TurboVisitAction.RESTORE -> restorationIdentifiers[visit.destinationIdentifier] ?: ""
-            TurboVisitAction.ADVANCE -> ""
+            VisitAction.RESTORE -> restorationIdentifiers[visit.destinationIdentifier] ?: ""
+            VisitAction.ADVANCE -> ""
             else -> ""
         }
 
         val options = when (restorationIdentifier) {
-            "" -> visit.options.copy(action = TurboVisitAction.ADVANCE)
+            "" -> visit.options.copy(action = VisitAction.ADVANCE)
             else -> visit.options
         }
 
@@ -533,7 +533,7 @@ class Session internal constructor(
         webView.visitLocation(visit.location, options, restorationIdentifier)
     }
 
-    private fun visitLocationAsColdBoot(visit: TurboVisit) {
+    private fun visitLocationAsColdBoot(visit: Visit) {
         logEvent("visitLocationAsColdBoot", "location" to visit.location)
         isColdBooting = true
 
@@ -548,7 +548,7 @@ class Session internal constructor(
         }
     }
 
-    private fun visitPendingLocation(visit: TurboVisit) {
+    private fun visitPendingLocation(visit: Visit) {
         logEvent("visitPendingLocation", "location" to visit.location)
         visitLocation(visit)
         visitPending = false
@@ -603,7 +603,7 @@ class Session internal constructor(
     private fun WebView.initDownloadListener() {
         setDownloadListener { url, _, _, _, _ ->
             logEvent("downloadListener", "location" to url)
-            visitProposedToLocation(url, TurboVisitOptions().toJson())
+            visitProposedToLocation(url, VisitOptions().toJson())
         }
     }
 
@@ -724,8 +724,8 @@ class Session internal constructor(
                 // Replace the cold boot destination on a redirect
                 // since the original url isn't visitable.
                 val options = when (isColdBootRedirect) {
-                    true -> TurboVisitOptions(action = TurboVisitAction.REPLACE)
-                    else -> TurboVisitOptions(action = TurboVisitAction.ADVANCE)
+                    true -> VisitOptions(action = VisitAction.REPLACE)
+                    else -> VisitOptions(action = VisitAction.ADVANCE)
                 }
                 visitProposedToLocation(location, options.toJson())
             }

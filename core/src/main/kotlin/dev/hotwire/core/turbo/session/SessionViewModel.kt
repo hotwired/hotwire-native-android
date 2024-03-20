@@ -4,7 +4,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**
  * Serves as a shared ViewModel to exchange data between [Session] and various other
@@ -15,7 +15,7 @@ internal class SessionViewModel : ViewModel() {
      * Represents visit options for the current visit. Typically consumed by a delegate to execute
      * a navigation action. Can only be consumed once.
      */
-    var visitOptions: SessionEvent<TurboVisitOptions>? = null
+    var visitOptions: SessionEvent<VisitOptions>? = null
         private set
 
     /**
@@ -42,7 +42,7 @@ internal class SessionViewModel : ViewModel() {
     /**
      * Wraps the visit options in a [SessionEvent] to ensure it can only be consumed once.
      */
-    fun saveVisitOptions(options: TurboVisitOptions) {
+    fun saveVisitOptions(options: VisitOptions) {
         visitOptions = SessionEvent(options)
     }
 

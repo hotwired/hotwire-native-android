@@ -20,9 +20,9 @@ import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.views.TurboView
 import dev.hotwire.core.turbo.views.TurboWebView
-import dev.hotwire.core.turbo.visit.TurboVisit
-import dev.hotwire.core.turbo.visit.TurboVisitAction
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitOptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -211,7 +211,7 @@ internal class TurboWebFragmentDelegate(
     }
 
     override fun onRenderProcessGone() {
-        navigator.navigate(location, TurboVisitOptions(action = TurboVisitAction.REPLACE))
+        navigator.navigate(location, VisitOptions(action = VisitAction.REPLACE))
     }
 
     override fun requestFailedWithError(visitHasCachedSnapshot: Boolean, error: TurboVisitError) {
@@ -228,7 +228,7 @@ internal class TurboWebFragmentDelegate(
 
     override fun visitProposedToLocation(
         location: String,
-        options: TurboVisitOptions
+        options: VisitOptions
     ) {
         navigator.navigate(location, options)
     }
@@ -249,9 +249,9 @@ internal class TurboWebFragmentDelegate(
     // Private
     // -----------------------------------------------------------------------
 
-    private fun currentVisitOptions(): TurboVisitOptions {
+    private fun currentVisitOptions(): VisitOptions {
         val visitOptions = delegate.sessionViewModel.visitOptions
-        return visitOptions?.getContentIfNotHandled() ?: TurboVisitOptions()
+        return visitOptions?.getContentIfNotHandled() ?: VisitOptions()
     }
 
     private fun initNavigationVisit() {
@@ -346,20 +346,20 @@ internal class TurboWebFragmentDelegate(
     private fun visit(location: String, restoreWithCachedSnapshot: Boolean, reload: Boolean) {
         val restore = restoreWithCachedSnapshot && !reload
         val options = when {
-            restore -> TurboVisitOptions(action = TurboVisitAction.RESTORE)
-            reload -> TurboVisitOptions()
+            restore -> VisitOptions(action = VisitAction.RESTORE)
+            reload -> VisitOptions()
             else -> visitOptions
         }
 
         viewTreeLifecycleOwner?.lifecycleScope?.launch {
             val snapshot = when (options.action) {
-                TurboVisitAction.ADVANCE -> fetchCachedSnapshot()
+                VisitAction.ADVANCE -> fetchCachedSnapshot()
                 else -> null
             }
 
             viewTreeLifecycleOwner?.lifecycle?.whenStateAtLeast(STARTED) {
                 session().visit(
-                    TurboVisit(
+                    Visit(
                         location = location,
                         destinationIdentifier = identifier,
                         restoreWithCachedSnapshot = restoreWithCachedSnapshot,

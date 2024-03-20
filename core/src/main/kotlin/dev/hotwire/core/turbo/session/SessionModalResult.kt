@@ -1,7 +1,7 @@
 package dev.hotwire.core.turbo.session
 
 import android.os.Bundle
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**
  * Wraps all the relevant data returned by the modal after it closes. This allows the fragment
@@ -14,7 +14,7 @@ import dev.hotwire.core.turbo.visit.TurboVisitOptions
  */
 data class SessionModalResult(
     val location: String,
-    val options: TurboVisitOptions,
+    val options: VisitOptions,
     val bundle: Bundle?,
     val shouldNavigate: Boolean
 )

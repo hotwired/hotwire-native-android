@@ -7,7 +7,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.toJson
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 open class TurboWebChromeClient(val session: Session) : WebChromeClient() {
     override fun onShowFileChooser(
@@ -28,7 +28,7 @@ open class TurboWebChromeClient(val session: Session) : WebChromeClient() {
         message.data.getString("url")?.let {
             session.visitProposedToLocation(
                 location = it,
-                optionsJson = TurboVisitOptions().toJson()
+                optionsJson = VisitOptions().toJson()
             )
         }
 

@@ -26,8 +26,8 @@ import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.fragments.TurboWebFragment
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.session.SessionNavHostFragment
-import dev.hotwire.core.turbo.visit.TurboVisitAction
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**
  * The primary interface that a navigable Fragment implements to provide the library with
@@ -157,7 +157,7 @@ interface HotwireNavDestination {
      */
     fun navigate(
         location: String,
-        options: TurboVisitOptions = TurboVisitOptions(),
+        options: VisitOptions = VisitOptions(),
         bundle: Bundle? = null,
         extras: FragmentNavigator.Extras? = null
     ) {
@@ -172,10 +172,10 @@ interface HotwireNavDestination {
     fun getNavigationOptions(
         newLocation: String,
         newPathProperties: PathConfigurationProperties,
-        action: TurboVisitAction
+        action: VisitAction
     ): NavOptions {
         val modal = newPathProperties.context == TurboNavPresentationContext.MODAL
-        val replace = action == TurboVisitAction.REPLACE
+        val replace = action == VisitAction.REPLACE
 
         return if (modal) {
             navOptions {

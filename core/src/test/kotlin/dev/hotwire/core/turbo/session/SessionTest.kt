@@ -9,8 +9,8 @@ import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.views.TurboWebView
-import dev.hotwire.core.turbo.visit.TurboVisit
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.errors.HttpError.ServerError
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -34,7 +34,7 @@ class SessionTest {
     private lateinit var navDestination: HotwireNavDestination
     private lateinit var activity: AppCompatActivity
     private lateinit var session: Session
-    private lateinit var visit: TurboVisit
+    private lateinit var visit: Visit
 
     @Before
     fun setup() {
@@ -42,14 +42,14 @@ class SessionTest {
 
         activity = buildActivity(TurboTestActivity::class.java).get()
         session = Session("test", activity, webView)
-        visit = TurboVisit(
+        visit = Visit(
             location = "https://turbo.hotwired.dev",
             destinationIdentifier = 1,
             restoreWithCachedSnapshot = false,
             reload = false,
             callback = callback,
             identifier = "",
-            options = TurboVisitOptions()
+            options = VisitOptions()
         )
 
         whenever(callback.visitNavDestination()).thenReturn(navDestination)
@@ -66,7 +66,7 @@ class SessionTest {
 
     @Test
     fun visitProposedToLocationFiresCallback() {
-        val options = TurboVisitOptions()
+        val options = VisitOptions()
         val newLocation = "${visit.location}/page"
 
         session.currentVisit = visit
