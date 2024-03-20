@@ -12,7 +12,7 @@ import androidx.lifecycle.LifecycleOwner
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.animateColorTo
 
-internal class TurboWindowThemeObserver(val destination: HotwireNavDestination) : DefaultLifecycleObserver {
+internal class HotwireWindowThemeObserver(val destination: HotwireNavDestination) : DefaultLifecycleObserver {
     private val window: Window?
         get() = destination.fragment.activity?.window
 

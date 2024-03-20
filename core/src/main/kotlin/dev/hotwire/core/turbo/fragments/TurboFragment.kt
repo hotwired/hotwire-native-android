@@ -11,7 +11,7 @@ import dev.hotwire.core.turbo.config.title
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
-import dev.hotwire.core.turbo.observers.TurboWindowThemeObserver
+import dev.hotwire.core.turbo.observers.HotwireWindowThemeObserver
 import dev.hotwire.core.turbo.session.TurboSessionModalResult
 
 /**
@@ -154,7 +154,7 @@ abstract class TurboFragment : Fragment(), HotwireNavDestination {
         val view = view ?: return
 
         if (requireActivity().theme != view.context.theme) {
-            viewLifecycleOwner.lifecycle.addObserver(TurboWindowThemeObserver(this))
+            viewLifecycleOwner.lifecycle.addObserver(HotwireWindowThemeObserver(this))
         }
     }
 
