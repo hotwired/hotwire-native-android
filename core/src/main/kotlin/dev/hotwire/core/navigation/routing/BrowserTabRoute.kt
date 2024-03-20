@@ -16,7 +16,7 @@ class BrowserTabRoute : Router.Route {
         return appUrl.toUri().host != location.toUri().host
     }
 
-    override fun perform(location: String, activity: AppCompatActivity) {
+    override fun handle(location: String, activity: AppCompatActivity) {
         val color = activity.colorFromThemeAttr(R.attr.colorSurface)
         val colorParams = CustomTabColorSchemeParams.Builder()
             .setToolbarColor(color)

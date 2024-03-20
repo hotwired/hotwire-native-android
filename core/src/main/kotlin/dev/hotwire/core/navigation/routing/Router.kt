@@ -41,10 +41,10 @@ class Router(private val routes: List<Route>) {
         fun matches(location: String): Boolean
 
         /**
-         * Perform custom routing behavior when a match is found. For example,
+         * Handle custom routing behavior when a match is found. For example,
          * open an external browser or app for external domain urls.
          */
-        fun perform(location: String, activity: AppCompatActivity)
+        fun handle(location: String, activity: AppCompatActivity)
     }
 
     enum class RouteResult {
@@ -67,7 +67,7 @@ class Router(private val routes: List<Route>) {
                     "location" to location
                 ))
 
-                route.perform(location, activity)
+                route.handle(location, activity)
                 return route.result
             }
         }

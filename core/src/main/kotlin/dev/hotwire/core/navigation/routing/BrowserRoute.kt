@@ -15,7 +15,7 @@ class BrowserRoute : Router.Route {
         return appUrl.toUri().host != location.toUri().host
     }
 
-    override fun perform(location: String, activity: AppCompatActivity) {
+    override fun handle(location: String, activity: AppCompatActivity) {
         val intent = Intent(Intent.ACTION_VIEW, location.toUri())
 
         try {
