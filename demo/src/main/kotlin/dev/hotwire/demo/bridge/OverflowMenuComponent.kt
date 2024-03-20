@@ -5,9 +5,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeDelegate
-import dev.hotwire.demo.R
 import dev.hotwire.core.bridge.Message
-import dev.hotwire.demo.base.NavDestination
+import dev.hotwire.demo.R
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

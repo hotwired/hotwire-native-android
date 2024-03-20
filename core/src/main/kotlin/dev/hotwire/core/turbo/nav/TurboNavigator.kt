@@ -11,6 +11,7 @@ import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.util.location
+import dev.hotwire.core.turbo.visit.TurboVisitAction
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
 internal class TurboNavigator(private val navDestination: TurboNavDestination) {
@@ -61,7 +62,7 @@ internal class TurboNavigator(private val navDestination: TurboNavDestination) {
             location = location,
             visitOptions = options,
             bundle = bundle,
-            navOptions = navOptions(location),
+            navOptions = navOptions(location, options.action),
             extras = extras,
             pathConfiguration = pathConfiguration,
             controller = currentControllerForLocation(location)
@@ -284,12 +285,13 @@ internal class TurboNavigator(private val navDestination: TurboNavDestination) {
         return result
     }
 
-    private fun navOptions(location: String): NavOptions {
+    private fun navOptions(location: String, action: TurboVisitAction): NavOptions {
         val properties = pathConfiguration.properties(location)
 
         return navDestination.getNavigationOptions(
             newLocation = location,
-            newPathProperties = properties
+            newPathProperties = properties,
+            action = action
         )
     }
 
