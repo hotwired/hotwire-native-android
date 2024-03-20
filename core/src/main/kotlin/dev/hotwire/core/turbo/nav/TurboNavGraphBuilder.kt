@@ -13,7 +13,6 @@ import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.core.turbo.config.uri
 import java.util.UUID
 import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
 
 internal class TurboNavGraphBuilder(
@@ -35,7 +34,7 @@ internal class TurboNavGraphBuilder(
         val fragmentDestinations = registeredFragments.map {
             FragmentDestination(
                 route = currentRoute.also { currentRoute++ }.toString(),
-                uri = it.turboAnnotation().uri.toUri(),
+                uri = TurboNavGraphDestination.from(it).uri.toUri(),
                 kClass = it
             )
         }
@@ -91,12 +90,6 @@ internal class TurboNavGraphBuilder(
         val startDestinationUri = pathConfiguration.properties(startLocation).uri
         return requireNotNull(firstOrNull { it.uri == startDestinationUri }) {
             "A start Fragment destination was not found for uri: $startDestinationUri"
-        }
-    }
-
-    private fun KClass<out Any>.turboAnnotation(): TurboNavGraphDestination {
-        return requireNotNull(findAnnotation()) {
-            "A TurboNavGraphDestination annotation is required for the destination: ${this.simpleName}"
         }
     }
 

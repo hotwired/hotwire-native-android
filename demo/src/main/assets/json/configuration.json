@@ -59,6 +59,7 @@
         "/numbers/[0-9]+$"
       ],
       "properties": {
+        "context": "modal",
         "uri": "turbo://fragment/numbers/sheet",
         "title": "Number",
         "description": "This is a native bottom sheet fragment"

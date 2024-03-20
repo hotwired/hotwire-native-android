@@ -41,6 +41,9 @@ class DemoApplication : Application() {
             )
         )
 
+        // Set the default fragment destination
+        Hotwire.defaultFragmentDestination = WebFragment::class
+
         // Register fragment destinations
         Hotwire.registerFragmentDestinations(listOf(
             WebFragment::class,

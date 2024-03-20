@@ -3,7 +3,10 @@ package dev.hotwire.core.turbo.config
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import androidx.core.net.toUri
 import com.google.gson.annotations.SerializedName
+import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentation
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
@@ -131,10 +134,11 @@ val TurboPathConfigurationProperties.context: TurboNavPresentationContext
     }
 
 val TurboPathConfigurationProperties.uri: Uri
-    get() = Uri.parse(get("uri"))
+    get() = get("uri")?.toUri() ?:
+        TurboNavGraphDestination.from(Hotwire.defaultFragmentDestination).uri.toUri()
 
 val TurboPathConfigurationProperties.fallbackUri: Uri?
-    get() = get("fallback_uri")?.let { Uri.parse(it) }
+    get() = get("fallback_uri")?.toUri()
 
 val TurboPathConfigurationProperties.title: String?
     get() = get("title")
