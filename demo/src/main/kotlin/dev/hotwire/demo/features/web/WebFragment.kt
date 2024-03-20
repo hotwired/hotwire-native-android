@@ -1,6 +1,7 @@
 package dev.hotwire.demo.features.web
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import dev.hotwire.core.navigation.fragments.HotwireWebFragment
 import dev.hotwire.core.turbo.errors.HttpError
@@ -38,4 +39,7 @@ open class WebFragment : HotwireWebFragment(), NavDestination {
     private fun setupMenu() {
         toolbarForNavigation()?.inflateMenu(R.menu.web)
     }
+
+    private val menuProgress: MenuItem?
+        get() = toolbarForNavigation()?.menu?.findItem(R.id.menu_progress)
 }

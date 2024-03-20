@@ -13,10 +13,10 @@ import java.net.URL
  * Provides the ability to load, parse, and retrieve url path
  * properties from the app's JSON configuration file.
  */
-class TurboPathConfiguration(context: Context) {
+class TurboPathConfiguration {
     private val cachedProperties: HashMap<String, TurboPathConfigurationProperties> = hashMapOf()
 
-    internal val loader = TurboPathConfigurationLoader(context.applicationContext)
+    internal var loader: TurboPathConfigurationLoader? = null
 
     @SerializedName("rules")
     internal var rules: List<TurboPathConfigurationRule> = emptyList()
@@ -55,11 +55,14 @@ class TurboPathConfiguration(context: Context) {
 
     /**
      * Loads and parses the specified configuration file(s) from their local
-     * and/or remote locations. You should not need to call this directly
-     * outside of testing.
+     * and/or remote locations.
      */
-    fun load(location: Location) {
-        loader.load(location) {
+    internal fun load(context: Context, location: Location) {
+        if (loader == null) {
+            loader = TurboPathConfigurationLoader(context.applicationContext)
+        }
+
+        loader?.load(location) {
             cachedProperties.clear()
             rules = it.rules
             settings = it.settings

@@ -65,8 +65,8 @@ class TurboNavRuleTest {
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
         controller = buildControllerWithGraph()
-        pathConfiguration = TurboPathConfiguration(context).apply {
-            load(TurboPathConfiguration.Location(assetFilePath = "json/test-configuration.json"))
+        pathConfiguration = TurboPathConfiguration().apply {
+            load(context, TurboPathConfiguration.Location(assetFilePath = "json/test-configuration.json"))
         }
     }
 

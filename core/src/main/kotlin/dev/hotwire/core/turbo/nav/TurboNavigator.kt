@@ -7,7 +7,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
+import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
@@ -51,7 +53,7 @@ internal class TurboNavigator(private val navDestination: TurboNavDestination) {
         extras: FragmentNavigator.Extras? = null
     ) {
 
-        if (!shouldNavigate(location)) {
+        if (getRouteResult(location) == Router.RouteResult.STOP) {
             return
         }
 
@@ -61,7 +63,7 @@ internal class TurboNavigator(private val navDestination: TurboNavDestination) {
             bundle = bundle,
             navOptions = navOptions(location),
             extras = extras,
-            pathConfiguration = session.pathConfiguration,
+            pathConfiguration = pathConfiguration,
             controller = currentControllerForLocation(location)
         )
 
@@ -271,19 +273,19 @@ internal class TurboNavigator(private val navDestination: TurboNavDestination) {
         return navDestination.navHostForNavigation(location).navController
     }
 
-    private fun shouldNavigate(location: String): Boolean {
-        val shouldNavigate = navDestination.shouldNavigateTo(location)
+    private fun getRouteResult(location: String): Router.RouteResult {
+        val result = navDestination.route(location)
 
         logEvent(
-            "shouldNavigateToLocation",
+            "routeResult",
             "location" to location,
-            "shouldNavigate" to shouldNavigate
+            "result" to result
         )
-        return shouldNavigate
+        return result
     }
 
     private fun navOptions(location: String): NavOptions {
-        val properties = session.pathConfiguration.properties(location)
+        val properties = pathConfiguration.properties(location)
 
         return navDestination.getNavigationOptions(
             newLocation = location,

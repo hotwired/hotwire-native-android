@@ -70,6 +70,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
+    // Browser
+    implementation("androidx.browser:browser:1.7.0")
+
     // Exported AndroidX dependencies
     api("androidx.appcompat:appcompat:1.6.1")
     api("androidx.core:core-ktx:1.12.0")

@@ -1,6 +1,7 @@
 package dev.hotwire.demo.features.web
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import dev.hotwire.core.navigation.fragments.HotwireWebBottomSheetFragment
 import dev.hotwire.core.turbo.fragments.TurboWebBottomSheetDialogFragment
@@ -26,4 +27,7 @@ class WebBottomSheetFragment : HotwireWebBottomSheetFragment(), NavDestination {
     private fun setupMenu() {
         toolbarForNavigation()?.inflateMenu(R.menu.web)
     }
+
+    private val menuProgress: MenuItem?
+        get() = toolbarForNavigation()?.menu?.findItem(R.id.menu_progress)
 }

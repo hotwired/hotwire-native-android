@@ -7,6 +7,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.bridge.Bridge
 import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.turbo.nav.TurboNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
 import dev.hotwire.core.turbo.views.TurboWebView
@@ -49,8 +50,6 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
      * WebView instance is required.
      */
     open fun onSessionCreated() {
-        session.pathConfiguration.load(Hotwire.config.pathConfigurationLocation)
-
         // Initialize bridge with new WebView instance
         if (Hotwire.registeredBridgeComponentFactories.isNotEmpty()) {
             Bridge.initialize(session.webView)
@@ -96,7 +95,7 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
         navController.apply {
             graph = TurboNavGraphBuilder(
                 startLocation = startLocation,
-                pathConfiguration = session.pathConfiguration,
+                pathConfiguration = pathConfiguration,
                 navController = findNavController()
             ).build(
                 registeredFragments = Hotwire.registeredFragmentDestinations
