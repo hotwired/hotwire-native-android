@@ -8,7 +8,7 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import androidx.activity.result.ActivityResult
 import dev.hotwire.core.R
-import dev.hotwire.core.logging.logError
+import dev.hotwire.core.lib.logging.logError
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
 import dev.hotwire.core.turbo.util.TurboFileProvider

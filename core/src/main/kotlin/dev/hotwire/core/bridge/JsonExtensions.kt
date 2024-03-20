@@ -1,6 +1,6 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.core.logging.logError
+import dev.hotwire.core.lib.logging.logError
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement

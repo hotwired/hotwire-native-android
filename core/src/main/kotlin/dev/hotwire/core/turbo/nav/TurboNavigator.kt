@@ -8,7 +8,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire.pathConfiguration
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.VisitAction

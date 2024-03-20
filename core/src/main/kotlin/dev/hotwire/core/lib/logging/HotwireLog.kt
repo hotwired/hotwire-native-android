@@ -1,4 +1,4 @@
-package dev.hotwire.core.logging
+package dev.hotwire.core.lib.logging
 
 import android.util.Log
 import dev.hotwire.core.config.Hotwire
