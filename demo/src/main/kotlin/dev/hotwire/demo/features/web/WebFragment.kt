@@ -5,7 +5,7 @@ import android.view.MenuItem
 import android.view.View
 import dev.hotwire.core.navigation.fragments.HotwireWebFragment
 import dev.hotwire.core.turbo.errors.HttpError
-import dev.hotwire.core.turbo.errors.TurboVisitError
+import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.core.turbo.visit.VisitAction.REPLACE
 import dev.hotwire.core.turbo.visit.VisitOptions
@@ -27,7 +27,7 @@ open class WebFragment : HotwireWebFragment() {
         menuProgress?.isVisible = false
     }
 
-    override fun onVisitErrorReceived(location: String, error: TurboVisitError) {
+    override fun onVisitErrorReceived(location: String, error: VisitError) {
         if (error is HttpError.ClientError.Unauthorized) {
             navigate(Urls.signInUrl, VisitOptions(action = REPLACE))
         } else {

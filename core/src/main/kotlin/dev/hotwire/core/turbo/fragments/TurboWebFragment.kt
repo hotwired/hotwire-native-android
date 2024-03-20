@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.R
 import dev.hotwire.core.turbo.delegates.TurboWebFragmentDelegate
-import dev.hotwire.core.turbo.errors.TurboVisitError
+import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
 import dev.hotwire.core.turbo.views.TurboView
@@ -95,7 +95,7 @@ abstract class TurboWebFragment : TurboFragment(), TurboWebFragmentCallback {
     }
 
     @SuppressLint("InflateParams")
-    override fun createErrorView(error: TurboVisitError): View {
+    override fun createErrorView(error: VisitError): View {
         return layoutInflater.inflate(R.layout.turbo_error, null)
     }
 
@@ -103,7 +103,7 @@ abstract class TurboWebFragment : TurboFragment(), TurboWebFragmentCallback {
         return TurboWebChromeClient(session)
     }
 
-    override fun onVisitErrorReceived(location: String, error: TurboVisitError) {
+    override fun onVisitErrorReceived(location: String, error: VisitError) {
         webDelegate.showErrorView(error)
     }
 }

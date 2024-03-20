@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dev.hotwire.core.turbo.errors.TurboVisitError
+import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.demo.R
 
@@ -16,7 +16,7 @@ class WebHomeFragment : WebFragment() {
     }
 
     @SuppressLint("InflateParams")
-    override fun createErrorView(error: TurboVisitError): View {
+    override fun createErrorView(error: VisitError): View {
         return layoutInflater.inflate(R.layout.error_web_home, null)
     }
 

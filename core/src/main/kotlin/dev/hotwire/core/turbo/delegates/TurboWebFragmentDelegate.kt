@@ -10,7 +10,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStateAtLeast
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
-import dev.hotwire.core.turbo.errors.TurboVisitError
+import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.fragments.TurboWebFragmentCallback
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavigator
@@ -159,7 +159,7 @@ internal class TurboWebFragmentDelegate(
     /**
      * Displays the error view that's implemented via [TurboWebFragmentCallback.createErrorView].
      */
-    fun showErrorView(error: TurboVisitError) {
+    fun showErrorView(error: VisitError) {
         turboView?.addErrorView(callback.createErrorView(error))
     }
 
@@ -206,7 +206,7 @@ internal class TurboWebFragmentDelegate(
         navDestination.fragmentViewModel.setTitle(title())
     }
 
-    override fun onReceivedError(error: TurboVisitError) {
+    override fun onReceivedError(error: VisitError) {
         callback.onVisitErrorReceived(location, error)
     }
 
@@ -214,7 +214,7 @@ internal class TurboWebFragmentDelegate(
         navigator.navigate(location, VisitOptions(action = VisitAction.REPLACE))
     }
 
-    override fun requestFailedWithError(visitHasCachedSnapshot: Boolean, error: TurboVisitError) {
+    override fun requestFailedWithError(visitHasCachedSnapshot: Boolean, error: VisitError) {
         if (visitHasCachedSnapshot) {
             callback.onVisitErrorReceivedWithCachedSnapshotAvailable(location, error)
         } else {
