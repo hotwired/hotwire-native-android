@@ -11,11 +11,13 @@ import dev.hotwire.core.turbo.util.colorFromThemeAttr
 class BrowserTabRoute : Router.Route {
     override val name = "browser-tab"
 
+    override val result = Router.RouteResult.STOP
+
     override fun matches(location: String): Boolean {
         return appUrl.toUri().host != location.toUri().host
     }
 
-    override fun perform(location: String, activity: AppCompatActivity): Router.RouteResult {
+    override fun perform(location: String, activity: AppCompatActivity) {
         val color = activity.colorFromThemeAttr(R.attr.colorSurface)
         val colorParams = CustomTabColorSchemeParams.Builder()
             .setToolbarColor(color)
@@ -29,7 +31,5 @@ class BrowserTabRoute : Router.Route {
             .setDefaultColorSchemeParams(colorParams)
             .build()
             .launchUrl(activity, Uri.parse(location))
-
-        return Router.RouteResult.STOP
     }
 }

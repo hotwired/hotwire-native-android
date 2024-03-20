@@ -10,11 +10,13 @@ import dev.hotwire.core.logging.logError
 class BrowserRoute : Router.Route {
     override val name = "browser"
 
+    override val result = Router.RouteResult.STOP
+
     override fun matches(location: String): Boolean {
         return appUrl.toUri().host != location.toUri().host
     }
 
-    override fun perform(location: String, activity: AppCompatActivity): Router.RouteResult {
+    override fun perform(location: String, activity: AppCompatActivity) {
         val uri: Uri = Uri.parse(location)
         val intent = Intent(Intent.ACTION_VIEW, uri)
 
@@ -23,7 +25,5 @@ class BrowserRoute : Router.Route {
         } catch (e: ActivityNotFoundException) {
             logError("BrowserRoute", e)
         }
-
-        return Router.RouteResult.STOP
     }
 }

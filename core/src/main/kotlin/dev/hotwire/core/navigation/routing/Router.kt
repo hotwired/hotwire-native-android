@@ -16,31 +16,35 @@ class Router(private val routes: List<Route>) {
      */
     interface Route {
         /**
-         * The route name used in debug logging.
-         */
-        val name: String
-
-        /**
          * The configured app url. You can use this to determine if a location
          * exists on the same domain.
          */
         val appUrl get() = Hotwire.appUrl
 
         /**
+         * The route name used in debug logging.
+         */
+        val name: String
+
+        /**
+         * To permit in-app navigation when the location matches this route,
+         * return [RouteResult.NAVIGATE]. To prevent in-app navigation return
+         * [RouteResult.STOP].
+         */
+        val result: RouteResult
+
+        /**
          * Determines whether the location matches this route. Use your own custom
          * rules based on the location's domain, protocol, path, or any other
-         * factors. For example, external domain urls or mailto: links should not
-         * be sent through the normal navigation flow.
+         * factors.
          */
         fun matches(location: String): Boolean
 
         /**
-         * Perform the custom routing behavior. To permit in-app navigation,
-         * return [RouteResult.NAVIGATE]. To prevent in-app navigation, perform
-         * your own custom behavior and return [RouteResult.STOP]. External
-         * domain urls should always return [RouteResult.STOP].
+         * Perform custom routing behavior when a match is found. For example,
+         * open an external browser or app for external domain urls.
          */
-        fun perform(location: String, activity: AppCompatActivity): RouteResult
+        fun perform(location: String, activity: AppCompatActivity)
     }
 
     enum class RouteResult {
@@ -56,13 +60,15 @@ class Router(private val routes: List<Route>) {
     }
 
     internal fun route(location: String, activity: AppCompatActivity): RouteResult {
-        routes.forEach {
-            if (it.matches(location)) {
+        routes.forEach { route ->
+            if (route.matches(location)) {
                 logEvent("routeMatch", listOf(
-                    "route" to it.name,
+                    "route" to route.name,
                     "location" to location
                 ))
-                return it.perform(location, activity)
+
+                route.perform(location, activity)
+                return route.result
             }
         }
 
