@@ -1,6 +1,6 @@
 package dev.hotwire.core.turbo.visit
 
-enum class TurboVisitAction {
+enum class VisitAction {
     ADVANCE,
     REPLACE,
     RESTORE

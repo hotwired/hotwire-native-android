@@ -9,7 +9,7 @@ import dev.hotwire.core.navigation.fragments.HotwireWebFragment
 import dev.hotwire.core.navigation.routing.AppNavigationRoute
 import dev.hotwire.core.navigation.routing.BrowserRoute
 import dev.hotwire.core.navigation.routing.Router
-import dev.hotwire.core.turbo.config.TurboPathConfiguration
+import dev.hotwire.core.turbo.config.PathConfiguration
 import kotlin.reflect.KClass
 
 object Hotwire {
@@ -39,13 +39,13 @@ object Hotwire {
     /**
      * The path configuration that defines your navigation rules.
      */
-    val pathConfiguration = TurboPathConfiguration()
+    val pathConfiguration = PathConfiguration()
 
     /**
-     * Loads the [TurboPathConfiguration] JSON file(s) from the provided location to
+     * Loads the [PathConfiguration] JSON file(s) from the provided location to
      * configure navigation rules.
      */
-    fun loadPathConfiguration(context: Context, location: TurboPathConfiguration.Location) {
+    fun loadPathConfiguration(context: Context, location: PathConfiguration.Location) {
         pathConfiguration.load(context, location)
     }
 

@@ -9,10 +9,10 @@ import dev.hotwire.core.R
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.config.title
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
-import dev.hotwire.core.turbo.observers.TurboWindowThemeObserver
-import dev.hotwire.core.turbo.session.TurboSessionModalResult
+import dev.hotwire.core.turbo.observers.HotwireWindowThemeObserver
+import dev.hotwire.core.turbo.session.SessionModalResult
 
 /**
  * The base class from which all "standard" native Fragments (non-dialogs) in a
@@ -20,7 +20,7 @@ import dev.hotwire.core.turbo.session.TurboSessionModalResult
  *
  * For web fragments, refer to [TurboWebFragment].
  */
-abstract class TurboFragment : Fragment(), TurboNavDestination {
+abstract class TurboFragment : Fragment(), HotwireNavDestination {
     internal lateinit var delegate: TurboFragmentDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +63,7 @@ abstract class TurboFragment : Fragment(), TurboNavDestination {
      * Use [registerForActivityResult] with the appropriate
      * [androidx.activity.result.contract.ActivityResultContract] and its callback.
      *
-     * Turbo provides the [TurboNavDestination.activityResultLauncher] interface
+     * Turbo provides the [HotwireNavDestination.activityResultLauncher] interface
      * to obtain registered result launchers from any destination.
      */
     @Suppress("DEPRECATION")
@@ -88,7 +88,7 @@ abstract class TurboFragment : Fragment(), TurboNavDestination {
      * Called when the Fragment has been started again after receiving a
      * modal result. Will navigate if the result indicates it should.
      */
-    open fun onStartAfterModalResult(result: TurboSessionModalResult) {
+    open fun onStartAfterModalResult(result: SessionModalResult) {
         delegate.onStartAfterModalResult(result)
     }
 
@@ -154,7 +154,7 @@ abstract class TurboFragment : Fragment(), TurboNavDestination {
         val view = view ?: return
 
         if (requireActivity().theme != view.context.theme) {
-            viewLifecycleOwner.lifecycle.addObserver(TurboWindowThemeObserver(this))
+            viewLifecycleOwner.lifecycle.addObserver(HotwireWindowThemeObserver(this))
         }
     }
 

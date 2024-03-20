@@ -10,19 +10,19 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStateAtLeast
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
-import dev.hotwire.core.turbo.errors.TurboVisitError
+import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.fragments.TurboWebFragmentCallback
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavigator
-import dev.hotwire.core.turbo.session.TurboSession
-import dev.hotwire.core.turbo.session.TurboSessionCallback
-import dev.hotwire.core.turbo.session.TurboSessionModalResult
+import dev.hotwire.core.turbo.session.Session
+import dev.hotwire.core.turbo.session.SessionCallback
+import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.views.TurboView
 import dev.hotwire.core.turbo.views.TurboWebView
-import dev.hotwire.core.turbo.visit.TurboVisit
-import dev.hotwire.core.turbo.visit.TurboVisitAction
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitOptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -33,9 +33,9 @@ import kotlin.random.Random
  */
 internal class TurboWebFragmentDelegate(
     private val delegate: TurboFragmentDelegate,
-    private val navDestination: TurboNavDestination,
+    private val navDestination: HotwireNavDestination,
     private val callback: TurboWebFragmentCallback
-) : TurboSessionCallback {
+) : SessionCallback {
 
     private val location = navDestination.location
     private val visitOptions = currentVisitOptions()
@@ -93,7 +93,7 @@ internal class TurboWebFragmentDelegate(
      * Provides a hook to Turbo when a fragment has been started again after receiving a
      * modal result. Will navigate if the result indicates it should.
      */
-    fun onStartAfterModalResult(result: TurboSessionModalResult) {
+    fun onStartAfterModalResult(result: SessionModalResult) {
         if (!result.shouldNavigate) {
             initNavigationVisit()
             initWebChromeClient()
@@ -134,7 +134,7 @@ internal class TurboWebFragmentDelegate(
 
     /**
      * Should be called by the implementing Fragment during
-     * [dev.hotwire.core.turbo.nav.TurboNavDestination.refresh]
+     * [dev.hotwire.core.turbo.nav.HotwireNavDestination.refresh]
      */
     fun refresh(displayProgress: Boolean) {
         if (webView.url == null) return
@@ -152,19 +152,19 @@ internal class TurboWebFragmentDelegate(
     /**
      * Retrieves the Turbo session from the destination.
      */
-    fun session(): TurboSession {
+    fun session(): Session {
         return navDestination.session
     }
 
     /**
      * Displays the error view that's implemented via [TurboWebFragmentCallback.createErrorView].
      */
-    fun showErrorView(error: TurboVisitError) {
+    fun showErrorView(error: VisitError) {
         turboView?.addErrorView(callback.createErrorView(error))
     }
 
     // -----------------------------------------------------------------------
-    // TurboSessionCallback interface
+    // SessionCallback interface
     // -----------------------------------------------------------------------
 
     override fun onPageStarted(location: String) {
@@ -206,15 +206,15 @@ internal class TurboWebFragmentDelegate(
         navDestination.fragmentViewModel.setTitle(title())
     }
 
-    override fun onReceivedError(error: TurboVisitError) {
+    override fun onReceivedError(error: VisitError) {
         callback.onVisitErrorReceived(location, error)
     }
 
     override fun onRenderProcessGone() {
-        navigator.navigate(location, TurboVisitOptions(action = TurboVisitAction.REPLACE))
+        navigator.navigate(location, VisitOptions(action = VisitAction.REPLACE))
     }
 
-    override fun requestFailedWithError(visitHasCachedSnapshot: Boolean, error: TurboVisitError) {
+    override fun requestFailedWithError(visitHasCachedSnapshot: Boolean, error: VisitError) {
         if (visitHasCachedSnapshot) {
             callback.onVisitErrorReceivedWithCachedSnapshotAvailable(location, error)
         } else {
@@ -228,12 +228,12 @@ internal class TurboWebFragmentDelegate(
 
     override fun visitProposedToLocation(
         location: String,
-        options: TurboVisitOptions
+        options: VisitOptions
     ) {
         navigator.navigate(location, options)
     }
 
-    override fun visitNavDestination(): TurboNavDestination {
+    override fun visitNavDestination(): HotwireNavDestination {
         return navDestination
     }
 
@@ -249,9 +249,9 @@ internal class TurboWebFragmentDelegate(
     // Private
     // -----------------------------------------------------------------------
 
-    private fun currentVisitOptions(): TurboVisitOptions {
+    private fun currentVisitOptions(): VisitOptions {
         val visitOptions = delegate.sessionViewModel.visitOptions
-        return visitOptions?.getContentIfNotHandled() ?: TurboVisitOptions()
+        return visitOptions?.getContentIfNotHandled() ?: VisitOptions()
     }
 
     private fun initNavigationVisit() {
@@ -346,20 +346,20 @@ internal class TurboWebFragmentDelegate(
     private fun visit(location: String, restoreWithCachedSnapshot: Boolean, reload: Boolean) {
         val restore = restoreWithCachedSnapshot && !reload
         val options = when {
-            restore -> TurboVisitOptions(action = TurboVisitAction.RESTORE)
-            reload -> TurboVisitOptions()
+            restore -> VisitOptions(action = VisitAction.RESTORE)
+            reload -> VisitOptions()
             else -> visitOptions
         }
 
         viewTreeLifecycleOwner?.lifecycleScope?.launch {
             val snapshot = when (options.action) {
-                TurboVisitAction.ADVANCE -> fetchCachedSnapshot()
+                VisitAction.ADVANCE -> fetchCachedSnapshot()
                 else -> null
             }
 
             viewTreeLifecycleOwner?.lifecycle?.whenStateAtLeast(STARTED) {
                 session().visit(
-                    TurboVisit(
+                    Visit(
                         location = location,
                         destinationIdentifier = identifier,
                         restoreWithCachedSnapshot = restoreWithCachedSnapshot,

@@ -5,18 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dev.hotwire.core.turbo.errors.TurboVisitError
-import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
+import dev.hotwire.core.turbo.errors.VisitError
+import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.demo.R
 
-@TurboNavGraphDestination(uri = "turbo://fragment/web/home")
+@HotwireDestination(uri = "turbo://fragment/web/home")
 class WebHomeFragment : WebFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_web_home, container, false)
     }
 
     @SuppressLint("InflateParams")
-    override fun createErrorView(error: TurboVisitError): View {
+    override fun createErrorView(error: VisitError): View {
         return layoutInflater.inflate(R.layout.error_web_home, null)
     }
 

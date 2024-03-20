@@ -10,7 +10,7 @@ import androidx.webkit.WebViewFeature.isFeatureSupported
  * from the WebView when attempting to load a page.
  * https://developer.android.com/reference/android/webkit/WebViewClient
  */
-sealed interface WebError : TurboVisitError {
+sealed interface WebError : VisitError {
     val errorCode: Int
     val description: String?
 

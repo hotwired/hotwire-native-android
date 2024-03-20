@@ -17,7 +17,7 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.util.contentFromAsset
 import dev.hotwire.core.turbo.util.runOnUiThread
 import dev.hotwire.core.turbo.util.toJson
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**
  * A Turbo-specific WebView that configures required settings and exposes some helpful info.
@@ -58,7 +58,7 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
     val majorVersion: Int?
         get() = versionName?.substringBefore(".")?.toIntOrNull()
 
-    internal fun visitLocation(location: String, options: TurboVisitOptions, restorationIdentifier: String) {
+    internal fun visitLocation(location: String, options: VisitOptions, restorationIdentifier: String) {
         val args = encodeArguments(location, options.toJson(), restorationIdentifier)
         runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
     }

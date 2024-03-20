@@ -3,10 +3,10 @@ package dev.hotwire.core.turbo.http
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import dev.hotwire.core.logging.logEvent
-import dev.hotwire.core.turbo.session.TurboSession
+import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 
-internal class TurboWebViewRequestInterceptor(val session: TurboSession) {
+internal class TurboWebViewRequestInterceptor(val session: Session) {
     private val offlineRequestHandler get() = session.offlineRequestHandler
     private val httpRepository get() = session.httpRepository
     private val currentVisit get() = session.currentVisit

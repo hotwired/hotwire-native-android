@@ -5,7 +5,7 @@ import android.webkit.WebResourceResponse
 /**
  * Errors representing HTTP status codes received from the server.
  */
-sealed interface HttpError : TurboVisitError {
+sealed interface HttpError : VisitError {
     val statusCode: Int
     val reasonPhrase: String?
 

@@ -4,7 +4,7 @@ package dev.hotwire.core.turbo.errors
  * Errors representing when turbo.js or the native adapter fails
  * to load on a page.
  */
-sealed interface LoadError : TurboVisitError {
+sealed interface LoadError : VisitError {
     val description: String
 
     data object NotPresent : LoadError {

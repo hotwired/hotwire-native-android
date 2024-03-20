@@ -9,10 +9,10 @@ import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.animateColorTo
 
-internal class TurboWindowThemeObserver(val destination: TurboNavDestination) : DefaultLifecycleObserver {
+internal class HotwireWindowThemeObserver(val destination: HotwireNavDestination) : DefaultLifecycleObserver {
     private val window: Window?
         get() = destination.fragment.activity?.window
 

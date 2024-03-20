@@ -8,7 +8,7 @@
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
--keepclassmembers class dev.hotwire.core.turbo.session.TurboSession {
+-keepclassmembers class dev.hotwire.core.turbo.session.Session {
     @android.webkit.JavascriptInterface <methods>;
 }
 

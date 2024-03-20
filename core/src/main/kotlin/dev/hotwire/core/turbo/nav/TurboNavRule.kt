@@ -9,19 +9,19 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.navOptions
 import dev.hotwire.core.turbo.config.*
-import dev.hotwire.core.turbo.session.TurboSessionModalResult
+import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.location
-import dev.hotwire.core.turbo.visit.TurboVisitAction
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal class TurboNavRule(
     location: String,
-    visitOptions: TurboVisitOptions,
+    visitOptions: VisitOptions,
     bundle: Bundle?,
     navOptions: NavOptions,
     extras: FragmentNavigator.Extras?,
-    pathConfiguration: TurboPathConfiguration,
+    pathConfiguration: PathConfiguration,
     val controller: NavController
 ) {
     // Current destination
@@ -66,7 +66,7 @@ internal class TurboNavRule(
 
         val locationIsCurrent = locationsAreSame(newLocation, currentLocation)
         val locationIsPrevious = locationsAreSame(newLocation, previousLocation)
-        val replace = newVisitOptions.action == TurboVisitAction.REPLACE
+        val replace = newVisitOptions.action == VisitAction.REPLACE
 
         return when {
             locationIsCurrent && isAtStartDestination -> TurboNavPresentation.REPLACE_ROOT
@@ -114,12 +114,12 @@ internal class TurboNavRule(
         }
     }
 
-    private fun newModalResult(): TurboSessionModalResult? {
+    private fun newModalResult(): SessionModalResult? {
         if (newNavigationMode != TurboNavMode.DISMISS_MODAL) {
             return null
         }
 
-        return TurboSessionModalResult(
+        return SessionModalResult(
             location = newLocation,
             options = newVisitOptions,
             bundle = newBundle,

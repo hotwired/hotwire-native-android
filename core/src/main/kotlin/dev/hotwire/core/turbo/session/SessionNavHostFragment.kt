@@ -8,13 +8,13 @@ import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.bridge.Bridge
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
 import dev.hotwire.core.turbo.views.TurboWebView
 
-abstract class TurboSessionNavHostFragment : NavHostFragment() {
+abstract class SessionNavHostFragment : NavHostFragment() {
     /**
-     * The name of the [TurboSession] instance, which is helpful for debugging
+     * The name of the [Session] instance, which is helpful for debugging
      * purposes. This is arbitrary, but must be unique in your app.
      */
     abstract val sessionName: String
@@ -25,10 +25,10 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
     abstract val startLocation: String
 
     /**
-     * The [TurboSession] instance that is shared with all destinations that are
-     * hosted inside this [TurboSessionNavHostFragment].
+     * The [Session] instance that is shared with all destinations that are
+     * hosted inside this [SessionNavHostFragment].
      */
-    lateinit var session: TurboSession
+    lateinit var session: Session
         private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,13 +39,13 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
 
     internal fun createNewSession() {
         val activity = requireActivity() as AppCompatActivity
-        session = TurboSession(sessionName, activity, onCreateWebView(activity))
+        session = Session(sessionName, activity, onCreateWebView(activity))
         onSessionCreated()
     }
 
     /**
-     * Called whenever the [TurboSession] instance has been (re)created. A new
-     * session is created whenever the [TurboSessionNavHostFragment] is created
+     * Called whenever the [Session] instance has been (re)created. A new
+     * session is created whenever the [SessionNavHostFragment] is created
      * and whenever the WebView render process has been terminated and a new
      * WebView instance is required.
      */
@@ -66,7 +66,7 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
     }
 
     /**
-     * Resets the [TurboSessionNavHostFragment] instance, it's [TurboSession]
+     * Resets the [SessionNavHostFragment] instance, it's [Session]
      * instance, and the entire navigation graph to its original starting point.
      */
     fun reset(onReset: () -> Unit = {}) {
@@ -85,10 +85,10 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
     }
 
     /**
-     * Retrieves the currently active [TurboNavDestination] on the backstack.
+     * Retrieves the currently active [HotwireNavDestination] on the backstack.
      */
-    val currentNavDestination: TurboNavDestination
-        get() = childFragmentManager.primaryNavigationFragment as TurboNavDestination?
+    val currentNavDestination: HotwireNavDestination
+        get() = childFragmentManager.primaryNavigationFragment as HotwireNavDestination?
             ?: throw IllegalStateException("No current destination found in NavHostFragment")
 
     private fun initControllerGraph() {

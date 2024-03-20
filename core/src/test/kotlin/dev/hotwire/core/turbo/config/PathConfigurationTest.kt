@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import dev.hotwire.core.turbo.BaseRepositoryTest
-import dev.hotwire.core.turbo.config.TurboPathConfiguration.Location
+import dev.hotwire.core.turbo.config.PathConfiguration.Location
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -20,10 +20,10 @@ import org.robolectric.annotation.Config
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboPathConfigurationTest : BaseRepositoryTest() {
+class PathConfigurationTest : BaseRepositoryTest() {
     private lateinit var context: Context
-    private lateinit var pathConfiguration: TurboPathConfiguration
-    private val mockRepository = mock<TurboPathConfigurationRepository>()
+    private lateinit var pathConfiguration: PathConfiguration
+    private val mockRepository = mock<PathConfigurationRepository>()
     private val url = "https://turbo.hotwired.dev"
 
     @Before
@@ -31,7 +31,7 @@ class TurboPathConfigurationTest : BaseRepositoryTest() {
         super.setup()
 
         context = ApplicationProvider.getApplicationContext()
-        pathConfiguration = TurboPathConfiguration().apply {
+        pathConfiguration = PathConfiguration().apply {
             load(context, Location(assetFilePath = "json/test-configuration.json"))
         }
     }
@@ -53,7 +53,7 @@ class TurboPathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun remoteConfigurationIsFetched() {
-        pathConfiguration.loader = TurboPathConfigurationLoader(context).apply {
+        pathConfiguration.loader = PathConfigurationLoader(context).apply {
             repository = mockRepository
         }
 

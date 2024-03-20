@@ -5,7 +5,7 @@ import dev.hotwire.core.turbo.util.truncateMiddle
 import dev.hotwire.core.turbo.util.withoutNewLineChars
 import dev.hotwire.core.turbo.util.withoutRepeatingWhitespace
 
-data class TurboVisitResponse(
+data class VisitResponse(
     @SerializedName("statusCode") val statusCode: Int,
     @SerializedName("responseHTML") val responseHTML: String? = null
 ) {
@@ -15,7 +15,7 @@ data class TurboVisitResponse(
             ?.withoutRepeatingWhitespace()
             ?.truncateMiddle(maxChars = 50)
 
-        return "TurboVisitResponse(" +
+        return "VisitResponse(" +
                     "statusCode=$statusCode, " +
                     "responseHTML=$response, " +
                     "responseLength=${responseHTML?.length ?: 0}" +

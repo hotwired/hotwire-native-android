@@ -4,12 +4,12 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import dev.hotwire.core.turbo.nav.TurboNavDestination
-import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.core.turbo.session.SessionNavHostFragment
+import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**
- * A simplified delegate that can be used when a [TurboSessionNavHostFragment] is nested
+ * A simplified delegate that can be used when a [SessionNavHostFragment] is nested
  * within a Fragment. This can be useful when you want a portion of the screen to have
  * sub-navigation destinations within the current Fragment.
  *
@@ -17,18 +17,18 @@ import dev.hotwire.core.turbo.visit.TurboVisitOptions
  * results load in a section of the view below the search bar.
  *
  * @property fragment The Fragment to bind this delegate to.
- * @param navHostFragmentId The resource ID of the [TurboSessionNavHostFragment]
+ * @param navHostFragmentId The resource ID of the [SessionNavHostFragment]
  *  instance hosted in your Fragment's layout resource.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class TurboNestedFragmentDelegate(val fragment: Fragment, navHostFragmentId: Int) {
     val navHostFragment by lazy { findNavHostFragment(navHostFragmentId) }
 
-    val currentNavDestination: TurboNavDestination
-        get() = currentFragment as TurboNavDestination
+    val currentNavDestination: HotwireNavDestination
+        get() = currentFragment as HotwireNavDestination
 
     /**
-     * Resets the nav host fragment via [TurboSessionNavHostFragment.reset]
+     * Resets the nav host fragment via [SessionNavHostFragment.reset]
      */
     fun resetNavHostFragment() {
         navHostFragment.reset()
@@ -51,7 +51,7 @@ class TurboNestedFragmentDelegate(val fragment: Fragment, navHostFragmentId: Int
      */
     fun navigate(
         location: String,
-        options: TurboVisitOptions = TurboVisitOptions(),
+        options: VisitOptions = VisitOptions(),
         bundle: Bundle? = null
     ) {
         currentNavDestination.navigate(location, options, bundle)
@@ -83,8 +83,8 @@ class TurboNestedFragmentDelegate(val fragment: Fragment, navHostFragmentId: Int
     private val currentFragment: Fragment
         get() = navHostFragment.childFragmentManager.primaryNavigationFragment as Fragment
 
-    private fun findNavHostFragment(@IdRes navHostFragmentId: Int): TurboSessionNavHostFragment {
-        return fragment.childFragmentManager.findFragmentById(navHostFragmentId) as? TurboSessionNavHostFragment
-            ?: throw IllegalStateException("No TurboSessionNavHostFragment found with ID: $navHostFragmentId")
+    private fun findNavHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
+        return fragment.childFragmentManager.findFragmentById(navHostFragmentId) as? SessionNavHostFragment
+            ?: throw IllegalStateException("No SessionNavHostFragment found with ID: $navHostFragmentId")
     }
 }

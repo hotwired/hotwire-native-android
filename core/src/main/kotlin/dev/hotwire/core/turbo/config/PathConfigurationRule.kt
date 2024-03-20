@@ -5,9 +5,9 @@ import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.logging.logError
 import java.util.regex.PatternSyntaxException
 
-internal data class TurboPathConfigurationRule(
+internal data class PathConfigurationRule(
     @SerializedName("patterns") val patterns: List<String>,
-    @SerializedName("properties") val properties: TurboPathConfigurationProperties
+    @SerializedName("properties") val properties: PathConfigurationProperties
 ) {
 
     fun matches(path: String): Boolean {

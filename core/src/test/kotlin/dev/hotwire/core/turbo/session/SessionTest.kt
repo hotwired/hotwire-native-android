@@ -6,11 +6,11 @@ import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.turbo.errors.LoadError
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.views.TurboWebView
-import dev.hotwire.core.turbo.visit.TurboVisit
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.errors.HttpError.ServerError
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -25,31 +25,31 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboSessionTest {
+class SessionTest {
     @Mock
-    private lateinit var callback: TurboSessionCallback
+    private lateinit var callback: SessionCallback
     @Mock
     private lateinit var webView: TurboWebView
     @Mock
-    private lateinit var navDestination: TurboNavDestination
+    private lateinit var navDestination: HotwireNavDestination
     private lateinit var activity: AppCompatActivity
-    private lateinit var session: TurboSession
-    private lateinit var visit: TurboVisit
+    private lateinit var session: Session
+    private lateinit var visit: Visit
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
-        session = TurboSession("test", activity, webView)
-        visit = TurboVisit(
+        session = Session("test", activity, webView)
+        visit = Visit(
             location = "https://turbo.hotwired.dev",
             destinationIdentifier = 1,
             restoreWithCachedSnapshot = false,
             reload = false,
             callback = callback,
             identifier = "",
-            options = TurboVisitOptions()
+            options = VisitOptions()
         )
 
         whenever(callback.visitNavDestination()).thenReturn(navDestination)
@@ -58,15 +58,15 @@ class TurboSessionTest {
 
     @Test
     fun getNewIsAlwaysNewInstance() {
-        val session = TurboSession("test", activity, webView)
-        val newSession = TurboSession("test", activity, webView)
+        val session = Session("test", activity, webView)
+        val newSession = Session("test", activity, webView)
 
         assertThat(session).isNotEqualTo(newSession)
     }
 
     @Test
     fun visitProposedToLocationFiresCallback() {
-        val options = TurboVisitOptions()
+        val options = VisitOptions()
         val newLocation = "${visit.location}/page"
 
         session.currentVisit = visit

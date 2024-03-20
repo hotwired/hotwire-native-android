@@ -7,7 +7,7 @@ import android.net.http.SslError
  * from the WebView when attempting to load a page.
  * https://developer.android.com/reference/android/net/http/SslError
  */
-sealed interface WebSslError : TurboVisitError {
+sealed interface WebSslError : VisitError {
     val errorCode: Int
     val description: String?
 

@@ -21,31 +21,31 @@ import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.errors.WebSslError
 import dev.hotwire.core.turbo.http.*
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.*
 import dev.hotwire.core.turbo.views.TurboWebView
-import dev.hotwire.core.turbo.visit.TurboVisit
-import dev.hotwire.core.turbo.visit.TurboVisitAction
-import dev.hotwire.core.turbo.visit.TurboVisitOptions
+import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitOptions
 import kotlinx.coroutines.*
 import java.util.*
 
 /**
  * This class is primarily responsible for managing an instance of an Android WebView that will
- * be shared between fragments. An implementation of [TurboSessionNavHostFragment] will create
- * a session for you and it can be retrieved via [TurboSessionNavHostFragment.session].
+ * be shared between fragments. An implementation of [SessionNavHostFragment] will create
+ * a session for you and it can be retrieved via [SessionNavHostFragment.session].
  *
  * @property sessionName An arbitrary name to be used as an identifier for a given session.
  * @property activity The activity to which the session will be bound to.
  * @property webView An instance of a [TurboWebView] to be shared/managed.
  */
 @Suppress("unused")
-class TurboSession internal constructor(
+class Session internal constructor(
     internal val sessionName: String,
     private val activity: AppCompatActivity,
     val webView: TurboWebView
 ) {
-    internal var currentVisit: TurboVisit? = null
+    internal var currentVisit: Visit? = null
     internal var coldBootVisitIdentifier = ""
     internal var previousOverrideUrlTime = 0L
     internal var isColdBooting = false
@@ -73,7 +73,7 @@ class TurboSession internal constructor(
     /**
      * Gets the nav destination that corresponds to the current WebView visit.
      */
-    val currentVisitNavDestination: TurboNavDestination?
+    val currentVisitNavDestination: HotwireNavDestination?
         get() = currentVisit?.callback?.visitNavDestination()
 
     /**
@@ -124,7 +124,7 @@ class TurboSession internal constructor(
 
     // Internal
 
-    internal fun visit(visit: TurboVisit) {
+    internal fun visit(visit: Visit) {
         this.currentVisit = visit
         callback { it.visitLocationStarted(visit.location) }
 
@@ -144,7 +144,7 @@ class TurboSession internal constructor(
      * visit request. This is used when restoring a Fragment destination from the backstack,
      * but the WebView's current location hasn't changed from the destination's location.
      */
-    internal fun restoreCurrentVisit(callback: TurboSessionCallback): Boolean {
+    internal fun restoreCurrentVisit(callback: SessionCallback): Boolean {
         val visit = currentVisit ?: return false
         val restorationIdentifier = restorationIdentifiers[visit.destinationIdentifier]
 
@@ -165,7 +165,7 @@ class TurboSession internal constructor(
         return true
     }
 
-    internal fun removeCallback(callback: TurboSessionCallback) {
+    internal fun removeCallback(callback: SessionCallback) {
         currentVisit?.let { visit ->
             if (visit.callback == callback) {
                 visit.callback = null
@@ -182,11 +182,11 @@ class TurboSession internal constructor(
      * You should never call this directly as it could lead to unintended behavior.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [TurboVisitOptions].
+     * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
     @JavascriptInterface
     fun visitProposedToLocation(location: String, optionsJson: String) {
-        val options = TurboVisitOptions.fromJSON(optionsJson) ?: return
+        val options = VisitOptions.fromJSON(optionsJson) ?: return
 
         logEvent("visitProposedToLocation", "location" to location, "options" to options)
         callback { it.visitProposedToLocation(location, options) }
@@ -200,11 +200,11 @@ class TurboSession internal constructor(
      * You should never call this directly as it could lead to unintended behavior.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [TurboVisitOptions].
+     * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
     @JavascriptInterface
     fun visitProposalRefreshingPage(location: String, optionsJson: String) {
-        val options = TurboVisitOptions.fromJSON(optionsJson) ?: return
+        val options = VisitOptions.fromJSON(optionsJson) ?: return
         logEvent("visitProposalRefreshingPage", "location" to location, "options" to options)
     }
 
@@ -216,11 +216,11 @@ class TurboSession internal constructor(
      * You should never call this directly as it could lead to unintended behavior.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [TurboVisitOptions].
+     * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
     @JavascriptInterface
     fun visitProposalScrollingToAnchor(location: String, optionsJson: String) {
-        val options = TurboVisitOptions.fromJSON(optionsJson) ?: return
+        val options = VisitOptions.fromJSON(optionsJson) ?: return
         logEvent("visitProposalScrollingToAnchor", "location" to location, "options" to options)
     }
 
@@ -511,15 +511,15 @@ class TurboSession internal constructor(
 
     // Private
 
-    private fun visitLocation(visit: TurboVisit) {
+    private fun visitLocation(visit: Visit) {
         val restorationIdentifier = when (visit.options.action) {
-            TurboVisitAction.RESTORE -> restorationIdentifiers[visit.destinationIdentifier] ?: ""
-            TurboVisitAction.ADVANCE -> ""
+            VisitAction.RESTORE -> restorationIdentifiers[visit.destinationIdentifier] ?: ""
+            VisitAction.ADVANCE -> ""
             else -> ""
         }
 
         val options = when (restorationIdentifier) {
-            "" -> visit.options.copy(action = TurboVisitAction.ADVANCE)
+            "" -> visit.options.copy(action = VisitAction.ADVANCE)
             else -> visit.options
         }
 
@@ -533,7 +533,7 @@ class TurboSession internal constructor(
         webView.visitLocation(visit.location, options, restorationIdentifier)
     }
 
-    private fun visitLocationAsColdBoot(visit: TurboVisit) {
+    private fun visitLocationAsColdBoot(visit: Visit) {
         logEvent("visitLocationAsColdBoot", "location" to visit.location)
         isColdBooting = true
 
@@ -548,7 +548,7 @@ class TurboSession internal constructor(
         }
     }
 
-    private fun visitPendingLocation(visit: TurboVisit) {
+    private fun visitPendingLocation(visit: Visit) {
         logEvent("visitPendingLocation", "location" to visit.location)
         visitLocation(visit)
         visitPending = false
@@ -593,7 +593,7 @@ class TurboSession internal constructor(
         )
 
         webView.apply {
-            addJavascriptInterface(this@TurboSession, "TurboSession")
+            addJavascriptInterface(this@Session, "TurboSession")
             webChromeClient = WebChromeClient()
             webViewClient = TurboWebViewClient()
             initDownloadListener()
@@ -603,7 +603,7 @@ class TurboSession internal constructor(
     private fun WebView.initDownloadListener() {
         setDownloadListener { url, _, _, _, _ ->
             logEvent("downloadListener", "location" to url)
-            visitProposedToLocation(url, TurboVisitOptions().toJson())
+            visitProposedToLocation(url, VisitOptions().toJson())
         }
     }
 
@@ -619,7 +619,7 @@ class TurboSession internal constructor(
         return hashCode().toLong()
     }
 
-    private fun callback(action: (TurboSessionCallback) -> Unit) {
+    private fun callback(action: (SessionCallback) -> Unit) {
         context.runOnUiThread {
             currentVisit?.callback?.let { callback ->
                 if (callback.visitNavDestination().isActive) {
@@ -724,8 +724,8 @@ class TurboSession internal constructor(
                 // Replace the cold boot destination on a redirect
                 // since the original url isn't visitable.
                 val options = when (isColdBootRedirect) {
-                    true -> TurboVisitOptions(action = TurboVisitAction.REPLACE)
-                    else -> TurboVisitOptions(action = TurboVisitAction.ADVANCE)
+                    true -> VisitOptions(action = VisitAction.REPLACE)
+                    else -> VisitOptions(action = VisitAction.ADVANCE)
                 }
                 visitProposedToLocation(location, options.toJson())
             }

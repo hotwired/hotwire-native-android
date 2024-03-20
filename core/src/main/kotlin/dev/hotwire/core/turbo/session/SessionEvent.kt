@@ -6,7 +6,7 @@ package dev.hotwire.core.turbo.session
  * @param T
  * @property content Content of the event.
  */
-internal class TurboSessionEvent<out T>(private val content: T) {
+internal class SessionEvent<out T>(private val content: T) {
     var hasBeenHandled = false
         private set // Allow external read but not write
 

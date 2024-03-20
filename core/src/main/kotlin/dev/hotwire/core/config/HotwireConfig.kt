@@ -2,7 +2,6 @@ package dev.hotwire.core.config
 
 import android.webkit.WebView
 import dev.hotwire.core.bridge.StradaJsonConverter
-import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.core.turbo.http.TurboHttpClient
 
 class HotwireConfig internal constructor() {

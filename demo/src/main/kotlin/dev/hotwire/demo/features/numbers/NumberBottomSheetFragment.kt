@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.textview.MaterialTextView
 import dev.hotwire.core.navigation.fragments.HotwireBottomSheetFragment
-import dev.hotwire.core.turbo.config.TurboPathConfigurationProperties
-import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
+import dev.hotwire.core.turbo.config.PathConfigurationProperties
+import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.demo.R
 
-@TurboNavGraphDestination(uri = "turbo://fragment/numbers/sheet")
+@HotwireDestination(uri = "turbo://fragment/numbers/sheet")
 class NumberBottomSheetFragment : HotwireBottomSheetFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_number_bottom_sheet, container, false)
@@ -32,6 +32,6 @@ class NumberBottomSheetFragment : HotwireBottomSheetFragment() {
         }
     }
 
-    private val TurboPathConfigurationProperties.description: String?
+    private val PathConfigurationProperties.description: String?
         get() = get("description")
 }

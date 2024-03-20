@@ -10,7 +10,7 @@ import dev.hotwire.core.turbo.util.toJson
 import kotlinx.coroutines.withContext
 import okhttp3.Request
 
-internal class TurboPathConfigurationRepository {
+internal class PathConfigurationRepository {
     private val cacheFile = "turbo"
 
     suspend fun getRemoteConfiguration(url: String): String? {
@@ -29,7 +29,7 @@ internal class TurboPathConfigurationRepository {
         return prefs(context).getString(url, null)
     }
 
-    fun cacheConfigurationForUrl(context: Context, url: String, pathConfiguration: TurboPathConfiguration) {
+    fun cacheConfigurationForUrl(context: Context, url: String, pathConfiguration: PathConfiguration) {
         prefs(context).edit {
             putString(url, pathConfiguration.toJson())
         }

@@ -4,7 +4,7 @@ import android.webkit.CookieManager
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 
-internal class TurboActivityObserver : DefaultLifecycleObserver {
+internal class HotwireActivityObserver : DefaultLifecycleObserver {
     /**
      * Cookies may not be persisted to storage yet, since WebView
      * maintains its own internal timing to flush in-memory cookies

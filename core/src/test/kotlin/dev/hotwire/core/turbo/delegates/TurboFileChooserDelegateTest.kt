@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.turbo.BaseRepositoryTest
-import dev.hotwire.core.turbo.session.TurboSession
+import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.TurboFileProvider
 import dev.hotwire.core.turbo.views.TurboWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,7 +29,7 @@ class TurboFileChooserDelegateTest : BaseRepositoryTest() {
     private lateinit var webView: TurboWebView
     private lateinit var activity: AppCompatActivity
     private lateinit var context: Context
-    private lateinit var session: TurboSession
+    private lateinit var session: Session
 
     @Before
     override fun setup() {
@@ -38,7 +38,7 @@ class TurboFileChooserDelegateTest : BaseRepositoryTest() {
 
         activity = buildActivity(TurboTestActivity::class.java).get()
         context = ApplicationProvider.getApplicationContext()
-        session = TurboSession("test", activity, webView)
+        session = Session("test", activity, webView)
     }
 
     @Test

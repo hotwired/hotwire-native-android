@@ -9,7 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dev.hotwire.core.R
 import dev.hotwire.core.turbo.config.title
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 
 /**
  * The base class from which all bottom sheet native fragments in a
@@ -18,7 +18,7 @@ import dev.hotwire.core.turbo.nav.TurboNavDestination
  * For web bottom sheet fragments, refer to [TurboWebBottomSheetDialogFragment].
  */
 abstract class TurboBottomSheetDialogFragment : BottomSheetDialogFragment(),
-    TurboNavDestination {
+    HotwireNavDestination {
     internal lateinit var delegate: TurboFragmentDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,7 +57,7 @@ abstract class TurboBottomSheetDialogFragment : BottomSheetDialogFragment(),
      * Use [registerForActivityResult] with the appropriate
      * [androidx.activity.result.contract.ActivityResultContract] and its callback.
      *
-     * Turbo provides the [TurboNavDestination.activityResultLauncher] interface
+     * Turbo provides the [HotwireNavDestination.activityResultLauncher] interface
      * to obtain registered result launchers from any destination.
      */
     @Suppress("DEPRECATION")

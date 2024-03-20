@@ -1,10 +1,10 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import org.mockito.Mockito.mock
 
 object TestData {
-    private val mockNavDestination: TurboNavDestination = mock()
+    private val mockNavDestination: HotwireNavDestination = mock()
 
     val componentFactories = listOf(
         BridgeComponentFactory("one", TestData::OneBridgeComponent),

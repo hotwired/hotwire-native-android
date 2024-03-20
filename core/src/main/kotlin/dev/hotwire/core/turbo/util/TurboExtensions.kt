@@ -14,8 +14,8 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.R
-import dev.hotwire.core.turbo.visit.TurboVisitAction
-import dev.hotwire.core.turbo.visit.TurboVisitActionAdapter
+import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitActionAdapter
 import java.io.File
 
 fun Toolbar.displayBackButton() {
@@ -107,5 +107,5 @@ internal fun Int.animateColorTo(toColor: Int, duration: Long = 150, onUpdate: (I
 }
 
 private val gson: Gson = GsonBuilder()
-    .registerTypeAdapter(TurboVisitAction::class.java, TurboVisitActionAdapter())
+    .registerTypeAdapter(VisitAction::class.java, VisitActionAdapter())
     .create()
