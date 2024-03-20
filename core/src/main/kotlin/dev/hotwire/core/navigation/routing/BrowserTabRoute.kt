@@ -1,6 +1,5 @@
 package dev.hotwire.core.navigation.routing
 
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
@@ -30,6 +29,6 @@ class BrowserTabRoute : Router.Route {
             .setUrlBarHidingEnabled(false)
             .setDefaultColorSchemeParams(colorParams)
             .build()
-            .launchUrl(activity, Uri.parse(location))
+            .launchUrl(activity, location.toUri())
     }
 }

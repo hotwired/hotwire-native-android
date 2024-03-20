@@ -2,7 +2,6 @@ package dev.hotwire.core.navigation.routing
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import dev.hotwire.core.logging.logError
@@ -17,8 +16,7 @@ class BrowserRoute : Router.Route {
     }
 
     override fun perform(location: String, activity: AppCompatActivity) {
-        val uri: Uri = Uri.parse(location)
-        val intent = Intent(Intent.ACTION_VIEW, uri)
+        val intent = Intent(Intent.ACTION_VIEW, location.toUri())
 
         try {
             activity.startActivity(intent)
