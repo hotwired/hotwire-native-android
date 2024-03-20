@@ -10,7 +10,7 @@ import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.core.turbo.visit.TurboVisitAction.REPLACE
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 import dev.hotwire.demo.R
-import dev.hotwire.demo.util.SIGN_IN_URL
+import dev.hotwire.demo.Urls
 
 @TurboNavGraphDestination(uri = "turbo://fragment/web")
 open class WebFragment : HotwireWebFragment() {
@@ -29,7 +29,7 @@ open class WebFragment : HotwireWebFragment() {
 
     override fun onVisitErrorReceived(location: String, error: TurboVisitError) {
         if (error is HttpError.ClientError.Unauthorized) {
-            navigate(SIGN_IN_URL, TurboVisitOptions(action = REPLACE))
+            navigate(Urls.signInUrl, TurboVisitOptions(action = REPLACE))
         } else {
             super.onVisitErrorReceived(location, error)
         }

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.hotwire.core.navigation.fragments.HotwireFragment
 import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.demo.R
-import dev.hotwire.demo.util.NUMBERS_URL
+import dev.hotwire.demo.Urls
 
 @TurboNavGraphDestination(uri = "turbo://fragment/numbers")
 class NumbersFragment : HotwireFragment(), NumbersFragmentCallback {
@@ -34,6 +34,6 @@ class NumbersFragment : HotwireFragment(), NumbersFragmentCallback {
     }
 
     override fun onItemClicked(number: Int) {
-        navigate("$NUMBERS_URL/$number")
+        navigate("${Urls.numbersUrl}/$number")
     }
 }

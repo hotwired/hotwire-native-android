@@ -5,8 +5,8 @@ import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.navigation.routing.BrowserTabRoute
 import dev.hotwire.core.navigation.routing.AppNavigationRoute
+import dev.hotwire.core.navigation.routing.BrowserTabRoute
 import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.demo.bridge.FormComponent
 import dev.hotwire.demo.bridge.MenuComponent
@@ -18,7 +18,6 @@ import dev.hotwire.demo.features.web.WebBottomSheetFragment
 import dev.hotwire.demo.features.web.WebFragment
 import dev.hotwire.demo.features.web.WebHomeFragment
 import dev.hotwire.demo.features.web.WebModalFragment
-import dev.hotwire.demo.util.BASE_URL
 
 class DemoApplication : Application() {
     override fun onCreate() {
@@ -32,7 +31,7 @@ class DemoApplication : Application() {
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
 
         // Set app url
-        Hotwire.appUrl = BASE_URL
+        Hotwire.appUrl = Urls.appUrl
 
         // Loads the path configuration
         Hotwire.loadPathConfiguration(
