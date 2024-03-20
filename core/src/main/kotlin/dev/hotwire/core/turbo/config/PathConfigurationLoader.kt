@@ -2,8 +2,8 @@ package dev.hotwire.core.turbo.config
 
 import android.content.Context
 import com.google.gson.reflect.TypeToken
-import dev.hotwire.core.logging.logError
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.lib.logging.logError
+import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.CoroutineScope

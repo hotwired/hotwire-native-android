@@ -5,7 +5,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
-import dev.hotwire.core.logging.logError
+import dev.hotwire.core.lib.logging.logError
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException

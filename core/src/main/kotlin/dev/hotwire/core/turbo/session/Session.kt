@@ -13,7 +13,7 @@ import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.*
 import dev.hotwire.core.config.Hotwire.pathConfiguration
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.turbo.config.screenshotsEnabled
 import dev.hotwire.core.turbo.delegates.TurboFileChooserDelegate
 import dev.hotwire.core.turbo.errors.HttpError

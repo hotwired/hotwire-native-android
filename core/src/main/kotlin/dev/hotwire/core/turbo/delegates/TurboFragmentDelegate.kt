@@ -1,6 +1,6 @@
 package dev.hotwire.core.turbo.delegates
 
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavigator

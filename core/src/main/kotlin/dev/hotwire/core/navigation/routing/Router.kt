@@ -2,7 +2,7 @@ package dev.hotwire.core.navigation.routing
 
 import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.navigation.routing.Router.Route
 
 /**

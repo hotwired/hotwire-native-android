@@ -4,8 +4,8 @@ import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.logging.logEvent
-import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.lib.logging.logEvent
+import dev.hotwire.core.lib.logging.logWarning
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 
 @Suppress("unused")

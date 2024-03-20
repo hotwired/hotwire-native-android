@@ -4,7 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
-import dev.hotwire.core.logging.logError
+import dev.hotwire.core.lib.logging.logError
 
 class BrowserRoute : Router.Route {
     override val name = "browser"

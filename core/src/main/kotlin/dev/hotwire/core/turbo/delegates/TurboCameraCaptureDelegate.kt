@@ -5,7 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.WebChromeClient.FileChooserParams
-import dev.hotwire.core.logging.logError
+import dev.hotwire.core.lib.logging.logError
 import dev.hotwire.core.turbo.util.TurboFileProvider
 import java.io.File
 import java.io.IOException
