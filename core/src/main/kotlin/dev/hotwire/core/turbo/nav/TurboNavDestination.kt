@@ -13,7 +13,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
-import androidx.navigation.ui.R
+import dev.hotwire.core.R
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.routing.Router
@@ -26,6 +26,7 @@ import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.fragments.TurboWebFragment
 import dev.hotwire.core.turbo.session.TurboSession
 import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
+import dev.hotwire.core.turbo.visit.TurboVisitAction
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
 /**
@@ -170,14 +171,29 @@ interface TurboNavDestination {
      */
     fun getNavigationOptions(
         newLocation: String,
-        newPathProperties: TurboPathConfigurationProperties
+        newPathProperties: TurboPathConfigurationProperties,
+        action: TurboVisitAction
     ): NavOptions {
-        return navOptions {
-            anim {
-                enter = R.anim.nav_default_enter_anim
-                exit = R.anim.nav_default_exit_anim
-                popEnter = R.anim.nav_default_pop_enter_anim
-                popExit = R.anim.nav_default_pop_exit_anim
+        val modal = newPathProperties.context == TurboNavPresentationContext.MODAL
+        val replace = action == TurboVisitAction.REPLACE
+
+        return if (modal) {
+            navOptions {
+                anim {
+                    enter = if (replace) 0 else R.anim.enter_slide_in_bottom
+                    exit = R.anim.exit_slide_out_bottom
+                    popEnter = R.anim.enter_slide_in_bottom
+                    popExit = R.anim.exit_slide_out_bottom
+                }
+            }
+        } else {
+            navOptions {
+                anim {
+                    enter = if (replace) 0 else R.anim.enter_slide_in_right
+                    exit = R.anim.exit_slide_out_left
+                    popEnter = R.anim.enter_slide_in_left
+                    popExit = R.anim.exit_slide_out_right
+                }
             }
         }
     }

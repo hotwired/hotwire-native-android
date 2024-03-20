@@ -10,11 +10,10 @@ import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.core.turbo.visit.TurboVisitAction.REPLACE
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 import dev.hotwire.demo.R
-import dev.hotwire.demo.base.NavDestination
 import dev.hotwire.demo.util.SIGN_IN_URL
 
 @TurboNavGraphDestination(uri = "turbo://fragment/web")
-open class WebFragment : HotwireWebFragment(), NavDestination {
+open class WebFragment : HotwireWebFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupMenu()

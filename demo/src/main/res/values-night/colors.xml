@@ -10,7 +10,7 @@
     <color name="color_secondary_variant">#797af9</color>
 
     <color name="color_background">@color/black</color>
-    <color name="color_surface">#262626</color>
+    <color name="color_surface">@color/black</color>
     <color name="color_error">#cf6679</color>
 
     <color name="color_on_primary">@color/black</color>

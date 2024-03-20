@@ -7,14 +7,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dev.hotwire.core.navigation.fragments.HotwireFragment
-import dev.hotwire.core.turbo.fragments.TurboFragment
 import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.demo.R
 import dev.hotwire.demo.util.NUMBERS_URL
-import dev.hotwire.demo.base.NavDestination
 
 @TurboNavGraphDestination(uri = "turbo://fragment/numbers")
-class NumbersFragment : HotwireFragment(), NavDestination, NumbersFragmentCallback {
+class NumbersFragment : HotwireFragment(), NumbersFragmentCallback {
     private val numbersAdapter = NumbersAdapter(this)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

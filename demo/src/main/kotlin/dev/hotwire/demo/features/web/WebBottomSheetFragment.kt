@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import dev.hotwire.core.navigation.fragments.HotwireWebBottomSheetFragment
-import dev.hotwire.core.turbo.fragments.TurboWebBottomSheetDialogFragment
 import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.demo.R
-import dev.hotwire.demo.base.NavDestination
 
 @TurboNavGraphDestination(uri = "turbo://fragment/web/modal/sheet")
-class WebBottomSheetFragment : HotwireWebBottomSheetFragment(), NavDestination {
+class WebBottomSheetFragment : HotwireWebBottomSheetFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupMenu()

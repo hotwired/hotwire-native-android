@@ -69,9 +69,11 @@
 
         <item name="android:statusBarColor">?colorSurface</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">@color/navigation_bar_color</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">@bool/use_light_navigation_bar</item>
-        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">@color/transparent</item>
+        <item name="android:navigationBarColor">?colorSurface</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarDividerColor">@color/transparent</item>
+
+        <item name="elevationOverlayEnabled">false</item>
 
         <!--Remap legacy AppCompat attributes to MaterialComponent attributes-->
         <item name="colorPrimaryDark">?colorPrimaryVariant</item>

@@ -10,10 +10,9 @@ import dev.hotwire.core.navigation.fragments.HotwireBottomSheetFragment
 import dev.hotwire.core.turbo.config.TurboPathConfigurationProperties
 import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
 import dev.hotwire.demo.R
-import dev.hotwire.demo.base.NavDestination
 
 @TurboNavGraphDestination(uri = "turbo://fragment/numbers/sheet")
-class NumberBottomSheetFragment : HotwireBottomSheetFragment(), NavDestination {
+class NumberBottomSheetFragment : HotwireBottomSheetFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_number_bottom_sheet, container, false)
     }
