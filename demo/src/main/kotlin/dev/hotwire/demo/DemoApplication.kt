@@ -5,6 +5,8 @@ import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.navigation.routing.BrowserTabRoute
+import dev.hotwire.core.navigation.routing.NavigationRoute
 import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.demo.bridge.FormComponent
 import dev.hotwire.demo.bridge.MenuComponent
@@ -16,6 +18,7 @@ import dev.hotwire.demo.features.web.WebBottomSheetFragment
 import dev.hotwire.demo.features.web.WebFragment
 import dev.hotwire.demo.features.web.WebHomeFragment
 import dev.hotwire.demo.features.web.WebModalFragment
+import dev.hotwire.demo.util.BASE_URL
 
 class DemoApplication : Application() {
     override fun onCreate() {
@@ -24,6 +27,21 @@ class DemoApplication : Application() {
     }
 
     private fun configureApp() {
+        // Configure debugging
+        Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
+        Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
+
+        // Set app url
+        Hotwire.appUrl = BASE_URL
+
+        // Loads the path configuration
+        Hotwire.loadPathConfiguration(
+            context = this,
+            location = TurboPathConfiguration.Location(
+                assetFilePath = "json/configuration.json"
+            )
+        )
+
         // Register fragment destinations
         Hotwire.registerFragmentDestinations(listOf(
             WebFragment::class,
@@ -42,15 +60,14 @@ class DemoApplication : Application() {
             BridgeComponentFactory("overflow-menu", ::OverflowMenuComponent)
         ))
 
+        // Register routes
+        Hotwire.registerRoutes(listOf(
+            NavigationRoute(),
+            BrowserTabRoute()
+        ))
+
         // Set configuration options
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
         Hotwire.config.userAgent = "Hotwire Demo; ${Hotwire.config.userAgentSubstring()}"
-        Hotwire.config.pathConfigurationLocation = TurboPathConfiguration.Location(
-            assetFilePath = "json/configuration.json"
-        )
-
-        // Configure debugging
-        Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
-        Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
     }
 }

@@ -12,8 +12,8 @@ import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.*
+import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.logging.logEvent
-import dev.hotwire.core.turbo.config.TurboPathConfiguration
 import dev.hotwire.core.turbo.config.screenshotsEnabled
 import dev.hotwire.core.turbo.delegates.TurboFileChooserDelegate
 import dev.hotwire.core.turbo.errors.HttpError
@@ -69,12 +69,6 @@ class TurboSession internal constructor(
      */
     val screenshotsEnabled
         get() = pathConfiguration.settings.screenshotsEnabled
-
-    /**
-     * Gets the path configuration for this session.
-     */
-    var pathConfiguration = TurboPathConfiguration(context)
-        internal set
 
     /**
      * Gets the nav destination that corresponds to the current WebView visit.

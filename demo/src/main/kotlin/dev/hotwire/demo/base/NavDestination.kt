@@ -1,10 +1,6 @@
 package dev.hotwire.demo.base
 
-import android.net.Uri
 import android.view.MenuItem
-import androidx.browser.customtabs.CustomTabColorSchemeParams
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_ON
 import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
 import dev.hotwire.core.turbo.config.TurboPathConfigurationProperties
@@ -12,21 +8,9 @@ import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.nav.TurboNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext.MODAL
 import dev.hotwire.demo.R
-import dev.hotwire.demo.util.BASE_URL
 
 interface NavDestination : TurboNavDestination {
-    val menuProgress: MenuItem?
-        get() = toolbarForNavigation()?.menu?.findItem(R.id.menu_progress)
 
-    override fun shouldNavigateTo(newLocation: String): Boolean {
-        return when (isNavigable(newLocation)) {
-            true -> true
-            else -> {
-                launchCustomTab(newLocation)
-                false
-            }
-        }
-    }
 
     override fun getNavigationOptions(
         newLocation: String,
@@ -36,27 +20,6 @@ interface NavDestination : TurboNavDestination {
             MODAL -> slideAnimation()
             else -> super.getNavigationOptions(newLocation, newPathProperties)
         }
-    }
-
-    private fun isNavigable(location: String): Boolean {
-        return location.startsWith(BASE_URL)
-    }
-
-    private fun launchCustomTab(location: String) {
-        val context = fragment.context ?: return
-        val color = context.getColor(R.color.color_surface)
-        val colorParams = CustomTabColorSchemeParams.Builder()
-            .setToolbarColor(color)
-            .setNavigationBarColor(color)
-            .build()
-
-        CustomTabsIntent.Builder()
-            .setShowTitle(true)
-            .setShareState(SHARE_STATE_ON)
-            .setUrlBarHidingEnabled(false)
-            .setDefaultColorSchemeParams(colorParams)
-            .build()
-            .launchUrl(context, Uri.parse(location))
     }
 
     private fun slideAnimation(): NavOptions {

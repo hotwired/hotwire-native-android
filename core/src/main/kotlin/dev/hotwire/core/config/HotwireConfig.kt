@@ -38,12 +38,6 @@ class HotwireConfig internal constructor() {
         }
 
     /**
-     * The location of your [TurboPathConfiguration] JSON file(s) to configure
-     * navigation rules.
-     */
-    var pathConfigurationLocation = TurboPathConfiguration.Location()
-
-    /**
      * Provides a standard substring to be included in your WebView's user agent
      * to identify itself as a Hotwire Native app.
      *

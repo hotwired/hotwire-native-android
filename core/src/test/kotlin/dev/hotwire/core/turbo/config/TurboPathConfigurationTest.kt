@@ -31,8 +31,8 @@ class TurboPathConfigurationTest : BaseRepositoryTest() {
         super.setup()
 
         context = ApplicationProvider.getApplicationContext()
-        pathConfiguration = TurboPathConfiguration(context).apply {
-            load(Location(assetFilePath = "json/test-configuration.json"))
+        pathConfiguration = TurboPathConfiguration().apply {
+            load(context, Location(assetFilePath = "json/test-configuration.json"))
         }
     }
 
@@ -53,13 +53,15 @@ class TurboPathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun remoteConfigurationIsFetched() {
-        pathConfiguration.loader.repository = mockRepository
+        pathConfiguration.loader = TurboPathConfigurationLoader(context).apply {
+            repository = mockRepository
+        }
 
         runBlocking {
             val remoteUrl = "$url/demo/configurations/android-v1.json"
             val location = Location(remoteFileUrl = remoteUrl)
 
-            pathConfiguration.load(location)
+            pathConfiguration.load(context, location)
             verify(mockRepository).getCachedConfigurationForUrl(context, remoteUrl)
             verify(mockRepository).getRemoteConfiguration(remoteUrl)
         }

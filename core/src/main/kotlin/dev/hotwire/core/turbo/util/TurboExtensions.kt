@@ -4,7 +4,9 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Handler
+import android.util.TypedValue
 import android.webkit.WebResourceRequest
+import androidx.annotation.AttrRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavBackStackEntry
@@ -36,6 +38,19 @@ internal fun Context.contentFromAsset(filePath: String): String {
     return assets.open(filePath).use {
         String(it.readBytes())
     }
+}
+
+internal fun Context.colorFromThemeAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    val attr = obtainStyledAttributes(typedValue.data, intArrayOf(attrColor))
+    val attrValue = attr.getColor(0, -1)
+    attr.recycle()
+
+    return attrValue
 }
 
 internal fun String.extract(patternRegex: String): String? {

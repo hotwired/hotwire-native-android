@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -13,7 +14,9 @@ import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.R
-import dev.hotwire.core.turbo.config.TurboPathConfiguration
+import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.config.Hotwire.pathConfiguration
+import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.config.TurboPathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
@@ -24,8 +27,6 @@ import dev.hotwire.core.turbo.fragments.TurboWebFragment
 import dev.hotwire.core.turbo.session.TurboSession
 import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
-import java.net.MalformedURLException
-import java.net.URL
 
 /**
  * The primary interface that a navigable Fragment implements to provide the library with
@@ -132,18 +133,16 @@ interface TurboNavDestination {
     }
 
     /**
-     * Gets whether the new location should be navigated to from the current destination. Override
-     * to provide your own custom rules based on the location's domain, protocol, path, or any other
-     * factors. (e.g. external domain urls or mailto: links should not be sent through the normal
-     * Turbo navigation flow).
+     * Determines whether the new location should be routed within in-app navigation from the
+     * current destination. By default, the registered [Router.Route] instances are used to
+     * determine routing logic. You can override the global behavior for a specific destination,
+     * but it's recommend to use dedicated [Router.Route] instances for routing logic.
      */
-    fun shouldNavigateTo(newLocation: String): Boolean {
-        return try {
-            URL(newLocation)
-            true
-        } catch (e: MalformedURLException) {
-            false
-        }
+    fun route(newLocation: String): Router.RouteResult {
+        return Hotwire.router.route(
+            location = newLocation,
+            activity = fragment.requireActivity() as AppCompatActivity
+        )
     }
 
     /**
@@ -235,9 +234,6 @@ interface TurboNavDestination {
 
     private val navigator: TurboNavigator
         get() = delegate().navigator
-
-    private val pathConfiguration: TurboPathConfiguration
-        get() = session.pathConfiguration
 
     /**
      * Retrieve the nav controller indirectly from the parent NavHostFragment,
