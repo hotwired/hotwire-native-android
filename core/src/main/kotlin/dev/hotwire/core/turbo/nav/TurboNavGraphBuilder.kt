@@ -9,7 +9,7 @@ import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.DialogFragmentNavigatorDestinationBuilder
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
-import dev.hotwire.core.turbo.config.TurboPathConfiguration
+import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.config.uri
 import java.util.UUID
 import kotlin.reflect.KClass
@@ -18,7 +18,7 @@ import kotlin.reflect.full.isSubclassOf
 internal class TurboNavGraphBuilder(
     private val startLocation: String,
     private val navController: NavController,
-    private val pathConfiguration: TurboPathConfiguration
+    private val pathConfiguration: PathConfiguration
 ) {
     private data class FragmentDestination(
         val route: String,
@@ -34,7 +34,7 @@ internal class TurboNavGraphBuilder(
         val fragmentDestinations = registeredFragments.map {
             FragmentDestination(
                 route = currentRoute.also { currentRoute++ }.toString(),
-                uri = TurboNavGraphDestination.from(it).uri.toUri(),
+                uri = HotwireDestination.from(it).uri.toUri(),
                 kClass = it
             )
         }

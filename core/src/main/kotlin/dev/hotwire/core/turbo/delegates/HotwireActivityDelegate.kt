@@ -6,7 +6,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.observers.TurboActivityObserver
 import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
@@ -20,7 +20,7 @@ import dev.hotwire.core.turbo.visit.TurboVisitOptions
  *  instance hosted in your Activity's layout resource.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class TurboActivityDelegate(
+class HotwireActivityDelegate(
     val activity: AppCompatActivity,
     currentNavHostFragmentId: Int
 ) {
@@ -54,8 +54,8 @@ class TurboActivityDelegate(
      * Gets the currently active Fragment destination hosted in the current
      * [TurboSessionNavHostFragment].
      */
-    val currentNavDestination: TurboNavDestination?
-        get() = currentFragment as TurboNavDestination?
+    val currentNavDestination: HotwireNavDestination?
+        get() = currentFragment as HotwireNavDestination?
 
     /**
      * Registers the provided nav host fragment and initializes the
@@ -149,7 +149,7 @@ class TurboActivityDelegate(
     }
 
     /**
-     * Refresh the current destination. See [TurboNavDestination.refresh] for
+     * Refresh the current destination. See [HotwireNavDestination.refresh] for
      * more details.
      */
     fun refresh(displayProgress: Boolean = true) {

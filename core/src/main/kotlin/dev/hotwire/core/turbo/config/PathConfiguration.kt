@@ -6,7 +6,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.google.gson.annotations.SerializedName
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
+import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentation
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
@@ -16,20 +16,20 @@ import java.net.URL
  * Provides the ability to load, parse, and retrieve url path
  * properties from the app's JSON configuration file.
  */
-class TurboPathConfiguration {
-    private val cachedProperties: HashMap<String, TurboPathConfigurationProperties> = hashMapOf()
+class PathConfiguration {
+    private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
 
-    internal var loader: TurboPathConfigurationLoader? = null
+    internal var loader: PathConfigurationLoader? = null
 
     @SerializedName("rules")
-    internal var rules: List<TurboPathConfigurationRule> = emptyList()
+    internal var rules: List<PathConfigurationRule> = emptyList()
 
     /**
      * Gets the top-level settings specified in the app's path configuration.
      * The settings are map of key/value `String` items.
      */
     @SerializedName("settings")
-    var settings: TurboPathConfigurationSettings = TurboPathConfigurationSettings()
+    var settings: PathConfigurationSettings = PathConfigurationSettings()
         private set
 
     /**
@@ -62,7 +62,7 @@ class TurboPathConfiguration {
      */
     internal fun load(context: Context, location: Location) {
         if (loader == null) {
-            loader = TurboPathConfigurationLoader(context.applicationContext)
+            loader = PathConfigurationLoader(context.applicationContext)
         }
 
         loader?.load(location) {
@@ -81,10 +81,10 @@ class TurboPathConfiguration {
      *  regex rules.
      * @return The map of key/value `String` properties
      */
-    fun properties(location: String): TurboPathConfigurationProperties {
+    fun properties(location: String): PathConfigurationProperties {
         cachedProperties[location]?.let { return it }
 
-        val properties = TurboPathConfigurationProperties()
+        val properties = PathConfigurationProperties()
         val path = path(location)
 
         for (rule in rules) {
@@ -106,10 +106,10 @@ class TurboPathConfiguration {
     }
 }
 
-typealias TurboPathConfigurationProperties = HashMap<String, String>
-typealias TurboPathConfigurationSettings = HashMap<String, String>
+typealias PathConfigurationProperties = HashMap<String, String>
+typealias PathConfigurationSettings = HashMap<String, String>
 
-val TurboPathConfigurationProperties.presentation: TurboNavPresentation
+val PathConfigurationProperties.presentation: TurboNavPresentation
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("presentation") ?: "default"
         TurboNavPresentation.valueOf(value.uppercase())
@@ -117,7 +117,7 @@ val TurboPathConfigurationProperties.presentation: TurboNavPresentation
         TurboNavPresentation.DEFAULT
     }
 
-val TurboPathConfigurationProperties.queryStringPresentation: TurboNavQueryStringPresentation
+val PathConfigurationProperties.queryStringPresentation: TurboNavQueryStringPresentation
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("query_string_presentation") ?: "default"
         TurboNavQueryStringPresentation.valueOf(value.uppercase())
@@ -125,7 +125,7 @@ val TurboPathConfigurationProperties.queryStringPresentation: TurboNavQueryStrin
         TurboNavQueryStringPresentation.DEFAULT
     }
 
-val TurboPathConfigurationProperties.context: TurboNavPresentationContext
+val PathConfigurationProperties.context: TurboNavPresentationContext
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("context") ?: "default"
         TurboNavPresentationContext.valueOf(value.uppercase())
@@ -133,18 +133,18 @@ val TurboPathConfigurationProperties.context: TurboNavPresentationContext
         TurboNavPresentationContext.DEFAULT
     }
 
-val TurboPathConfigurationProperties.uri: Uri
+val PathConfigurationProperties.uri: Uri
     get() = get("uri")?.toUri() ?:
-        TurboNavGraphDestination.from(Hotwire.defaultFragmentDestination).uri.toUri()
+        HotwireDestination.from(Hotwire.defaultFragmentDestination).uri.toUri()
 
-val TurboPathConfigurationProperties.fallbackUri: Uri?
+val PathConfigurationProperties.fallbackUri: Uri?
     get() = get("fallback_uri")?.toUri()
 
-val TurboPathConfigurationProperties.title: String?
+val PathConfigurationProperties.title: String?
     get() = get("title")
 
-val TurboPathConfigurationProperties.pullToRefreshEnabled: Boolean
+val PathConfigurationProperties.pullToRefreshEnabled: Boolean
     get() = get("pull_to_refresh_enabled")?.toBoolean() ?: false
 
-val TurboPathConfigurationSettings.screenshotsEnabled: Boolean
+val PathConfigurationSettings.screenshotsEnabled: Boolean
     get() = get("screenshots_enabled")?.toBoolean() ?: true

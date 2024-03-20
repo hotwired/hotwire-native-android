@@ -35,7 +35,7 @@ class FormComponent(
             "connect" -> handleConnectEvent(message)
             "submitEnabled" -> handleSubmitEnabled()
             "submitDisabled" -> handleSubmitDisabled()
-            else -> Log.w("TurboDemo", "Unknown event for message: $message")
+            else -> Log.w("FormComponent", "Unknown event for message: $message")
         }
     }
 

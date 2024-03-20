@@ -11,13 +11,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-internal class TurboPathConfigurationLoader(val context: Context) : CoroutineScope {
-    internal var repository = TurboPathConfigurationRepository()
+internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
+    internal var repository = PathConfigurationRepository()
 
     override val coroutineContext: CoroutineContext
         get() = dispatcherProvider.io + Job()
 
-    fun load(location: TurboPathConfiguration.Location, onCompletion: (TurboPathConfiguration) -> Unit) {
+    fun load(location: PathConfiguration.Location, onCompletion: (PathConfiguration) -> Unit) {
         location.assetFilePath?.let {
             loadBundledAssetConfiguration(it, onCompletion)
         }
@@ -27,7 +27,7 @@ internal class TurboPathConfigurationLoader(val context: Context) : CoroutineSco
         }
     }
 
-    private fun downloadRemoteConfiguration(url: String, onCompletion: (TurboPathConfiguration) -> Unit) {
+    private fun downloadRemoteConfiguration(url: String, onCompletion: (PathConfiguration) -> Unit) {
         // Always load the previously cached version first, if available
         loadCachedConfigurationForUrl(url, onCompletion)
 
@@ -42,7 +42,7 @@ internal class TurboPathConfigurationLoader(val context: Context) : CoroutineSco
         }
     }
 
-    private fun loadBundledAssetConfiguration(filePath: String, onCompletion: (TurboPathConfiguration) -> Unit) {
+    private fun loadBundledAssetConfiguration(filePath: String, onCompletion: (PathConfiguration) -> Unit) {
         val json = repository.getBundledConfiguration(context, filePath)
         load(json)?.let {
             logEvent("bundledPathConfigurationLoaded", filePath)
@@ -50,7 +50,7 @@ internal class TurboPathConfigurationLoader(val context: Context) : CoroutineSco
         }
     }
 
-    private fun loadCachedConfigurationForUrl(url: String, onCompletion: (TurboPathConfiguration) -> Unit) {
+    private fun loadCachedConfigurationForUrl(url: String, onCompletion: (PathConfiguration) -> Unit) {
         repository.getCachedConfigurationForUrl(context, url)?.let { json ->
             load(json)?.let {
                 logEvent("cachedPathConfigurationLoaded", url)
@@ -59,12 +59,12 @@ internal class TurboPathConfigurationLoader(val context: Context) : CoroutineSco
         }
     }
 
-    private fun cacheConfigurationForUrl(url: String, pathConfiguration: TurboPathConfiguration) {
+    private fun cacheConfigurationForUrl(url: String, pathConfiguration: PathConfiguration) {
         repository.cacheConfigurationForUrl(context, url, pathConfiguration)
     }
 
     private fun load(json: String) = try {
-        json.toObject(object : TypeToken<TurboPathConfiguration>() {})
+        json.toObject(object : TypeToken<PathConfiguration>() {})
     } catch(e: Exception) {
         logError("pathConfiguredFailedToParse", e)
         null

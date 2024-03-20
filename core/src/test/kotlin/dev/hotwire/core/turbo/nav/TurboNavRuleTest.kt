@@ -12,7 +12,7 @@ import androidx.navigation.navOptions
 import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
-import dev.hotwire.core.turbo.config.TurboPathConfiguration
+import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 class TurboNavRuleTest {
     private lateinit var context: Context
     private lateinit var controller: TestNavHostController
-    private lateinit var pathConfiguration: TurboPathConfiguration
+    private lateinit var pathConfiguration: PathConfiguration
 
     private val homeUrl = "https://hotwired.dev/home"
     private val newHomeUrl = "https://hotwired.dev/new-home"
@@ -65,8 +65,8 @@ class TurboNavRuleTest {
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
         controller = buildControllerWithGraph()
-        pathConfiguration = TurboPathConfiguration().apply {
-            load(context, TurboPathConfiguration.Location(assetFilePath = "json/test-configuration.json"))
+        pathConfiguration = PathConfiguration().apply {
+            load(context, PathConfiguration.Location(assetFilePath = "json/test-configuration.json"))
         }
     }
 

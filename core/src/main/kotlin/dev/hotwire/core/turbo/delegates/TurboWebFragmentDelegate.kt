@@ -12,7 +12,7 @@ import androidx.lifecycle.whenStateAtLeast
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.TurboVisitError
 import dev.hotwire.core.turbo.fragments.TurboWebFragmentCallback
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavigator
 import dev.hotwire.core.turbo.session.TurboSession
 import dev.hotwire.core.turbo.session.TurboSessionCallback
@@ -33,7 +33,7 @@ import kotlin.random.Random
  */
 internal class TurboWebFragmentDelegate(
     private val delegate: TurboFragmentDelegate,
-    private val navDestination: TurboNavDestination,
+    private val navDestination: HotwireNavDestination,
     private val callback: TurboWebFragmentCallback
 ) : TurboSessionCallback {
 
@@ -134,7 +134,7 @@ internal class TurboWebFragmentDelegate(
 
     /**
      * Should be called by the implementing Fragment during
-     * [dev.hotwire.core.turbo.nav.TurboNavDestination.refresh]
+     * [dev.hotwire.core.turbo.nav.HotwireNavDestination.refresh]
      */
     fun refresh(displayProgress: Boolean) {
         if (webView.url == null) return
@@ -233,7 +233,7 @@ internal class TurboWebFragmentDelegate(
         navigator.navigate(location, options)
     }
 
-    override fun visitNavDestination(): TurboNavDestination {
+    override fun visitNavDestination(): HotwireNavDestination {
         return navDestination
     }
 

@@ -1,6 +1,6 @@
 package dev.hotwire.demo.features.web
 
-import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
+import dev.hotwire.core.turbo.nav.HotwireDestination
 
-@TurboNavGraphDestination(uri = "turbo://fragment/web/modal")
+@HotwireDestination(uri = "turbo://fragment/web/modal")
 class WebModalFragment : WebFragment()

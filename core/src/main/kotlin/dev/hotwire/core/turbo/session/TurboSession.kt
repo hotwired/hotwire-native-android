@@ -21,7 +21,7 @@ import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.errors.WebSslError
 import dev.hotwire.core.turbo.http.*
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.*
 import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.core.turbo.visit.TurboVisit
@@ -73,7 +73,7 @@ class TurboSession internal constructor(
     /**
      * Gets the nav destination that corresponds to the current WebView visit.
      */
-    val currentVisitNavDestination: TurboNavDestination?
+    val currentVisitNavDestination: HotwireNavDestination?
         get() = currentVisit?.callback?.visitNavDestination()
 
     /**

@@ -2,7 +2,7 @@ package dev.hotwire.core.turbo.delegates
 
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavigator
 import dev.hotwire.core.turbo.session.TurboSessionModalResult
 import dev.hotwire.core.turbo.session.TurboSessionViewModel
@@ -14,7 +14,7 @@ import dev.hotwire.core.turbo.util.displayBackButtonAsCloseIcon
  * to this class. Note: This class should not need to be used directly
  * from within your app.
  */
-class TurboFragmentDelegate(private val navDestination: TurboNavDestination) {
+class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     private val fragment = navDestination.fragment
     private val location = navDestination.location
     private val sessionName = navDestination.sessionNavHostFragment.sessionName

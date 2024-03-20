@@ -2,7 +2,7 @@ package dev.hotwire.core.turbo.session
 
 import android.webkit.HttpAuthHandler
 import dev.hotwire.core.turbo.errors.TurboVisitError
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
 internal interface TurboSessionCallback {
@@ -19,7 +19,7 @@ internal interface TurboSessionCallback {
     fun visitCompleted(completedOffline: Boolean)
     fun visitLocationStarted(location: String)
     fun visitProposedToLocation(location: String, options: TurboVisitOptions)
-    fun visitNavDestination(): TurboNavDestination
+    fun visitNavDestination(): HotwireNavDestination
     fun formSubmissionStarted(location: String)
     fun formSubmissionFinished(location: String)
 }

@@ -27,7 +27,7 @@ class MenuComponent(
     override fun onReceive(message: Message) {
         when (message.event) {
             "display" -> handleDisplayEvent(message)
-            else -> Log.w("TurboDemo", "Unknown event for message: $message")
+            else -> Log.w("MenuComponent", "Unknown event for message: $message")
         }
     }
 

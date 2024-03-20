@@ -17,7 +17,7 @@ import dev.hotwire.core.R
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.routing.Router
-import dev.hotwire.core.turbo.config.TurboPathConfigurationProperties
+import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.delegates.TurboNestedFragmentDelegate
@@ -33,7 +33,7 @@ import dev.hotwire.core.turbo.visit.TurboVisitOptions
  * The primary interface that a navigable Fragment implements to provide the library with
  * the information it needs to properly navigate.
  */
-interface TurboNavDestination {
+interface HotwireNavDestination {
     /**
      * Gets the fragment instance for this destination.
      */
@@ -62,7 +62,7 @@ interface TurboNavDestination {
      * Gets the path configuration properties for the location associated with this
      * destination.
      */
-    val pathProperties: TurboPathConfigurationProperties
+    val pathProperties: PathConfigurationProperties
         get() = pathConfiguration.properties(location)
 
     /**
@@ -171,7 +171,7 @@ interface TurboNavDestination {
      */
     fun getNavigationOptions(
         newLocation: String,
-        newPathProperties: TurboPathConfigurationProperties,
+        newPathProperties: PathConfigurationProperties,
         action: TurboVisitAction
     ): NavOptions {
         val modal = newPathProperties.context == TurboNavPresentationContext.MODAL

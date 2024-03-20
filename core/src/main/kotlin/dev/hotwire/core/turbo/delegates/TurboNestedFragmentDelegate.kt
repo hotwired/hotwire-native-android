@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
@@ -24,8 +24,8 @@ import dev.hotwire.core.turbo.visit.TurboVisitOptions
 class TurboNestedFragmentDelegate(val fragment: Fragment, navHostFragmentId: Int) {
     val navHostFragment by lazy { findNavHostFragment(navHostFragmentId) }
 
-    val currentNavDestination: TurboNavDestination
-        get() = currentFragment as TurboNavDestination
+    val currentNavDestination: HotwireNavDestination
+        get() = currentFragment as HotwireNavDestination
 
     /**
      * Resets the nav host fragment via [TurboSessionNavHostFragment.reset]

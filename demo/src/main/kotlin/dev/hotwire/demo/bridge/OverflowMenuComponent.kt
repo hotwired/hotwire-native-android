@@ -27,7 +27,7 @@ class OverflowMenuComponent(
     override fun onReceive(message: Message) {
         when (message.event) {
             "connect" -> handleConnectEvent(message)
-            else -> Log.w("TurboDemo", "Unknown event for message: $message")
+            else -> Log.w("OverflowMenuComponent", "Unknown event for message: $message")
         }
     }
 

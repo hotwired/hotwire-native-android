@@ -21,7 +21,7 @@ internal class TurboNavRule(
     bundle: Bundle?,
     navOptions: NavOptions,
     extras: FragmentNavigator.Extras?,
-    pathConfiguration: TurboPathConfiguration,
+    pathConfiguration: PathConfiguration,
     val controller: NavController
 ) {
     // Current destination

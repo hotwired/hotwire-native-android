@@ -8,7 +8,7 @@ import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.bridge.Bridge
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
 import dev.hotwire.core.turbo.views.TurboWebView
 
@@ -85,10 +85,10 @@ abstract class TurboSessionNavHostFragment : NavHostFragment() {
     }
 
     /**
-     * Retrieves the currently active [TurboNavDestination] on the backstack.
+     * Retrieves the currently active [HotwireNavDestination] on the backstack.
      */
-    val currentNavDestination: TurboNavDestination
-        get() = childFragmentManager.primaryNavigationFragment as TurboNavDestination?
+    val currentNavDestination: HotwireNavDestination
+        get() = childFragmentManager.primaryNavigationFragment as HotwireNavDestination?
             ?: throw IllegalStateException("No current destination found in NavHostFragment")
 
     private fun initControllerGraph() {

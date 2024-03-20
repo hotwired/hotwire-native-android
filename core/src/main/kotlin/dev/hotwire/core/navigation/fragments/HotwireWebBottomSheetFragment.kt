@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.View
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.turbo.fragments.TurboWebBottomSheetDialogFragment
-import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
+import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.core.turbo.views.TurboWebView
 
-@TurboNavGraphDestination(uri = "turbo://fragment/web/modal/sheet")
+@HotwireDestination(uri = "turbo://fragment/web/modal/sheet")
 open class HotwireWebBottomSheetFragment : TurboWebBottomSheetDialogFragment() {
     private val bridgeDelegate by lazy {
         BridgeDelegate(location = location, destination = this)

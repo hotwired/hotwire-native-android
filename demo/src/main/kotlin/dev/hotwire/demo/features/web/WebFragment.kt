@@ -6,13 +6,13 @@ import android.view.View
 import dev.hotwire.core.navigation.fragments.HotwireWebFragment
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.TurboVisitError
-import dev.hotwire.core.turbo.nav.TurboNavGraphDestination
+import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.core.turbo.visit.TurboVisitAction.REPLACE
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
 
-@TurboNavGraphDestination(uri = "turbo://fragment/web")
+@HotwireDestination(uri = "turbo://fragment/web")
 open class WebFragment : HotwireWebFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

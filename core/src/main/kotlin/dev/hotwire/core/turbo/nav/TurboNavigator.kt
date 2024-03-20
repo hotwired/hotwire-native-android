@@ -14,7 +14,7 @@ import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.TurboVisitAction
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
-internal class TurboNavigator(private val navDestination: TurboNavDestination) {
+internal class TurboNavigator(private val navDestination: HotwireNavDestination) {
     private val fragment = navDestination.fragment
     private val session = navDestination.session
 

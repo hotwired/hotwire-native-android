@@ -6,7 +6,7 @@ import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.turbo.errors.LoadError
-import dev.hotwire.core.turbo.nav.TurboNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.core.turbo.visit.TurboVisit
@@ -31,7 +31,7 @@ class TurboSessionTest {
     @Mock
     private lateinit var webView: TurboWebView
     @Mock
-    private lateinit var navDestination: TurboNavDestination
+    private lateinit var navDestination: HotwireNavDestination
     private lateinit var activity: AppCompatActivity
     private lateinit var session: TurboSession
     private lateinit var visit: TurboVisit
