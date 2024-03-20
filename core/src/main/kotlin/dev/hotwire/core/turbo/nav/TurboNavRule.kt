@@ -9,7 +9,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.navOptions
 import dev.hotwire.core.turbo.config.*
-import dev.hotwire.core.turbo.session.TurboSessionModalResult
+import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.TurboVisitAction
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
@@ -114,12 +114,12 @@ internal class TurboNavRule(
         }
     }
 
-    private fun newModalResult(): TurboSessionModalResult? {
+    private fun newModalResult(): SessionModalResult? {
         if (newNavigationMode != TurboNavMode.DISMISS_MODAL) {
             return null
         }
 
-        return TurboSessionModalResult(
+        return SessionModalResult(
             location = newLocation,
             options = newVisitOptions,
             bundle = newBundle,

@@ -4,8 +4,8 @@ import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavigator
-import dev.hotwire.core.turbo.session.TurboSessionModalResult
-import dev.hotwire.core.turbo.session.TurboSessionViewModel
+import dev.hotwire.core.turbo.session.SessionModalResult
+import dev.hotwire.core.turbo.session.SessionViewModel
 import dev.hotwire.core.turbo.util.displayBackButton
 import dev.hotwire.core.turbo.util.displayBackButtonAsCloseIcon
 
@@ -19,7 +19,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     private val location = navDestination.location
     private val sessionName = navDestination.sessionNavHostFragment.sessionName
 
-    internal val sessionViewModel = TurboSessionViewModel.get(sessionName, fragment.requireActivity())
+    internal val sessionViewModel = SessionViewModel.get(sessionName, fragment.requireActivity())
     internal val fragmentViewModel = TurboFragmentViewModel.get(location, fragment)
 
     internal lateinit var navigator: TurboNavigator
@@ -63,7 +63,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
      * Provides a hook to Turbo when a Fragment has been started again after receiving a
      * modal result. Will navigate if the result indicates it should.
      */
-    fun onStartAfterModalResult(result: TurboSessionModalResult) {
+    fun onStartAfterModalResult(result: SessionModalResult) {
         logEvent("fragment.onStartAfterModalResult", "location" to result.location, "options" to result.options)
         if (result.shouldNavigate) {
             navigator.navigate(result.location, result.options, result.bundle)
@@ -72,7 +72,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
 
     /**
      * Provides a hook to Turbo when the dialog has been canceled. If there is a modal
-     * result, an event will be created in [TurboSessionViewModel] that can be observed.
+     * result, an event will be created in [SessionViewModel] that can be observed.
      */
     fun onDialogCancel() {
         logEvent("fragment.onDialogCancel", "location" to location)

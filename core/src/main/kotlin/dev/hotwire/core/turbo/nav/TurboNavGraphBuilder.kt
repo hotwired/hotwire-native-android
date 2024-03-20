@@ -69,7 +69,7 @@ internal class TurboNavGraphBuilder(
 
             // Use a random value to represent a unique instance of the graph, so the
             // graph is unique every time. This lets it be reset/recreated on-demand from
-            // `TurboSessionNavHostFragment.reset()`. Replacing an existing nav graph with
+            // `SessionNavHostFragment.reset()`. Replacing an existing nav graph with
             // an identical one would bypass recreating the nav stack from scratch in
             // `NavController.setGraph()`.
             argument("unique_instance") {

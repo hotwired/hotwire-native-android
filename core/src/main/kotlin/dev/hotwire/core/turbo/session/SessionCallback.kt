@@ -5,7 +5,7 @@ import dev.hotwire.core.turbo.errors.TurboVisitError
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
-internal interface TurboSessionCallback {
+internal interface SessionCallback {
     fun onPageStarted(location: String)
     fun onPageFinished(location: String)
     fun onReceivedError(error: TurboVisitError)

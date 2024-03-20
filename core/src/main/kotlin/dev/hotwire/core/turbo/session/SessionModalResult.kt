@@ -12,7 +12,7 @@ import dev.hotwire.core.turbo.visit.TurboVisitOptions
  * @property bundle Any additional data used by the navigation library.
  * @property shouldNavigate Whether the location should be navigated to based on its presentation property.
  */
-data class TurboSessionModalResult(
+data class SessionModalResult(
     val location: String,
     val options: TurboVisitOptions,
     val bundle: Bundle?,

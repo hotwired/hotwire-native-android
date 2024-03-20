@@ -9,7 +9,7 @@ import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
-import dev.hotwire.core.turbo.session.TurboSession
+import dev.hotwire.core.turbo.session.Session
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -22,7 +22,7 @@ class BridgeDelegateTest {
     private val bridge: Bridge = mock()
     private val webView: WebView = mock()
     private val destination: HotwireNavDestination = mock()
-    private val session: TurboSession = mock()
+    private val session: Session = mock()
 
     @Rule
     @JvmField

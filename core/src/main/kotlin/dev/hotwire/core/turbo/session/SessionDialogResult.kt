@@ -1,5 +1,5 @@
 package dev.hotwire.core.turbo.session
 
-internal data class TurboSessionDialogResult(
+internal data class SessionDialogResult(
     val cancelled: Boolean
 )

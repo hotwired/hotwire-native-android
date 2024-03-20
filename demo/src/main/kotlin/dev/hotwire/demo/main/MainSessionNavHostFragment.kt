@@ -1,10 +1,10 @@
 package dev.hotwire.demo.main
 
-import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
+import dev.hotwire.core.turbo.session.SessionNavHostFragment
 import dev.hotwire.demo.Urls
 
 @Suppress("unused")
-class MainSessionNavHostFragment : TurboSessionNavHostFragment() {
+class MainSessionNavHostFragment : SessionNavHostFragment() {
     override val sessionName = "main"
     override val startLocation = Urls.homeUrl
 }

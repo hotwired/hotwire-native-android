@@ -24,8 +24,8 @@ import dev.hotwire.core.turbo.delegates.TurboNestedFragmentDelegate
 import dev.hotwire.core.turbo.fragments.TurboFragment
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.fragments.TurboWebFragment
-import dev.hotwire.core.turbo.session.TurboSession
-import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
+import dev.hotwire.core.turbo.session.Session
+import dev.hotwire.core.turbo.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.visit.TurboVisitAction
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
@@ -43,8 +43,8 @@ interface HotwireNavDestination {
     /**
      * Gets the Turbo session's nav host fragment associated with this destination.
      */
-    val sessionNavHostFragment: TurboSessionNavHostFragment
-        get() = fragment.parentFragment as TurboSessionNavHostFragment
+    val sessionNavHostFragment: SessionNavHostFragment
+        get() = fragment.parentFragment as SessionNavHostFragment
 
     /**
      * Gets the location for this destination.
@@ -66,9 +66,9 @@ interface HotwireNavDestination {
         get() = pathConfiguration.properties(location)
 
     /**
-     * Gets the [TurboSession] associated with this destination.
+     * Gets the [Session] associated with this destination.
      */
-    val session: TurboSession
+    val session: Session
         get() = sessionNavHostFragment.session
 
     /**
@@ -129,7 +129,7 @@ interface HotwireNavDestination {
      * not have to override this, unless you're using a [TurboNestedFragmentDelegate] to provide
      * sub-navigation within your current Fragment destination and would like custom behavior.
      */
-    fun navHostForNavigation(newLocation: String): TurboSessionNavHostFragment {
+    fun navHostForNavigation(newLocation: String): SessionNavHostFragment {
         return sessionNavHostFragment
     }
 
@@ -238,11 +238,11 @@ interface HotwireNavDestination {
     /**
      * Finds the nav host fragment with the given resource ID.
      */
-    fun findNavHostFragment(@IdRes navHostFragmentId: Int): TurboSessionNavHostFragment {
+    fun findNavHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
         return fragment.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
             ?: fragment.parentFragment?.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
             ?: fragment.requireActivity().supportFragmentManager.findNavHostFragment(navHostFragmentId)
-            ?: throw IllegalStateException("No TurboSessionNavHostFragment found with ID: $navHostFragmentId")
+            ?: throw IllegalStateException("No SessionNavHostFragment found with ID: $navHostFragmentId")
     }
 
     private val Bundle.location
@@ -259,7 +259,7 @@ interface HotwireNavDestination {
         return fragment.parentFragment?.findNavController()
     }
 
-    private fun FragmentManager.findNavHostFragment(navHostFragmentId: Int): TurboSessionNavHostFragment? {
-        return findFragmentById(navHostFragmentId) as? TurboSessionNavHostFragment
+    private fun FragmentManager.findNavHostFragment(navHostFragmentId: Int): SessionNavHostFragment? {
+        return findFragmentById(navHostFragmentId) as? SessionNavHostFragment
     }
 }

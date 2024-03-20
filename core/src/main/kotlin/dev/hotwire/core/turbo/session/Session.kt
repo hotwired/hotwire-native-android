@@ -32,15 +32,15 @@ import java.util.*
 
 /**
  * This class is primarily responsible for managing an instance of an Android WebView that will
- * be shared between fragments. An implementation of [TurboSessionNavHostFragment] will create
- * a session for you and it can be retrieved via [TurboSessionNavHostFragment.session].
+ * be shared between fragments. An implementation of [SessionNavHostFragment] will create
+ * a session for you and it can be retrieved via [SessionNavHostFragment.session].
  *
  * @property sessionName An arbitrary name to be used as an identifier for a given session.
  * @property activity The activity to which the session will be bound to.
  * @property webView An instance of a [TurboWebView] to be shared/managed.
  */
 @Suppress("unused")
-class TurboSession internal constructor(
+class Session internal constructor(
     internal val sessionName: String,
     private val activity: AppCompatActivity,
     val webView: TurboWebView
@@ -144,7 +144,7 @@ class TurboSession internal constructor(
      * visit request. This is used when restoring a Fragment destination from the backstack,
      * but the WebView's current location hasn't changed from the destination's location.
      */
-    internal fun restoreCurrentVisit(callback: TurboSessionCallback): Boolean {
+    internal fun restoreCurrentVisit(callback: SessionCallback): Boolean {
         val visit = currentVisit ?: return false
         val restorationIdentifier = restorationIdentifiers[visit.destinationIdentifier]
 
@@ -165,7 +165,7 @@ class TurboSession internal constructor(
         return true
     }
 
-    internal fun removeCallback(callback: TurboSessionCallback) {
+    internal fun removeCallback(callback: SessionCallback) {
         currentVisit?.let { visit ->
             if (visit.callback == callback) {
                 visit.callback = null
@@ -593,7 +593,7 @@ class TurboSession internal constructor(
         )
 
         webView.apply {
-            addJavascriptInterface(this@TurboSession, "TurboSession")
+            addJavascriptInterface(this@Session, "TurboSession")
             webChromeClient = WebChromeClient()
             webViewClient = TurboWebViewClient()
             initDownloadListener()
@@ -619,7 +619,7 @@ class TurboSession internal constructor(
         return hashCode().toLong()
     }
 
-    private fun callback(action: (TurboSessionCallback) -> Unit) {
+    private fun callback(action: (SessionCallback) -> Unit) {
         context.runOnUiThread {
             currentVisit?.callback?.let { callback ->
                 if (callback.visitNavDestination().isActive) {

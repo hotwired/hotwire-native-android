@@ -14,9 +14,9 @@ import dev.hotwire.core.turbo.errors.TurboVisitError
 import dev.hotwire.core.turbo.fragments.TurboWebFragmentCallback
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavigator
-import dev.hotwire.core.turbo.session.TurboSession
-import dev.hotwire.core.turbo.session.TurboSessionCallback
-import dev.hotwire.core.turbo.session.TurboSessionModalResult
+import dev.hotwire.core.turbo.session.Session
+import dev.hotwire.core.turbo.session.SessionCallback
+import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.views.TurboView
 import dev.hotwire.core.turbo.views.TurboWebView
@@ -35,7 +35,7 @@ internal class TurboWebFragmentDelegate(
     private val delegate: TurboFragmentDelegate,
     private val navDestination: HotwireNavDestination,
     private val callback: TurboWebFragmentCallback
-) : TurboSessionCallback {
+) : SessionCallback {
 
     private val location = navDestination.location
     private val visitOptions = currentVisitOptions()
@@ -93,7 +93,7 @@ internal class TurboWebFragmentDelegate(
      * Provides a hook to Turbo when a fragment has been started again after receiving a
      * modal result. Will navigate if the result indicates it should.
      */
-    fun onStartAfterModalResult(result: TurboSessionModalResult) {
+    fun onStartAfterModalResult(result: SessionModalResult) {
         if (!result.shouldNavigate) {
             initNavigationVisit()
             initWebChromeClient()
@@ -152,7 +152,7 @@ internal class TurboWebFragmentDelegate(
     /**
      * Retrieves the Turbo session from the destination.
      */
-    fun session(): TurboSession {
+    fun session(): Session {
         return navDestination.session
     }
 
@@ -164,7 +164,7 @@ internal class TurboWebFragmentDelegate(
     }
 
     // -----------------------------------------------------------------------
-    // TurboSessionCallback interface
+    // SessionCallback interface
     // -----------------------------------------------------------------------
 
     override fun onPageStarted(location: String) {

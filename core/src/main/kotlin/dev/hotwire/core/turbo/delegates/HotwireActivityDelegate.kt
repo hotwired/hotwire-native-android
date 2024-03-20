@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
-import dev.hotwire.core.turbo.session.TurboSessionNavHostFragment
+import dev.hotwire.core.turbo.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
 /**
@@ -16,7 +16,7 @@ import dev.hotwire.core.turbo.visit.TurboVisitOptions
  * Activity to communicate with Turbo (and vice versa).
  *
  * @property activity The Activity to bind this delegate to.
- * @property currentNavHostFragmentId The resource ID of the [TurboSessionNavHostFragment]
+ * @property currentNavHostFragmentId The resource ID of the [SessionNavHostFragment]
  *  instance hosted in your Activity's layout resource.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -24,7 +24,7 @@ class HotwireActivityDelegate(
     val activity: AppCompatActivity,
     currentNavHostFragmentId: Int
 ) {
-    private val navHostFragments = mutableMapOf<Int, TurboSessionNavHostFragment>()
+    private val navHostFragments = mutableMapOf<Int, SessionNavHostFragment>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
         override fun handleOnBackPressed() {
@@ -33,7 +33,7 @@ class HotwireActivityDelegate(
     }
 
     /**
-     * Gets or sets the currently active resource ID of the [TurboSessionNavHostFragment]
+     * Gets or sets the currently active resource ID of the [SessionNavHostFragment]
      *  instance hosted in your Activity's layout resource. If you use multiple nav host
      *  fragments in your app (such as for bottom tabs), you must update this whenever
      *  the currently active nav host fragment changes.
@@ -45,14 +45,14 @@ class HotwireActivityDelegate(
         }
 
     /**
-     * Gets the Activity's currently active [TurboSessionNavHostFragment].
+     * Gets the Activity's currently active [SessionNavHostFragment].
      */
-    val currentSessionNavHostFragment: TurboSessionNavHostFragment
+    val currentSessionNavHostFragment: SessionNavHostFragment
         get() = navHostFragment(currentNavHostFragmentId)
 
     /**
      * Gets the currently active Fragment destination hosted in the current
-     * [TurboSessionNavHostFragment].
+     * [SessionNavHostFragment].
      */
     val currentNavDestination: HotwireNavDestination?
         get() = currentFragment as HotwireNavDestination?
@@ -74,7 +74,7 @@ class HotwireActivityDelegate(
      * @param navHostFragmentId
      * @return
      */
-    fun registerNavHostFragment(@IdRes navHostFragmentId: Int): TurboSessionNavHostFragment {
+    fun registerNavHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
         return findNavHostFragment(navHostFragmentId).also {
             if (navHostFragments[navHostFragmentId] == null) {
                 navHostFragments[navHostFragmentId] = it
@@ -89,9 +89,9 @@ class HotwireActivityDelegate(
      * @param navHostFragmentId
      * @return
      */
-    fun navHostFragment(@IdRes navHostFragmentId: Int): TurboSessionNavHostFragment {
+    fun navHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
         return requireNotNull(navHostFragments[navHostFragmentId]) {
-            "No registered TurboSessionNavHostFragment found"
+            "No registered SessionNavHostFragment found"
         }
     }
 
@@ -103,7 +103,7 @@ class HotwireActivityDelegate(
     }
 
     /**
-     * Resets all registered nav host fragments via [TurboSessionNavHostFragment.reset].
+     * Resets all registered nav host fragments via [SessionNavHostFragment.reset].
      */
     fun resetNavHostFragments() {
         navHostFragments.forEach { it.value.reset() }
@@ -177,8 +177,8 @@ class HotwireActivityDelegate(
             }
         }
 
-    private fun findNavHostFragment(@IdRes navHostFragmentId: Int): TurboSessionNavHostFragment {
-        return activity.supportFragmentManager.findFragmentById(navHostFragmentId) as? TurboSessionNavHostFragment
-            ?: throw IllegalStateException("No TurboSessionNavHostFragment found with ID: $navHostFragmentId")
+    private fun findNavHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
+        return activity.supportFragmentManager.findFragmentById(navHostFragmentId) as? SessionNavHostFragment
+            ?: throw IllegalStateException("No SessionNavHostFragment found with ID: $navHostFragmentId")
     }
 }

@@ -3,7 +3,7 @@
 # The custom rule file must be defined using the 'consumerProguardFiles' property in your
 # build.gradle.kts file.
 
--keepclassmembers class dev.hotwire.core.turbo.session.TurboSession {
+-keepclassmembers class dev.hotwire.core.turbo.session.Session {
     @android.webkit.JavascriptInterface <methods>;
 }
 -keepclassmembers class dev.hotwire.core.bridge.Bridge {

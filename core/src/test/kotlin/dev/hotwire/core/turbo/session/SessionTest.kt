@@ -25,15 +25,15 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboSessionTest {
+class SessionTest {
     @Mock
-    private lateinit var callback: TurboSessionCallback
+    private lateinit var callback: SessionCallback
     @Mock
     private lateinit var webView: TurboWebView
     @Mock
     private lateinit var navDestination: HotwireNavDestination
     private lateinit var activity: AppCompatActivity
-    private lateinit var session: TurboSession
+    private lateinit var session: Session
     private lateinit var visit: TurboVisit
 
     @Before
@@ -41,7 +41,7 @@ class TurboSessionTest {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
-        session = TurboSession("test", activity, webView)
+        session = Session("test", activity, webView)
         visit = TurboVisit(
             location = "https://turbo.hotwired.dev",
             destinationIdentifier = 1,
@@ -58,8 +58,8 @@ class TurboSessionTest {
 
     @Test
     fun getNewIsAlwaysNewInstance() {
-        val session = TurboSession("test", activity, webView)
-        val newSession = TurboSession("test", activity, webView)
+        val session = Session("test", activity, webView)
+        val newSession = Session("test", activity, webView)
 
         assertThat(session).isNotEqualTo(newSession)
     }

@@ -10,7 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.R
 import dev.hotwire.core.turbo.delegates.TurboWebFragmentDelegate
 import dev.hotwire.core.turbo.errors.TurboVisitError
-import dev.hotwire.core.turbo.session.TurboSessionModalResult
+import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
 import dev.hotwire.core.turbo.views.TurboView
 import dev.hotwire.core.turbo.views.TurboWebChromeClient
@@ -50,7 +50,7 @@ abstract class TurboWebFragment : TurboFragment(), TurboWebFragmentCallback {
      * Called when the Fragment has been started again after receiving a
      * modal result. Will navigate if the result indicates it should.
      */
-    override fun onStartAfterModalResult(result: TurboSessionModalResult) {
+    override fun onStartAfterModalResult(result: SessionModalResult) {
         super.onStartAfterModalResult(result)
         webDelegate.onStartAfterModalResult(result)
     }

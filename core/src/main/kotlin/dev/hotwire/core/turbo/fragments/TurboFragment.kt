@@ -12,7 +12,7 @@ import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.observers.HotwireWindowThemeObserver
-import dev.hotwire.core.turbo.session.TurboSessionModalResult
+import dev.hotwire.core.turbo.session.SessionModalResult
 
 /**
  * The base class from which all "standard" native Fragments (non-dialogs) in a
@@ -88,7 +88,7 @@ abstract class TurboFragment : Fragment(), HotwireNavDestination {
      * Called when the Fragment has been started again after receiving a
      * modal result. Will navigate if the result indicates it should.
      */
-    open fun onStartAfterModalResult(result: TurboSessionModalResult) {
+    open fun onStartAfterModalResult(result: SessionModalResult) {
         delegate.onStartAfterModalResult(result)
     }
 

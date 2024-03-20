@@ -5,11 +5,11 @@ import android.os.Message
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import dev.hotwire.core.turbo.session.TurboSession
+import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.visit.TurboVisitOptions
 
-open class TurboWebChromeClient(val session: TurboSession) : WebChromeClient() {
+open class TurboWebChromeClient(val session: Session) : WebChromeClient() {
     override fun onShowFileChooser(
         webView: WebView,
         filePathCallback: ValueCallback<Array<Uri>>,
