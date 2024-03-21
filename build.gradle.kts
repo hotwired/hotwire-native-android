@@ -5,3 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.9.22" apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22" apply false
 }
+
+tasks.register<Delete>("clean").configure {
+    delete(rootProject.buildDir)
+}
