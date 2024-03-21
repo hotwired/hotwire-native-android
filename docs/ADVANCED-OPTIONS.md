@@ -1,5 +1,29 @@
 # Advanced Options
 
+## Create a Web Fragment
+
+### Create the TurboWebFragment class
+
+You'll need at least one web Fragment that will serve as a destination for urls that display web content in your app.
+
+A web Fragment is straightforward and needs to implement the [`TurboWebFragment`](../turbo/src/main/kotlin/dev/hotwire/turbo/fragments/TurboWebFragment.kt) abstract class. This abstract class implements the [`TurboWebFragmentCallback`](../turbo/src/main/kotlin/dev/hotwire/turbo/fragments/TurboWebFragmentCallback.kt) interface, which provides a number of functions available to customize your Fragment.
+
+You'll need to annotate each Fragment in your app with a `@TurboNavGraphDestination` annotation with a URI of your own scheme. This URI is used by the library to build an internal navigation graph and map url path patterns to the destination Fragment with the corresponding URI. See the [Path Configuration documentation](PATH-CONFIGURATION.md) to learn how to map url paths to destination Fragments.
+
+In its simplest form, your web Fragment will look like:
+
+**`WebFragment.kt`:**
+```kotlin
+@TurboNavGraphDestination(uri = "turbo://fragment/web")
+class WebFragment : TurboWebFragment()
+```
+
+The library automatically inflates a default `R.layout.turbo_fragment_web` layout to host a `TurboView`. If you'd like to create your own custom layout for your web Fragment, you can override the `onCreateView()` function and inflate your own layout. See the demo [`WebHomeFragment`](../demo/src/main/kotlin/dev/hotwire/turbo/demo/features/web/WebHomeFragment.kt) as an example of of providing your own layout.
+
+You can also provide your own custom progress view or error view by overriding the `createProgressView()` and `createErrorView()` functions in your web Fragment.
+
+Refer to demo [`WebFragment`](../demo/src/main/kotlin/dev/hotwire/turbo/demo/features/web/WebFragment.kt) as an example.
+
 ## Create a Native Fragment
 You don't need to rely on your web app for every screen in your app. Elevating destinations that would benefit from a higher fidelity experience to fully-native is often a great idea. For example, here's how you would create a fully native image viewer fragment:
 
@@ -106,24 +130,3 @@ if (BuildConfig.DEBUG) {
     Turbo.config.debugLoggingEnabled = true
 }
 ```
-
-## Native <-> JavaScript Integration
-
-To call native code from JavaScript, use [`addJavascriptInterface`](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)). JavaScript interfaces are long lasting, so a good place to do this is your `TurboSessionNavHostFragment` subclass' `onSessionCreated` function.
-
-To call JavaScript code from native, use [`evaluateJavascript`](https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)). For example, to do this every time a Turbo visit is completed, override `onVisitCompleted` in your `TurboWebFragment` subclass:
-
-```kotlin
-class WebFragment : TurboWebFragment() {
-
-    // ...
-    
-    override fun onVisitCompleted(location: String, completedOffline: Boolean) {
-        super.onVisitCompleted(location, completedOffline)
-        
-        val script = "console.log('hello world')"
-        session.webView.evaluateJavascript(script, null)
-    }
-```
-
-Executing JavaScript directly is fine for simple tasks, but we've found we need something more comprehensive for our apps, which is why we created a new framework called Strada. This is a library in 3 parts (web, iOS, and Android) for integrating Turbo Native apps with their hosted web apps. This is separate and optional, but can dramatically improve the experience of your app. See the Strada repo for details *(coming soon)*.

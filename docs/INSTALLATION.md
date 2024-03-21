@@ -6,9 +6,12 @@ Add the dependency from Maven Central to your app module's (not top-level) `buil
 
 ```kotlin
 dependencies {
-    implementation("dev.hotwire:turbo:<latest-version>")
+    implementation("dev.hotwire:core:<latest-version>")
 }
 ```
+
+> [!NOTE]
+> Releases won't be published to Maven Central until the public release.
 
 [![Download](https://img.shields.io/maven-central/v/dev.hotwire/turbo)](https://search.maven.org/artifact/dev.hotwire/turbo)
 
@@ -16,13 +19,13 @@ See the [latest version](https://search.maven.org/artifact/dev.hotwire/turbo) av
 
 ## Required `minSdk`
 
-Android SDK 26 (or greater) is required as the `minSdk` in your app module's `build.gradle.kts` file:
+Android SDK 28 (or greater) is required as the `minSdk` in your app module's `build.gradle.kts` file:
 
 ```kotlin
 compileSdk = 34
 
 defaultConfig {
-    minSdk = 26
+    minSdk = 28
     targetSdk = 34
     // ...
 }
@@ -59,7 +62,7 @@ Add the GitHub Packages maven repository and the dependency to your app module's
 repositories {
     maven {
         name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/hotwired/turbo-android")
+        url = uri("https://maven.pkg.github.com/hotwired/hotwire-native-android")
 
         credentials {
             username = System.getenv('GITHUB_USER')
@@ -69,8 +72,8 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.hotwire:turbo:<latest-version>")
+    implementation("dev.hotwire:core:<latest-version>")
 }
 ```
 
-See the [latest version](https://github.com/hotwired/turbo-android/releases) available on GitHub Packages.
+See the [latest version](https://github.com/hotwired/hotwire-native-android/releases) available on GitHub Packages.
