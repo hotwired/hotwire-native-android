@@ -4,8 +4,10 @@
 
 1. [Create a NavHostFragment](#create-a-navhostfragment)
 1. [Create an Activity](#create-an-activity)
-1. [Create a Web Fragment](#create-a-web-fragment)
+1. [Configure your app](#configure-your-app)
 1. [Create a Path Configuration](#create-a-path-configuration)
+1. [Navigation](#navigation)
+1. [Advanced Options](#advanced-options)
 
 ## Create a NavHostFragment
 
