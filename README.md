@@ -1,6 +1,6 @@
 # Hotwire Native for Android
 
-**Build high-fidelity hybrid apps with native navigation and a single shared web view**. Turbo Native for Android provides the tooling to wrap your [Turbo 7](https://turbo.hotwired.dev/)-enabled web app in a native Android shell. It manages a single WebView instance across multiple Fragment destinations, giving you native navigation UI with all the client-side performance benefits of Turbo.
+**Build high-fidelity hybrid apps with native navigation and a single shared web view**. Hotwire Native for Android provides the tooling to wrap your [Turbo 7](https://turbo.hotwired.dev/)-enabled web app in a native Android shell. It manages a single WebView instance across multiple Fragment destinations, giving you native navigation UI with all the client-side performance benefits of Turbo.
 
 ## Features
 - **Deliver fast, efficient hybrid apps.** Avoid reloading JavaScript and CSS. Save memory by sharing one WebView.
@@ -10,15 +10,15 @@
 
 ## Requirements
 
-1. Android SDK 26+ is required as the `minSdk` in your `build.gradle.kts` file.
+1. Android SDK 28+ is required as the `minSdk` in your `build.gradle.kts` file.
 1. This library is written entirely in [Kotlin](https://kotlinlang.org/), and your app should use Kotlin as well. Compatibility with Java is not provided or supported.
 1. This library supports web apps using either Turbo 7 or Turbolinks 5.
 1. `Turbo` (or `Turbolinks`) is exposed on the `window` object on the WebView page being loaded.
 
-**Note:** You should understand how Turbo works with web applications in the browser before attempting to use Turbo Android. See the [Turbo 7 documentation](https://turbo.hotwired.dev) for details.
+**Note:** You should understand how Turbo works with web applications in the browser before attempting to use Hotwire Native. See the [Turbo 7 documentation](https://turbo.hotwired.dev) for details.
 
 ## Getting Started
-The best way to get started with Turbo Android is to try out the demo app first to get familiar with the framework. The demo app walks you through all the basic Turbo flows as well as some advanced features. To run the demo, clone this repo, open the directory in Android Studio, and build the `demo` module to your Android device. See [demo/README.md](demo/README.md) for more details about the demo. When you’re ready to start your own application, read through the rest of the documentation.
+The best way to get started with Hotwire Native Android is to try out the demo app first to get familiar with the framework. The demo app walks you through all the basic Turbo flows as well as some advanced features. To run the demo, clone this repo, open the directory in Android Studio, and build the `demo` module to your Android device. See [demo/README.md](demo/README.md) for more details about the demo. When you’re ready to start your own application, read through the rest of the documentation.
 
 See the [instructions to build the project yourself](docs/BUILD-PROJECT.md).
 
@@ -33,9 +33,9 @@ See the [instructions to build the project yourself](docs/BUILD-PROJECT.md).
 
 ## Contributing
 
-Turbo Android is open-source software, freely distributable under the terms of an [MIT-style license](LICENSE). The [source code is hosted on GitHub](https://github.com/hotwired/turbo-android). Development is sponsored by [37signals](https://37signals.com/).
+Hotwire Native Android is open-source software, freely distributable under the terms of an [MIT-style license](LICENSE). The [source code is hosted on GitHub](https://github.com/hotwired/hotwire-native-android). Development is sponsored by [37signals](https://37signals.com/).
 
-We welcome contributions in the form of bug reports, pull requests, or thoughtful discussions in the [GitHub issue tracker](https://github.com/hotwired/turbo-android/issues).
+We welcome contributions in the form of bug reports, pull requests, or thoughtful discussions in the [GitHub issue tracker](https://github.com/hotwired/hotwire-native-android/issues).
 
 Please note that this project is released with a [Contributor Code of Conduct](docs/CONDUCT.md). By participating in this project you agree to abide by its terms.
 
