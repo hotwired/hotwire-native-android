@@ -89,9 +89,9 @@ Refer to the demo [`MainActivity`](../demo/src/main/kotlin/dev/hotwire/demo/main
 
 At a minimum, you'll want to set a handful configuration options before your `HotwireActivity` instance is created by the system. It's recommended to create your own `Application` instance and place the configuration code there. The configuration op 
 
-**`MyApplication.kt`:**
+**`DemoApplication.kt`:**
 ```kotlin
-class MyApplication : Application() {
+class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
@@ -106,7 +106,7 @@ class MyApplication : Application() {
         // `userAgentSubstring()` helper available that you should include as 
         // part of your user agent so the app is properly identified as a Hotwire
         // Native app on your server.
-        Hotwire.config.userAgent = "My App; ${Hotwire.config.userAgentSubstring()}"
+        Hotwire.config.userAgent = "Demo App; ${Hotwire.config.userAgentSubstring()}"
     }
 }
 ```
