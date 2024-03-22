@@ -1,12 +1,11 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.navigation.activities
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import dev.hotwire.core.turbo.activities.HotwireActivity
-import dev.hotwire.core.turbo.activities.SessionConfiguration
+import dev.hotwire.core.navigation.config.SessionConfiguration
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
 import dev.hotwire.core.turbo.session.SessionNavHostFragment

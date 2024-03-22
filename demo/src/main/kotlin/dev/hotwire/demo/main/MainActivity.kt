@@ -2,9 +2,9 @@ package dev.hotwire.demo.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import dev.hotwire.core.turbo.activities.HotwireActivity
-import dev.hotwire.core.turbo.activities.SessionConfiguration
-import dev.hotwire.core.turbo.delegates.HotwireActivityDelegate
+import dev.hotwire.core.navigation.activities.HotwireActivity
+import dev.hotwire.core.navigation.activities.HotwireActivityDelegate
+import dev.hotwire.core.navigation.config.SessionConfiguration
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
 

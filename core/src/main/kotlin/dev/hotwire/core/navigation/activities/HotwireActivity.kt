@@ -1,8 +1,7 @@
-package dev.hotwire.core.turbo.activities
+package dev.hotwire.core.navigation.activities
 
-import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
-import dev.hotwire.core.turbo.delegates.HotwireActivityDelegate
+import dev.hotwire.core.navigation.config.SessionConfiguration
 import dev.hotwire.core.turbo.session.SessionNavHostFragment
 
 /**
@@ -15,9 +14,3 @@ interface HotwireActivity {
     val appCompatActivity: AppCompatActivity
     fun sessionConfigurations(): List<SessionConfiguration>
 }
-
-data class SessionConfiguration(
-    val name: String,
-    val startLocation: String,
-    @IdRes val navHostFragmentId: Int,
-)

@@ -4,8 +4,8 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.google.android.material.R
-import dev.hotwire.core.turbo.activities.HotwireActivity
-import dev.hotwire.core.turbo.activities.SessionConfiguration
+import dev.hotwire.core.navigation.activities.HotwireActivity
+import dev.hotwire.core.navigation.config.SessionConfiguration
 import dev.hotwire.core.turbo.util.colorFromThemeAttr
 
 class BrowserTabRoute : Router.Route {

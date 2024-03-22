@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.IdRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -17,7 +16,7 @@ import dev.hotwire.core.R
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.routing.Router
-import dev.hotwire.core.turbo.activities.HotwireActivity
+import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate

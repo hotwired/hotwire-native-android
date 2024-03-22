@@ -1,9 +1,9 @@
 package dev.hotwire.core.navigation.routing
 
 import dev.hotwire.core.lib.logging.logEvent
+import dev.hotwire.core.navigation.activities.HotwireActivity
+import dev.hotwire.core.navigation.config.SessionConfiguration
 import dev.hotwire.core.navigation.routing.Router.Route
-import dev.hotwire.core.turbo.activities.HotwireActivity
-import dev.hotwire.core.turbo.activities.SessionConfiguration
 
 /**
  * Routes location urls within in-app navigation or with custom behaviors
