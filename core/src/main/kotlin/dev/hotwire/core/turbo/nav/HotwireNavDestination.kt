@@ -15,8 +15,9 @@ import androidx.navigation.navOptions
 import dev.hotwire.core.R
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
-import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.navigation.activities.HotwireActivity
+import dev.hotwire.core.navigation.routing.Router
+import dev.hotwire.core.navigation.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
@@ -25,7 +26,6 @@ import dev.hotwire.core.turbo.fragments.TurboFragment
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.fragments.TurboWebFragment
 import dev.hotwire.core.turbo.session.Session
-import dev.hotwire.core.turbo.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 

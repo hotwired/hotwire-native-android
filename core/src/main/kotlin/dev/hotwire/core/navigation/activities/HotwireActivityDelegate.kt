@@ -6,9 +6,9 @@ import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import dev.hotwire.core.navigation.session.SessionConfiguration
+import dev.hotwire.core.navigation.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
-import dev.hotwire.core.turbo.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**

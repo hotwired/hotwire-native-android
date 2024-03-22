@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.session
+package dev.hotwire.core.navigation.session
 
 import android.content.Context
 import android.os.Bundle
@@ -10,6 +10,7 @@ import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
+import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.views.TurboWebView
 
 open class SessionNavHostFragment : NavHostFragment() {

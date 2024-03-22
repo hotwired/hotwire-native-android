@@ -2,7 +2,7 @@ package dev.hotwire.core.navigation.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.navigation.session.SessionConfiguration
-import dev.hotwire.core.turbo.session.SessionNavHostFragment
+import dev.hotwire.core.navigation.session.SessionNavHostFragment
 
 /**
  * Interface that should be implemented by any Activity using Turbo. Ensures that the
