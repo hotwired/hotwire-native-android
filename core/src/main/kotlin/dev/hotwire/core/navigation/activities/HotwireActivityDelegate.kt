@@ -1,29 +1,27 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.navigation.activities
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import dev.hotwire.core.navigation.session.SessionConfiguration
+import dev.hotwire.core.navigation.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
-import dev.hotwire.core.turbo.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**
- * Initializes the Activity for Turbo navigation and provides all the hooks for an
- * Activity to communicate with Turbo (and vice versa).
+ * Initializes the Activity for Hotwire navigation and provides all the hooks for an
+ * Activity to communicate with Hotwire Native (and vice versa).
  *
  * @property activity The Activity to bind this delegate to.
  * @property currentNavHostFragmentId The resource ID of the [SessionNavHostFragment]
  *  instance hosted in your Activity's layout resource.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class HotwireActivityDelegate(
-    val activity: AppCompatActivity,
-    currentNavHostFragmentId: Int
-) {
+class HotwireActivityDelegate(val activity: HotwireActivity) {
+    private val appCompatActivity = activity.appCompatActivity
     private val navHostFragments = mutableMapOf<Int, SessionNavHostFragment>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
@@ -32,22 +30,28 @@ class HotwireActivityDelegate(
         }
     }
 
-    /**
-     * Gets or sets the currently active resource ID of the [SessionNavHostFragment]
-     *  instance hosted in your Activity's layout resource. If you use multiple nav host
-     *  fragments in your app (such as for bottom tabs), you must update this whenever
-     *  the currently active nav host fragment changes.
-     */
-    var currentNavHostFragmentId = currentNavHostFragmentId
+    private var currentNavHostFragmentId = activity.sessionConfigurations().first().navHostFragmentId
         set(value) {
             field = value
-            updateOnBackPressedCallback(currentSessionNavHostFragment.navController)
+            updateOnBackPressedCallback(currentNavHostFragment.navController)
         }
+
+    /**
+     * Initializes the Activity with a BackPressedDispatcher that properly
+     * handles Fragment navigation with the back button.
+     */
+    init {
+        appCompatActivity.lifecycle.addObserver(HotwireActivityObserver())
+        appCompatActivity.onBackPressedDispatcher.addCallback(
+            owner = appCompatActivity,
+            onBackPressedCallback = onBackPressedCallback
+        )
+    }
 
     /**
      * Gets the Activity's currently active [SessionNavHostFragment].
      */
-    val currentSessionNavHostFragment: SessionNavHostFragment
+    val currentNavHostFragment: SessionNavHostFragment
         get() = navHostFragment(currentNavHostFragmentId)
 
     /**
@@ -58,29 +62,23 @@ class HotwireActivityDelegate(
         get() = currentFragment as HotwireNavDestination?
 
     /**
-     * Registers the provided nav host fragment and initializes the
-     * Activity with a BackPressedDispatcher that properly handles Fragment
-     * navigation with the back button.
+     * Sets the currently active session in your Activity. If you use multiple
+     *  [SessionNavHostFragment] instances in your app (such as for bottom tabs),
+     *  you must update this whenever the current session changes.
      */
-    init {
-        registerNavHostFragment(currentNavHostFragmentId)
-        activity.lifecycle.addObserver(HotwireActivityObserver())
-        activity.onBackPressedDispatcher.addCallback(activity, onBackPressedCallback)
+    fun setCurrentSession(sessionConfiguration: SessionConfiguration) {
+        currentNavHostFragmentId = sessionConfiguration.navHostFragmentId
     }
 
-    /**
-     * Provides the ability to register additional nav host fragments.
-     *
-     * @param navHostFragmentId
-     * @return
-     */
-    fun registerNavHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
-        return findNavHostFragment(navHostFragmentId).also {
-            if (navHostFragments[navHostFragmentId] == null) {
-                navHostFragments[navHostFragmentId] = it
-                listenToDestinationChanges(it.navController)
-            }
+    internal fun registerNavHostFragment(navHostFragment: SessionNavHostFragment) {
+        if (navHostFragments[navHostFragment.id] == null) {
+            navHostFragments[navHostFragment.id] = navHostFragment
+            listenToDestinationChanges(navHostFragment.navController)
         }
+    }
+
+    internal fun unregisterNavHostFragment(navHostFragment: SessionNavHostFragment) {
+        navHostFragments.remove(navHostFragment.id)
     }
 
     /**
@@ -163,22 +161,17 @@ class HotwireActivityDelegate(
     }
 
     private fun updateOnBackPressedCallback(navController: NavController) {
-        if (navController == currentSessionNavHostFragment.navController)  {
+        if (navController == currentNavHostFragment.navController)  {
             onBackPressedCallback.isEnabled = navController.previousBackStackEntry != null
         }
     }
 
     private val currentFragment: Fragment?
         get() {
-            return if (currentSessionNavHostFragment.isAdded && !currentSessionNavHostFragment.isDetached) {
-                currentSessionNavHostFragment.childFragmentManager.primaryNavigationFragment
+            return if (currentNavHostFragment.isAdded && !currentNavHostFragment.isDetached) {
+                currentNavHostFragment.childFragmentManager.primaryNavigationFragment
             } else {
                 null
             }
         }
-
-    private fun findNavHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
-        return activity.supportFragmentManager.findFragmentById(navHostFragmentId) as? SessionNavHostFragment
-            ?: throw IllegalStateException("No SessionNavHostFragment found with ID: $navHostFragmentId")
-    }
 }

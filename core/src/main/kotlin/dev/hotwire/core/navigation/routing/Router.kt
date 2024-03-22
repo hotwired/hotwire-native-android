@@ -1,8 +1,8 @@
 package dev.hotwire.core.navigation.routing
 
-import androidx.appcompat.app.AppCompatActivity
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.lib.logging.logEvent
+import dev.hotwire.core.navigation.activities.HotwireActivity
+import dev.hotwire.core.navigation.session.SessionConfiguration
 import dev.hotwire.core.navigation.routing.Router.Route
 
 /**
@@ -15,12 +15,6 @@ class Router(private val routes: List<Route>) {
      * An interface to implement to provide custom route behaviors in your app.
      */
     interface Route {
-        /**
-         * The configured app url. You can use this to determine if a location
-         * exists on the same domain.
-         */
-        val appUrl get() = Hotwire.appUrl
-
         /**
          * The route name used in debug logging.
          */
@@ -38,13 +32,20 @@ class Router(private val routes: List<Route>) {
          * rules based on the location's domain, protocol, path, or any other
          * factors.
          */
-        fun matches(location: String): Boolean
+        fun matches(
+            location: String,
+            sessionConfiguration: SessionConfiguration
+        ): Boolean
 
         /**
          * Handle custom routing behavior when a match is found. For example,
          * open an external browser or app for external domain urls.
          */
-        fun handle(location: String, activity: AppCompatActivity)
+        fun handle(
+            location: String,
+            sessionConfiguration: SessionConfiguration,
+            activity: HotwireActivity
+        )
     }
 
     enum class RouteResult {
@@ -59,15 +60,19 @@ class Router(private val routes: List<Route>) {
         STOP
     }
 
-    internal fun route(location: String, activity: AppCompatActivity): RouteResult {
+    internal fun route(
+        location: String,
+        sessionConfiguration: SessionConfiguration,
+        activity: HotwireActivity
+    ): RouteResult {
         routes.forEach { route ->
-            if (route.matches(location)) {
+            if (route.matches(location, sessionConfiguration)) {
                 logEvent("routeMatch", listOf(
                     "route" to route.name,
                     "location" to location
                 ))
 
-                route.handle(location, activity)
+                route.handle(location, sessionConfiguration, activity)
                 return route.result
             }
         }

@@ -17,7 +17,7 @@ import dev.hotwire.core.turbo.util.displayBackButtonAsCloseIcon
 class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     private val fragment = navDestination.fragment
     private val location = navDestination.location
-    private val sessionName = navDestination.sessionNavHostFragment.sessionName
+    private val sessionName = navDestination.session.sessionName
 
     internal val sessionViewModel = SessionViewModel.get(sessionName, fragment.requireActivity())
     internal val fragmentViewModel = TurboFragmentViewModel.get(location, fragment)

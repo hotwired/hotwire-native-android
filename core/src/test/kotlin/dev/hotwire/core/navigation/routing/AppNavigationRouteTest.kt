@@ -1,8 +1,7 @@
 package dev.hotwire.core.navigation.routing
 
-import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.navigation.activities.SessionConfiguration
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -10,11 +9,11 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class AppNavigationRouteTest {
     private val route = AppNavigationRoute()
-
-    @Before
-    fun setup() {
-        Hotwire.appUrl = "https://my.app.com"
-    }
+    private val sessionConfig = SessionConfiguration(
+        name = "test",
+        startLocation = "https://my.app.com",
+        navHostFragmentId = 0
+    )
 
     @Test
     fun `matching result navigates`() {
@@ -24,18 +23,18 @@ class AppNavigationRouteTest {
     @Test
     fun `url on app domain matches`() {
         val url = "https://my.app.com/page"
-        assertTrue(route.matches(url))
+        assertTrue(route.matches(url, sessionConfig))
     }
 
     @Test
     fun `url without subdomain does not match`() {
         val url = "https://app.com/page"
-        assertFalse(route.matches(url))
+        assertFalse(route.matches(url, sessionConfig))
     }
 
     @Test
     fun `masqueraded url does not match`() {
         val url = "https://app.my.com@fake.domain"
-        assertFalse(route.matches(url))
+        assertFalse(route.matches(url, sessionConfig))
     }
 }

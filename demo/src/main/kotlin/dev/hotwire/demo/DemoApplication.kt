@@ -30,9 +30,6 @@ class DemoApplication : Application() {
         Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
 
-        // Set app url
-        Hotwire.appUrl = Urls.appUrl
-
         // Loads the path configuration
         Hotwire.loadPathConfiguration(
             context = this,

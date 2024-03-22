@@ -1,28 +1,24 @@
-package dev.hotwire.core.turbo.session
+package dev.hotwire.core.navigation.session
 
 import android.content.Context
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.bridge.Bridge
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
+import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
+import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.views.TurboWebView
 
-abstract class SessionNavHostFragment : NavHostFragment() {
-    /**
-     * The name of the [Session] instance, which is helpful for debugging
-     * purposes. This is arbitrary, but must be unique in your app.
-     */
-    abstract val sessionName: String
+open class SessionNavHostFragment : NavHostFragment() {
+    private val activity get() = requireActivity() as HotwireActivity
 
-    /**
-     * The url of a starting location when your app starts up.
-     */
-    abstract val startLocation: String
+    val sessionConfiguration get() = activity.sessionConfigurations().first {
+        id == it.navHostFragmentId
+    }
 
     /**
      * The [Session] instance that is shared with all destinations that are
@@ -33,13 +29,23 @@ abstract class SessionNavHostFragment : NavHostFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activity.delegate.registerNavHostFragment(this)
+
         createNewSession()
         initControllerGraph()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        activity.delegate.unregisterNavHostFragment(this)
+    }
+
     internal fun createNewSession() {
-        val activity = requireActivity() as AppCompatActivity
-        session = Session(sessionName, activity, onCreateWebView(activity))
+        session = Session(
+            sessionName = sessionConfiguration.name,
+            activity = activity.appCompatActivity,
+            webView = onCreateWebView(activity.appCompatActivity)
+        )
         onSessionCreated()
     }
 
@@ -94,7 +100,7 @@ abstract class SessionNavHostFragment : NavHostFragment() {
     private fun initControllerGraph() {
         navController.apply {
             graph = TurboNavGraphBuilder(
-                startLocation = startLocation,
+                startLocation = sessionConfiguration.startLocation,
                 pathConfiguration = pathConfiguration,
                 navController = findNavController()
             ).build(
