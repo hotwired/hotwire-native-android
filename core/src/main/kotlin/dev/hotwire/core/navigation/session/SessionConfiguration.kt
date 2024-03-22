@@ -1,4 +1,4 @@
-package dev.hotwire.core.navigation.config
+package dev.hotwire.core.navigation.session
 
 import androidx.annotation.IdRes
 

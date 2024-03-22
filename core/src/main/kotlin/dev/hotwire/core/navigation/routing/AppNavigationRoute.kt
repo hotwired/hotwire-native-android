@@ -2,7 +2,7 @@ package dev.hotwire.core.navigation.routing
 
 import androidx.core.net.toUri
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.config.SessionConfiguration
+import dev.hotwire.core.navigation.session.SessionConfiguration
 
 class AppNavigationRoute : Router.Route {
     override val name = "app-navigation"

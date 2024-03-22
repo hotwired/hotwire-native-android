@@ -1,7 +1,7 @@
 package dev.hotwire.core.navigation.activities
 
 import androidx.appcompat.app.AppCompatActivity
-import dev.hotwire.core.navigation.config.SessionConfiguration
+import dev.hotwire.core.navigation.session.SessionConfiguration
 import dev.hotwire.core.turbo.session.SessionNavHostFragment
 
 /**

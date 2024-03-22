@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.navigation.activities.HotwireActivityDelegate
-import dev.hotwire.core.navigation.config.SessionConfiguration
+import dev.hotwire.core.navigation.session.SessionConfiguration
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
 

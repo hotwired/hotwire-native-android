@@ -2,7 +2,7 @@ package dev.hotwire.core.navigation.routing
 
 import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.config.SessionConfiguration
+import dev.hotwire.core.navigation.session.SessionConfiguration
 import dev.hotwire.core.navigation.routing.Router.Route
 
 /**

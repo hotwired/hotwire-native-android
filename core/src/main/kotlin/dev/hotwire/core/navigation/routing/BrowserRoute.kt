@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.core.net.toUri
 import dev.hotwire.core.lib.logging.logError
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.config.SessionConfiguration
+import dev.hotwire.core.navigation.session.SessionConfiguration
 
 class BrowserRoute : Router.Route {
     override val name = "browser"
