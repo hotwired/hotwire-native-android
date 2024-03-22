@@ -32,11 +32,6 @@ object Hotwire {
     val config: HotwireConfig = HotwireConfig()
 
     /**
-     * The base url of your web app.
-     */
-    var appUrl: String = ""
-
-    /**
      * The path configuration that defines your navigation rules.
      */
     val pathConfiguration = PathConfiguration()

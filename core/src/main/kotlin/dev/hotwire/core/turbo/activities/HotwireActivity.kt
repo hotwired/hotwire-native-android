@@ -1,5 +1,7 @@
 package dev.hotwire.core.turbo.activities
 
+import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.turbo.delegates.HotwireActivityDelegate
 import dev.hotwire.core.turbo.session.SessionNavHostFragment
 
@@ -9,5 +11,13 @@ import dev.hotwire.core.turbo.session.SessionNavHostFragment
  * [SessionNavHostFragment] hosted in your Activity's layout resource.
  */
 interface HotwireActivity {
-    var delegate: HotwireActivityDelegate
+    val delegate: HotwireActivityDelegate
+    val appCompatActivity: AppCompatActivity
+    fun sessionConfigurations(): List<SessionConfiguration>
 }
+
+data class SessionConfiguration(
+    val name: String,
+    val startLocation: String,
+    @IdRes val navHostFragmentId: Int,
+)

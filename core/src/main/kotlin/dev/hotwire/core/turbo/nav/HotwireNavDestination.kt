@@ -17,6 +17,7 @@ import dev.hotwire.core.R
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.routing.Router
+import dev.hotwire.core.turbo.activities.HotwireActivity
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
@@ -142,7 +143,8 @@ interface HotwireNavDestination {
     fun route(newLocation: String): Router.RouteResult {
         return Hotwire.router.route(
             location = newLocation,
-            activity = fragment.requireActivity() as AppCompatActivity
+            sessionConfiguration = sessionNavHostFragment.sessionConfiguration,
+            activity = fragment.requireActivity() as HotwireActivity
         )
     }
 

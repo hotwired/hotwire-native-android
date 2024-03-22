@@ -10,7 +10,9 @@ object Urls {
     // Remote demo server
     private const val remoteUrl = "https://turbo-native-demo.glitch.me"
 
-    val appUrl = if (useLocalDev) localDevUrl else remoteUrl
+    // Base app url
+    private val appUrl = if (useLocalDev) localDevUrl else remoteUrl
+
     val homeUrl = appUrl
     val signInUrl = "$appUrl/signin"
     val numbersUrl = "$appUrl/numbers"
