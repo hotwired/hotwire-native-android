@@ -27,6 +27,8 @@ import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.core.turbo.webview.LoadingState
+import dev.hotwire.core.turbo.webview.WebViewState
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -47,15 +49,15 @@ class Session internal constructor(
 ) {
     internal var currentVisit: Visit? = null
     internal var coldBootVisitIdentifier = ""
-    internal var previousOverrideUrlTime = 0L
-    internal var isColdBooting = false
     internal var visitPending = false
-    internal var isRenderProcessGone = false
     internal var restorationIdentifiers = SparseArray<String>()
     internal val context: Context = activity.applicationContext
     internal val httpRepository = TurboHttpRepository(activity.lifecycleScope)
     internal val requestInterceptor = TurboWebViewRequestInterceptor(this)
     internal val fileChooserDelegate = TurboFileChooserDelegate(this)
+
+    private var visitCallback: SessionCallback? = null
+    internal var state: WebViewState = WebViewState()
 
     // User accessible
 
@@ -74,13 +76,12 @@ class Session internal constructor(
      * Gets the nav destination that corresponds to the current WebView visit.
      */
     val currentVisitNavDestination: HotwireNavDestination?
-        get() = currentVisit?.callback?.visitNavDestination()
+        get() = visitCallback?.visitNavDestination()
 
     /**
      * Provides the status of whether Turbo is initialized and ready for use.
      */
-    var isReady = false
-        internal set
+    val isReady get() = state.isReady
 
     init {
         initializeWebView()
@@ -114,18 +115,18 @@ class Session internal constructor(
      */
     fun reset() {
         logEvent("reset")
-        currentVisit?.identifier = ""
+        state.currentVisit?.identifier = ""
         coldBootVisitIdentifier = ""
         restorationIdentifiers.clear()
         visitPending = false
-        isReady = false
-        isColdBooting = false
+        state.isReady = false
+        state.loadingState = LoadingState.Initializing
     }
 
     // Internal
 
     internal fun visit(visit: Visit) {
-        this.currentVisit = visit
+        state.currentVisit = visit
         callback { it.visitLocationStarted(visit.location) }
 
         if (visit.reload) {
@@ -133,7 +134,7 @@ class Session internal constructor(
         }
 
         when {
-            isColdBooting -> visitPending = true
+            state.loadingState == LoadingState.ColdBooting -> visitPending = true
             isReady -> visitLocation(visit)
             else -> visitLocationAsColdBoot(visit)
         }
@@ -145,7 +146,7 @@ class Session internal constructor(
      * but the WebView's current location hasn't changed from the destination's location.
      */
     internal fun restoreCurrentVisit(callback: SessionCallback): Boolean {
-        val visit = currentVisit ?: return false
+        val visit = state.currentVisit ?: return false
         val restorationIdentifier = restorationIdentifiers[visit.destinationIdentifier]
 
         if (!isReady || restorationIdentifier == null) {
@@ -158,18 +159,20 @@ class Session internal constructor(
             "restorationIdentifier" to restorationIdentifier
         )
 
-        visit.callback = callback
+        visitCallback = callback
         visitRendered(visit.identifier)
         visitCompleted(visit.identifier, restorationIdentifier)
 
         return true
     }
 
+    internal fun addCallback(callback: SessionCallback) {
+        visitCallback = callback
+    }
+
     internal fun removeCallback(callback: SessionCallback) {
-        currentVisit?.let { visit ->
-            if (visit.callback == callback) {
-                visit.callback = null
-            }
+        if (visitCallback == callback) {
+            visitCallback = null
         }
     }
 
@@ -245,7 +248,7 @@ class Session internal constructor(
             "visitIsPageRefresh" to visitIsPageRefresh
         )
 
-        currentVisit?.identifier = visitIdentifier
+        state.currentVisit?.identifier = visitIdentifier
     }
 
     /**
@@ -289,7 +292,7 @@ class Session internal constructor(
             "error" to visitError
         )
 
-        currentVisit?.let { visit ->
+        state.currentVisit?.let { visit ->
             if (visitIdentifier == visit.identifier) {
                 callback { it.requestFailedWithError(visitHasCachedSnapshot, visitError) }
             }
@@ -322,7 +325,7 @@ class Session internal constructor(
     fun pageLoaded(restorationIdentifier: String) {
         logEvent("pageLoaded", "restorationIdentifier" to restorationIdentifier)
 
-        currentVisit?.let { visit ->
+        state.currentVisit?.let { visit ->
             restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
         }
     }
@@ -339,7 +342,7 @@ class Session internal constructor(
     fun visitRendered(visitIdentifier: String) {
         logEvent("visitRendered", "visitIdentifier" to visitIdentifier)
 
-        currentVisit?.let { visit ->
+        state.currentVisit?.let { visit ->
             if (visitIdentifier == coldBootVisitIdentifier || visitIdentifier == visit.identifier) {
                 if (isFeatureSupported(VISUAL_STATE_CALLBACK)) {
                     postVisitVisualStateCallback(visitIdentifier)
@@ -369,7 +372,7 @@ class Session internal constructor(
             "restorationIdentifier" to restorationIdentifier
         )
 
-        currentVisit?.let { visit ->
+        state.currentVisit?.let { visit ->
             if (visitIdentifier == visit.identifier) {
                 restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
                 callback { it.visitCompleted(visit.completedOffline) }
@@ -392,7 +395,7 @@ class Session internal constructor(
             "location" to location
         )
 
-        currentVisit?.let {
+        state.currentVisit?.let {
             callback { it.formSubmissionStarted(location) }
         }
     }
@@ -412,7 +415,7 @@ class Session internal constructor(
             "location" to location
         )
 
-        currentVisit?.let {
+        state.currentVisit?.let {
             callback { it.formSubmissionFinished(location) }
         }
     }
@@ -429,7 +432,7 @@ class Session internal constructor(
     fun pageInvalidated() {
         logEvent("pageInvalidated")
 
-        currentVisit?.let { visit ->
+        state.currentVisit?.let { visit ->
             callback {
                 it.pageInvalidated()
                 visit(visit.copy(reload = true))
@@ -449,9 +452,9 @@ class Session internal constructor(
     fun turboIsReady(isReady: Boolean) {
         logEvent("turboIsReady", "isReady" to isReady)
 
-        currentVisit?.let { visit ->
-            this.isReady = isReady
-            this.isColdBooting = false
+        state.currentVisit?.let { visit ->
+            state.isReady = isReady
+            state.loadingState = LoadingState.Loading
 
             if (!isReady) {
                 reset()
@@ -535,7 +538,7 @@ class Session internal constructor(
 
     private fun visitLocationAsColdBoot(visit: Visit) {
         logEvent("visitLocationAsColdBoot", "location" to visit.location)
-        isColdBooting = true
+        state.loadingState = LoadingState.ColdBooting
 
         // When a page is invalidated by Turbo, we need to reload the
         // same URL in the WebView. For a URL with an anchor, the WebView
@@ -558,7 +561,7 @@ class Session internal constructor(
         logEvent("renderVisitForColdBoot", "coldBootVisitIdentifier" to coldBootVisitIdentifier)
         webView.visitRenderedForColdBoot(coldBootVisitIdentifier)
 
-        currentVisit?.let { visit ->
+        state.currentVisit?.let { visit ->
             callback { it.visitCompleted(visit.completedOffline) }
         }
     }
@@ -621,7 +624,7 @@ class Session internal constructor(
 
     private fun callback(action: (SessionCallback) -> Unit) {
         context.runOnUiThread {
-            currentVisit?.callback?.let { callback ->
+            visitCallback?.let { callback ->
                 if (callback.visitNavDestination().isActive) {
                     action(callback)
                 }
@@ -640,12 +643,13 @@ class Session internal constructor(
     private inner class TurboWebViewClient : WebViewClientCompat() {
         private var initialScaleChanged = false
         private var initialScale = 0f
+        private var previousOverrideUrlTime = 0L
 
         override fun onPageStarted(view: WebView, location: String, favicon: Bitmap?) {
             logEvent("onPageStarted", "location" to location)
             callback { it.onPageStarted(location) }
             coldBootVisitIdentifier = ""
-            currentVisit?.identifier = ""
+            state.currentVisit?.identifier = ""
         }
 
         override fun onPageFinished(view: WebView, location: String) {
@@ -657,7 +661,7 @@ class Session internal constructor(
                 return
             }
 
-            if (!isColdBooting) {
+            if (state.loadingState != LoadingState.ColdBooting) {
                 // We can get here even when the page failed to load. If
                 // onReceivedError() or onReceivedHttpError() are called,
                 // they reset the session, so we're no longer cold booting.
@@ -666,7 +670,7 @@ class Session internal constructor(
 
             logEvent("onPageFinished", "location" to location, "progress" to view.progress)
             coldBootVisitIdentifier = location.identifier()
-            currentVisit?.identifier = coldBootVisitIdentifier
+            state.currentVisit?.identifier = coldBootVisitIdentifier
             installBridge(location)
         }
 
@@ -709,7 +713,8 @@ class Session internal constructor(
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val location = request.url.toString()
             val isHttpRequest = request.isHttpGetRequest()
-            val isColdBootRedirect = isHttpRequest && isColdBooting && currentVisit?.location != location
+            val isColdBooting = state.loadingState == LoadingState.ColdBooting
+            val isColdBootRedirect = isHttpRequest && isColdBooting && state.currentVisit?.location != location
             val shouldOverride = isReady || isColdBootRedirect
 
             // Don't allow onPageFinished to process its
@@ -780,7 +785,7 @@ class Session internal constructor(
             val visitError = WebSslError.from(error)
             logEvent("onReceivedSslError", "error" to visitError, "url" to error.url)
 
-            if (currentVisit?.location == error.url) {
+            if (state.currentVisit?.location == error.url) {
                 reset()
                 callback { it.onReceivedError(visitError) }
             }
@@ -792,7 +797,7 @@ class Session internal constructor(
             if (view == webView) {
                 // Set a flag if the WebView render process is gone so we
                 // can avoid using this session any further in the app.
-                isRenderProcessGone = true
+                state.isRenderProcessGone = true
 
                 // Note: The render process can be gone even if a visit
                 // hasn't been performed yet in this WebView instance.

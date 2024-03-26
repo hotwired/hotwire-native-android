@@ -358,13 +358,13 @@ internal class TurboWebFragmentDelegate(
             }
 
             viewTreeLifecycleOwner?.lifecycle?.whenStateAtLeast(STARTED) {
+                session().addCallback(this@TurboWebFragmentDelegate)
                 session().visit(
                     Visit(
                         location = location,
                         destinationIdentifier = identifier,
                         restoreWithCachedSnapshot = restoreWithCachedSnapshot,
                         reload = reload,
-                        callback = this@TurboWebFragmentDelegate,
                         options = options.copy(snapshotHTML = snapshot)
                     )
                 )

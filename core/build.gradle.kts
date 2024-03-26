@@ -45,6 +45,11 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
 
     compileOptions {
@@ -95,6 +100,10 @@ dependencies {
 
     // Browser
     implementation("androidx.browser:browser:1.7.0")
+
+    // Compose
+    implementation("androidx.compose.material3:material3")
+    implementation(platform("androidx.compose:compose-bom:2024.03.00"))
 
     // Exported AndroidX dependencies
     api("androidx.appcompat:appcompat:1.6.1")
