@@ -58,6 +58,6 @@ internal class TurboCameraCaptureDelegate(val context: Context) {
                 acceptTypes.contains("image/jpeg") ||
                 acceptTypes.contains("image/jpg")
 
-        return isCaptureEnabled && (acceptsAny() || acceptsImages)
+        return acceptsImages || (isCaptureEnabled && acceptsAny())
     }
 }
