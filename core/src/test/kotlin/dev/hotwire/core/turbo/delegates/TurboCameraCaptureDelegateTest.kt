@@ -30,15 +30,18 @@ class TurboCameraCaptureDelegateTest : BaseUnitTest() {
 
     @Test
     fun buildIntentAcceptTypesValid() {
-        val acceptTypes = arrayOf(
-            "*/*",
-            "image/*",
-            "image/jpg",
-            "image/jpeg"
+        val params = listOf(
+            params(arrayOf("*/*"), captureEnabled = true),
+            params(arrayOf("image/*"), captureEnabled = true),
+            params(arrayOf("image/*"), captureEnabled = false),
+            params(arrayOf("image/jpg"), captureEnabled = true),
+            params(arrayOf("image/jpg"), captureEnabled = false),
+            params(arrayOf("image/jpeg"), captureEnabled = true),
+            params(arrayOf("image/jpeg"), captureEnabled = false)
         )
 
-        acceptTypes.forEach {
-            val intent = delegate.buildIntent(params(acceptTypes = arrayOf(it)))
+        params.forEach {
+            val intent = delegate.buildIntent(it)
             val uri = intent?.getParcelableExtra<Uri>(MediaStore.EXTRA_OUTPUT).toString()
 
             assertThat(intent).isNotNull()
@@ -51,14 +54,18 @@ class TurboCameraCaptureDelegateTest : BaseUnitTest() {
 
     @Test
     fun buildIntentAcceptTypesInvalid() {
-        val acceptTypes = arrayOf(
-            "image/png",
-            "image/webp",
-            "video/*"
+        val params = listOf(
+            params(arrayOf("*/*"), captureEnabled = false),
+            params(arrayOf("image/png"), captureEnabled = true),
+            params(arrayOf("image/png"), captureEnabled = false),
+            params(arrayOf("image/webp"), captureEnabled = true),
+            params(arrayOf("image/webp"), captureEnabled = false),
+            params(arrayOf("video/*"), captureEnabled = true),
+            params(arrayOf("video/*"), captureEnabled = false),
         )
 
-        acceptTypes.forEach {
-            val intent = delegate.buildIntent(params(acceptTypes = arrayOf(it)))
+        params.forEach {
+            val intent = delegate.buildIntent(it)
             assertThat(intent).isNull()
         }
     }
