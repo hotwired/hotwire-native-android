@@ -43,8 +43,8 @@ open class SessionNavHostFragment : NavHostFragment() {
     internal fun createNewSession() {
         session = Session(
             sessionName = sessionConfiguration.name,
-            activity = activity.appCompatActivity,
-            webView = onCreateWebView(activity.appCompatActivity)
+            activity = activity,
+            webView = onCreateWebView(activity)
         )
         onSessionCreated()
     }

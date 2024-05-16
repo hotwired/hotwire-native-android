@@ -1,16 +1,20 @@
 package dev.hotwire.core.navigation.activities
 
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.navigation.session.SessionConfiguration
-import dev.hotwire.core.navigation.session.SessionNavHostFragment
 
 /**
- * Interface that should be implemented by any Activity using Turbo. Ensures that the
- * Activity provides a [HotwireActivityDelegate] so the framework can initialize the
- * [SessionNavHostFragment] hosted in your Activity's layout resource.
+ * Activity that should be implemented by any Activity using Hotwire.
  */
-interface HotwireActivity {
-    val delegate: HotwireActivityDelegate
-    val appCompatActivity: AppCompatActivity
-    fun sessionConfigurations(): List<SessionConfiguration>
+abstract class HotwireActivity : AppCompatActivity() {
+    lateinit var delegate: HotwireActivityDelegate
+        private set
+
+    abstract fun sessionConfigurations(): List<SessionConfiguration>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        delegate = HotwireActivityDelegate(this)
+    }
 }

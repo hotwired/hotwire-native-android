@@ -47,11 +47,11 @@ Android Jetpack provides a [`FragmentContainerView`](https://developer.android.c
 
 Refer to the demo [`activity_main.xml`](../demo/src/main/res/layout/activity_main.xml) for an example.
 
-### Implement the HotwireActivity interface
+### Implement the HotwireActivity abstract class
 
-A Hotwire `Activity` is straightforward and needs to implement the [`HotwireActivity`](../core/src/main/kotlin/dev/hotwire/core/turbo/activities/HotwireActivity.kt) interface in order to provide a [`HotwireActivityDelegate`](../core/src/main/kotlin/dev/hotwire/core/turbo/delegates/HotwireActivityDelegate.kt) and `Session` configuration information.
+A Hotwire `Activity` is straightforward and needs to subclass the [`HotwireActivity`](../core/src/main/kotlin/dev/hotwire/core/turbo/activities/HotwireActivity.kt) class in order to provide `Session` configuration information.
 
-Your Activity should extend Android Jetpack's [`AppCompatActivity`](https://developer.android.com/reference/androidx/appcompat/app/AppCompatActivity). 
+`HotwireActivity` extends Android Jetpack's [`AppCompatActivity`](https://developer.android.com/reference/androidx/appcompat/app/AppCompatActivity). 
 
 You'll need to provide at least one `SessionConfiguration` instance (one for each `SessionNavHostFragment` that exists in our Activity layout). This includes:
 - The `name` of the `Session` (this is arbitrary and helpful for debugging purposes, but each must be unique in your app)
@@ -62,10 +62,7 @@ In its simplest form, your Activity will look like:
 
 **`MainActivity.kt`:**
 ```kotlin
-class MainActivity : AppCompatActivity(), HotwireActivity {
-    override val delegate by lazy { HotwireActivityDelegate(this) }
-    override val appCompatActivity = this
-
+class MainActivity : HotwireActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

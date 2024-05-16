@@ -27,7 +27,7 @@ class BrowserRoute : Router.Route {
         val intent = Intent(Intent.ACTION_VIEW, location.toUri())
 
         try {
-            activity.appCompatActivity.startActivity(intent)
+            activity.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             logError("BrowserRoute", e)
         }
