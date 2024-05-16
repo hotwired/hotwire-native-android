@@ -21,7 +21,6 @@ import dev.hotwire.core.turbo.visit.VisitOptions
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class HotwireActivityDelegate(val activity: HotwireActivity) {
-    private val appCompatActivity = activity.appCompatActivity
     private val navHostFragments = mutableMapOf<Int, SessionNavHostFragment>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
@@ -41,9 +40,9 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      * handles Fragment navigation with the back button.
      */
     init {
-        appCompatActivity.lifecycle.addObserver(HotwireActivityObserver())
-        appCompatActivity.onBackPressedDispatcher.addCallback(
-            owner = appCompatActivity,
+        activity.lifecycle.addObserver(HotwireActivityObserver())
+        activity.onBackPressedDispatcher.addCallback(
+            owner = activity,
             onBackPressedCallback = onBackPressedCallback
         )
     }

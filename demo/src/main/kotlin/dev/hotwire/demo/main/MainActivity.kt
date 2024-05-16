@@ -1,17 +1,12 @@
 package dev.hotwire.demo.main
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.activities.HotwireActivityDelegate
 import dev.hotwire.core.navigation.session.SessionConfiguration
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
 
-class MainActivity : AppCompatActivity(), HotwireActivity {
-    override val delegate by lazy { HotwireActivityDelegate(this) }
-    override val appCompatActivity = this
-
+class MainActivity : HotwireActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

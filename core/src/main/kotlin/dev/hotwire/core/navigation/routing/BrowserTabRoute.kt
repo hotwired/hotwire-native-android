@@ -25,7 +25,7 @@ class BrowserTabRoute : Router.Route {
         sessionConfiguration: SessionConfiguration,
         activity: HotwireActivity
     ) {
-        val color = activity.appCompatActivity.colorFromThemeAttr(R.attr.colorSurface)
+        val color = activity.colorFromThemeAttr(R.attr.colorSurface)
         val colorParams = CustomTabColorSchemeParams.Builder()
             .setToolbarColor(color)
             .setNavigationBarColor(color)
@@ -37,6 +37,6 @@ class BrowserTabRoute : Router.Route {
             .setUrlBarHidingEnabled(false)
             .setDefaultColorSchemeParams(colorParams)
             .build()
-            .launchUrl(activity.appCompatActivity, location.toUri())
+            .launchUrl(activity, location.toUri())
     }
 }
