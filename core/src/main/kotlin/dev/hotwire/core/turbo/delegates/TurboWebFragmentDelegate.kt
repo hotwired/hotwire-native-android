@@ -13,8 +13,6 @@ import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.fragments.TurboWebFragmentCallback
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
-import dev.hotwire.core.turbo.nav.TurboNavigator
-import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.session.SessionCallback
 import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.dispatcherProvider
@@ -46,37 +44,34 @@ internal class TurboWebFragmentDelegate(
     private var screenshotOrientation = 0
     private var screenshotZoomed = false
     private var currentlyZoomed = false
-    private val navigator: TurboNavigator
-        get() = navDestination.delegate().navigator
-    private val turboView: TurboView?
-        get() = callback.turboView
-    private val viewTreeLifecycleOwner
-        get() = turboView?.findViewTreeLifecycleOwner()
+    private val navigator = navDestination.navigator
+    private val session get() = navigator.session
+    private val turboView get() = callback.turboView
+    private val viewTreeLifecycleOwner get() = turboView?.findViewTreeLifecycleOwner()
 
     /**
      * Get the session's WebView instance
      */
     val webView: TurboWebView
-        get() = session().webView
+        get() = session.webView
 
     /**
      * The activity result launcher that handles file chooser results.
      */
     val fileChooserResultLauncher = registerFileChooserLauncher()
 
+    fun prepareNavigation(onReady: () -> Unit) {
+        session.removeCallback(this)
+        detachWebView(onReady)
+    }
+
     /**
      * Should be called by the implementing Fragment during
      * [androidx.fragment.app.Fragment.onViewCreated].
      */
     fun onViewCreated() {
-        if (session().isRenderProcessGone) {
-            navDestination.sessionNavHostFragment.createNewSession()
-        }
-
-        navigator.onNavigationVisit = { onReady ->
-            navDestination.onBeforeNavigation()
-            session().removeCallback(this)
-            detachWebView(onReady)
+        if (session.isRenderProcessGone) {
+            navigator.createNewSession()
         }
     }
 
@@ -115,7 +110,7 @@ internal class TurboWebFragmentDelegate(
      * before navigation.
      */
     fun onDialogCancel() {
-        session().removeCallback(this)
+        session.removeCallback(this)
         detachWebView()
     }
 
@@ -127,7 +122,7 @@ internal class TurboWebFragmentDelegate(
         // The WebView is already detached in most circumstances, but sometimes
         // fast user cancellation does not call onCancel() before onDismiss()
         if (webViewIsAttached()) {
-            session().removeCallback(this)
+            session.removeCallback(this)
             detachWebView()
         }
     }
@@ -147,13 +142,6 @@ internal class TurboWebFragmentDelegate(
 
         isWebViewAttachedToNewDestination = false
         visit(location, restoreWithCachedSnapshot = false, reload = true)
-    }
-
-    /**
-     * Retrieves the Turbo session from the destination.
-     */
-    fun session(): Session {
-        return navDestination.session
     }
 
     /**
@@ -316,8 +304,8 @@ internal class TurboWebFragmentDelegate(
             // Visit every time the WebView is reattached to the current Fragment.
             if (isWebViewAttachedToNewDestination) {
                 val currentSessionVisitRestored = !isInitialVisit &&
-                    session().currentVisit?.destinationIdentifier == identifier &&
-                    session().restoreCurrentVisit(this)
+                    session.currentVisit?.destinationIdentifier == identifier &&
+                    session.restoreCurrentVisit(this)
 
                 if (!currentSessionVisitRestored) {
                     showProgressView(location)
@@ -339,7 +327,7 @@ internal class TurboWebFragmentDelegate(
 
     private fun registerFileChooserLauncher(): ActivityResultLauncher<Intent> {
         return navDestination.fragment.registerForActivityResult(StartActivityForResult()) { result ->
-            session().fileChooserDelegate.onActivityResult(result)
+            session.fileChooserDelegate.onActivityResult(result)
         }
     }
 
@@ -358,7 +346,7 @@ internal class TurboWebFragmentDelegate(
             }
 
             viewTreeLifecycleOwner?.lifecycle?.whenStateAtLeast(STARTED) {
-                session().visit(
+                session.visit(
                     Visit(
                         location = location,
                         destinationIdentifier = identifier,
@@ -374,7 +362,7 @@ internal class TurboWebFragmentDelegate(
 
     private suspend fun fetchCachedSnapshot(): String? {
         return withContext(dispatcherProvider.io) {
-            val response = session().offlineRequestHandler?.getCachedSnapshot(
+            val response = session.offlineRequestHandler?.getCachedSnapshot(
                 url = location
             )
 
@@ -385,7 +373,7 @@ internal class TurboWebFragmentDelegate(
     }
 
     private fun screenshotView() {
-        if (!session().screenshotsEnabled) return
+        if (!session.screenshotsEnabled) return
 
         turboView?.let {
             screenshot = it.createScreenshot()

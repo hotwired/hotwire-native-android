@@ -9,7 +9,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_nav_host"
-        android:name="dev.hotwire.core.navigation.session.SessionNavHostFragment"
+        android:name="dev.hotwire.core.navigation.session.NavigatorHost"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="false" />

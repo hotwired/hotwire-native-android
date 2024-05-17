@@ -3,7 +3,7 @@ package dev.hotwire.core.turbo.delegates
 import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
-import dev.hotwire.core.turbo.nav.TurboNavigator
+import dev.hotwire.core.turbo.nav.Navigator
 import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.session.SessionViewModel
 import dev.hotwire.core.turbo.util.displayBackButton
@@ -17,20 +17,20 @@ import dev.hotwire.core.turbo.util.displayBackButtonAsCloseIcon
 class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     private val fragment = navDestination.fragment
     private val location = navDestination.location
-    private val sessionName = navDestination.session.sessionName
+    private val navigator = navDestination.navigator
 
-    internal val sessionViewModel = SessionViewModel.get(sessionName, fragment.requireActivity())
+    internal val sessionViewModel = SessionViewModel.get(navigator.session.sessionName, fragment.requireActivity())
     internal val fragmentViewModel = TurboFragmentViewModel.get(location, fragment)
 
-    internal lateinit var navigator: TurboNavigator
+    fun prepareNavigation(onReady: () -> Unit) {
+        onReady()
+    }
 
     /**
      * Should be called by the implementing Fragment during
      * [androidx.fragment.app.Fragment.onViewCreated].
      */
     fun onViewCreated() {
-        navigator = TurboNavigator(navDestination)
-
         initToolbar()
         logEvent("fragment.onViewCreated", "location" to location)
     }
@@ -110,7 +110,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
 
     private fun logEvent(event: String, vararg params: Pair<String, Any>) {
         val attributes = params.toMutableList().apply {
-            add(0, "session" to sessionName)
+            add(0, "session" to navigator.session.sessionName)
             add("fragment" to fragment.javaClass.simpleName)
         }
         logEvent(event, attributes)

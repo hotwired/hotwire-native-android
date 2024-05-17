@@ -17,7 +17,7 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.navigation.routing.Router
-import dev.hotwire.core.navigation.session.SessionNavHostFragment
+import dev.hotwire.core.navigation.session.NavigatorHost
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
@@ -25,7 +25,6 @@ import dev.hotwire.core.turbo.delegates.TurboNestedFragmentDelegate
 import dev.hotwire.core.turbo.fragments.TurboFragment
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.fragments.TurboWebFragment
-import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 
@@ -35,16 +34,15 @@ import dev.hotwire.core.turbo.visit.VisitOptions
  */
 interface HotwireNavDestination {
     /**
+     * Gets the navigator instance associated with this destination.
+     */
+    val navigator: Navigator
+
+    /**
      * Gets the fragment instance for this destination.
      */
     val fragment: Fragment
         get() = this as Fragment
-
-    /**
-     * Gets the Turbo session's nav host fragment associated with this destination.
-     */
-    val sessionNavHostFragment: SessionNavHostFragment
-        get() = fragment.parentFragment as SessionNavHostFragment
 
     /**
      * Gets the location for this destination.
@@ -64,12 +62,6 @@ interface HotwireNavDestination {
      */
     val pathProperties: PathConfigurationProperties
         get() = pathConfiguration.properties(location)
-
-    /**
-     * Gets the [Session] associated with this destination.
-     */
-    val session: Session
-        get() = sessionNavHostFragment.session
 
     /**
      * Gets the [TurboFragmentViewModel] associated with this destination.
@@ -129,8 +121,9 @@ interface HotwireNavDestination {
      * not have to override this, unless you're using a [TurboNestedFragmentDelegate] to provide
      * sub-navigation within your current Fragment destination and would like custom behavior.
      */
-    fun navHostForNavigation(newLocation: String): SessionNavHostFragment {
-        return sessionNavHostFragment
+    // TODO replace with `navigatorForNavigation()`
+    fun navHostForNavigation(newLocation: String): NavigatorHost {
+        return navigator.host
     }
 
     /**
@@ -142,7 +135,7 @@ interface HotwireNavDestination {
     fun route(newLocation: String): Router.RouteResult {
         return Hotwire.router.route(
             location = newLocation,
-            sessionConfiguration = sessionNavHostFragment.sessionConfiguration,
+            sessionConfiguration = navigator.host.sessionConfiguration,
             activity = fragment.requireActivity() as HotwireActivity
         )
     }
@@ -239,18 +232,17 @@ interface HotwireNavDestination {
     /**
      * Finds the nav host fragment with the given resource ID.
      */
-    fun findNavHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
+    fun findNavHostFragment(@IdRes navHostFragmentId: Int): NavigatorHost {
         return fragment.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
             ?: fragment.parentFragment?.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
             ?: fragment.requireActivity().supportFragmentManager.findNavHostFragment(navHostFragmentId)
-            ?: throw IllegalStateException("No SessionNavHostFragment found with ID: $navHostFragmentId")
+            ?: throw IllegalStateException("No NavigatorHost found with ID: $navHostFragmentId")
     }
+
+    fun prepareNavigation(onReady: () -> Unit)
 
     private val Bundle.location
         get() = getString("location")
-
-    private val navigator: TurboNavigator
-        get() = delegate().navigator
 
     /**
      * Retrieve the nav controller indirectly from the parent NavHostFragment,
@@ -260,7 +252,7 @@ interface HotwireNavDestination {
         return fragment.parentFragment?.findNavController()
     }
 
-    private fun FragmentManager.findNavHostFragment(navHostFragmentId: Int): SessionNavHostFragment? {
-        return findFragmentById(navHostFragmentId) as? SessionNavHostFragment
+    private fun FragmentManager.findNavHostFragment(navHostFragmentId: Int): NavigatorHost? {
+        return findFragmentById(navHostFragmentId) as? NavigatorHost
     }
 }

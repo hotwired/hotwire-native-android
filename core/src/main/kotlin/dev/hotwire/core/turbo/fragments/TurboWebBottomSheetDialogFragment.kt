@@ -65,6 +65,10 @@ abstract class TurboWebBottomSheetDialogFragment : TurboBottomSheetDialogFragmen
         webDelegate.refresh(displayProgress)
     }
 
+    final override fun prepareNavigation(onReady: () -> Unit) {
+        webDelegate.prepareNavigation(onReady)
+    }
+
     // ----------------------------------------------------------------------------
     // TurboWebFragmentCallback interface
     // ----------------------------------------------------------------------------
@@ -87,7 +91,7 @@ abstract class TurboWebBottomSheetDialogFragment : TurboBottomSheetDialogFragmen
     }
 
     override fun createWebChromeClient(): TurboWebChromeClient {
-        return TurboWebChromeClient(session)
+        return TurboWebChromeClient(navigator.session)
     }
 
     override fun onVisitErrorReceived(location: String, error: VisitError) {

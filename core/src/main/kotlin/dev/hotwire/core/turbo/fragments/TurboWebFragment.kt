@@ -78,6 +78,10 @@ abstract class TurboWebFragment : TurboFragment(), TurboWebFragmentCallback {
         }
     }
 
+    final override fun prepareNavigation(onReady: () -> Unit) {
+        webDelegate.prepareNavigation(onReady)
+    }
+
     // ----------------------------------------------------------------------------
     // TurboWebFragmentCallback interface
     // ----------------------------------------------------------------------------
@@ -100,7 +104,7 @@ abstract class TurboWebFragment : TurboFragment(), TurboWebFragmentCallback {
     }
 
     override fun createWebChromeClient(): TurboWebChromeClient {
-        return TurboWebChromeClient(session)
+        return TurboWebChromeClient(navigator.session)
     }
 
     override fun onVisitErrorReceived(location: String, error: VisitError) {

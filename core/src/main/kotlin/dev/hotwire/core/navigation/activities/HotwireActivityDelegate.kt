@@ -5,8 +5,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import dev.hotwire.core.navigation.session.NavigatorHost
 import dev.hotwire.core.navigation.session.SessionConfiguration
-import dev.hotwire.core.navigation.session.SessionNavHostFragment
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
 import dev.hotwire.core.turbo.visit.VisitOptions
@@ -16,12 +16,10 @@ import dev.hotwire.core.turbo.visit.VisitOptions
  * Activity to communicate with Hotwire Native (and vice versa).
  *
  * @property activity The Activity to bind this delegate to.
- * @property currentNavHostFragmentId The resource ID of the [SessionNavHostFragment]
- *  instance hosted in your Activity's layout resource.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class HotwireActivityDelegate(val activity: HotwireActivity) {
-    private val navHostFragments = mutableMapOf<Int, SessionNavHostFragment>()
+    private val navigatorHosts = mutableMapOf<Int, NavigatorHost>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
         override fun handleOnBackPressed() {
@@ -29,10 +27,10 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
         }
     }
 
-    private var currentNavHostFragmentId = activity.sessionConfigurations().first().navHostFragmentId
+    private var currentNavigatorHostId = activity.sessionConfigurations().first().navHostFragmentId
         set(value) {
             field = value
-            updateOnBackPressedCallback(currentNavHostFragment.navController)
+            updateOnBackPressedCallback(currentNavigatorHost.navController)
         }
 
     /**
@@ -48,62 +46,61 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     /**
-     * Gets the Activity's currently active [SessionNavHostFragment].
+     * Gets the Activity's currently active [NavigatorHost].
      */
-    val currentNavHostFragment: SessionNavHostFragment
-        get() = navHostFragment(currentNavHostFragmentId)
+    val currentNavigatorHost: NavigatorHost
+        get() = navigatorHost(currentNavigatorHostId)
 
     /**
-     * Gets the currently active Fragment destination hosted in the current
-     * [SessionNavHostFragment].
+     * Gets the currently active destination hosted in the current [NavigatorHost].
      */
     val currentNavDestination: HotwireNavDestination?
         get() = currentFragment as HotwireNavDestination?
 
     /**
      * Sets the currently active session in your Activity. If you use multiple
-     *  [SessionNavHostFragment] instances in your app (such as for bottom tabs),
+     *  [NavigatorHost] instances in your app (such as for bottom tabs),
      *  you must update this whenever the current session changes.
      */
     fun setCurrentSession(sessionConfiguration: SessionConfiguration) {
-        currentNavHostFragmentId = sessionConfiguration.navHostFragmentId
+        currentNavigatorHostId = sessionConfiguration.navHostFragmentId
     }
 
-    internal fun registerNavHostFragment(navHostFragment: SessionNavHostFragment) {
-        if (navHostFragments[navHostFragment.id] == null) {
-            navHostFragments[navHostFragment.id] = navHostFragment
-            listenToDestinationChanges(navHostFragment.navController)
+    internal fun registerNavigatorHost(host: NavigatorHost) {
+        if (navigatorHosts[host.id] == null) {
+            navigatorHosts[host.id] = host
+            listenToDestinationChanges(host.navController)
         }
     }
 
-    internal fun unregisterNavHostFragment(navHostFragment: SessionNavHostFragment) {
-        navHostFragments.remove(navHostFragment.id)
+    internal fun unregisterNavigatorHost(host: NavigatorHost) {
+        navigatorHosts.remove(host.id)
     }
 
     /**
-     * Finds the nav host fragment associated with the provided resource ID.
+     * Finds the navigator host associated with the provided resource ID.
      *
-     * @param navHostFragmentId
+     * @param navigatorHostId
      * @return
      */
-    fun navHostFragment(@IdRes navHostFragmentId: Int): SessionNavHostFragment {
-        return requireNotNull(navHostFragments[navHostFragmentId]) {
-            "No registered SessionNavHostFragment found"
+    fun navigatorHost(@IdRes navigatorHostId: Int): NavigatorHost {
+        return requireNotNull(navigatorHosts[navigatorHostId]) {
+            "No registered NavigatorHost found"
         }
     }
 
     /**
-     * Resets the Turbo sessions associated with all registered nav host fragments.
+     * Resets the sessions associated with all registered navigator hosts.
      */
     fun resetSessions() {
-        navHostFragments.forEach { it.value.session.reset() }
+        navigatorHosts.forEach { it.value.navigator.session.reset() }
     }
 
     /**
-     * Resets all registered nav host fragments via [SessionNavHostFragment.reset].
+     * Resets all registered navigators via [Navigator.reset].
      */
-    fun resetNavHostFragments() {
-        navHostFragments.forEach { it.value.reset() }
+    fun resetNavigators() {
+        navigatorHosts.forEach { it.value.navigator.reset() }
     }
 
     /**
@@ -160,15 +157,15 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     private fun updateOnBackPressedCallback(navController: NavController) {
-        if (navController == currentNavHostFragment.navController)  {
+        if (navController ==  currentNavigatorHost.navController)  {
             onBackPressedCallback.isEnabled = navController.previousBackStackEntry != null
         }
     }
 
     private val currentFragment: Fragment?
         get() {
-            return if (currentNavHostFragment.isAdded && !currentNavHostFragment.isDetached) {
-                currentNavHostFragment.childFragmentManager.primaryNavigationFragment
+            return if (currentNavigatorHost.isAdded && !currentNavigatorHost.isDetached) {
+                currentNavigatorHost.childFragmentManager.primaryNavigationFragment
             } else {
                 null
             }
