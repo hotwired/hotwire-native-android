@@ -63,9 +63,9 @@ class Navigator(val host: NavigatorHost) {
     }
 
     /**
-     * Navigates up to the previous destination.
+     * Pops the backstack up to the previous destination.
      */
-    fun navigateUp() {
+    fun popUp() {
         navigateWhenReady {
             val currentFragment = currentDestination.fragment
             if (currentFragment is HotwireNavDialogDestination) {
@@ -77,10 +77,9 @@ class Navigator(val host: NavigatorHost) {
     }
 
     /**
-     * Navigates back to the previous destination. See [NavController.popBackStack] for
-     * more details.
+     * Pops the backstack to the previous destination.
      */
-    fun navigateBack() {
+    fun pop() {
         navigateWhenReady {
             val currentFragment = currentDestination.fragment
             if (currentFragment is HotwireNavDialogDestination) {
@@ -92,7 +91,7 @@ class Navigator(val host: NavigatorHost) {
     }
 
     /**
-     * Navigates to the specified location. The resulting destination and its presentation
+     * Routes to the specified location. The resulting destination and its presentation
      * will be determined using the path configuration rules.
      *
      * @param location The location to navigate to.
@@ -100,7 +99,7 @@ class Navigator(val host: NavigatorHost) {
      * @param bundle Bundled arguments to pass to the destination. (optional)
      * @param extras Extras that can be passed to enable Fragment specific behavior. (optional)
      */
-    fun navigate(
+    fun route(
         location: String,
         options: VisitOptions = VisitOptions(),
         bundle: Bundle? = null,
@@ -140,7 +139,7 @@ class Navigator(val host: NavigatorHost) {
                 navigateWithinContext(rule)
             }
             TurboNavMode.REFRESH -> {
-                navigate(rule.currentLocation, VisitOptions())
+                route(rule.currentLocation, VisitOptions())
             }
             TurboNavMode.NONE -> {
                 // Do nothing
@@ -149,9 +148,9 @@ class Navigator(val host: NavigatorHost) {
     }
 
     /**
-     * Clears the navigation back stack to the start destination.
+     * Clears the navigation backstack to the start destination.
      */
-    fun clearBackStack(onCleared: () -> Unit = {}) {
+    fun clearAll(onCleared: () -> Unit = {}) {
         if (isAtStartDestination()) {
             onCleared()
             return
@@ -169,12 +168,12 @@ class Navigator(val host: NavigatorHost) {
     }
 
     /**
-     * Resets the [Navigator] along with its [NavigatorHost] and [Session] instances.
+     * Resets the [Navigator] along with its [NavigatorHost] and [Session] instance.
      * The entire navigation graph is reset to its original starting point.
      */
     fun reset(onReset: () -> Unit = {}) {
         navigateWhenReady {
-            clearBackStack {
+            clearAll {
                 session.reset()
                 host.initControllerGraph()
 
@@ -226,7 +225,7 @@ class Navigator(val host: NavigatorHost) {
                 replaceRootLocation(rule)
             }
             TurboNavPresentation.CLEAR_ALL -> navigateWhenReady {
-                clearBackStack()
+                clearAll()
             }
             else -> {
                 throw IllegalStateException("Unexpected Presentation for navigating within context")

@@ -3,7 +3,6 @@ package dev.hotwire.core.turbo.delegates
 import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
-import dev.hotwire.core.turbo.nav.Navigator
 import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.session.SessionViewModel
 import dev.hotwire.core.turbo.util.displayBackButton
@@ -66,7 +65,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     fun onStartAfterModalResult(result: SessionModalResult) {
         logEvent("fragment.onStartAfterModalResult", "location" to result.location, "options" to result.options)
         if (result.shouldNavigate) {
-            navigator.navigate(result.location, result.options, result.bundle)
+            navigator.route(result.location, result.options, result.bundle)
         }
     }
 
@@ -103,7 +102,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
             }
 
             it.setNavigationOnClickListener {
-                navigator.navigateUp()
+                navigator.popUp()
             }
         }
     }

@@ -199,7 +199,7 @@ internal class TurboWebFragmentDelegate(
     }
 
     override fun onRenderProcessGone() {
-        navigator.navigate(location, VisitOptions(action = VisitAction.REPLACE))
+        navigator.route(location, VisitOptions(action = VisitAction.REPLACE))
     }
 
     override fun requestFailedWithError(visitHasCachedSnapshot: Boolean, error: VisitError) {
@@ -218,7 +218,7 @@ internal class TurboWebFragmentDelegate(
         location: String,
         options: VisitOptions
     ) {
-        navigator.navigate(location, options)
+        navigator.route(location, options)
     }
 
     override fun visitNavDestination(): HotwireNavDestination {

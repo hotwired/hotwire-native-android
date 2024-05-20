@@ -23,7 +23,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
         override fun handleOnBackPressed() {
-            navigateBack()
+            currentNavigator?.pop()
         }
     }
 
@@ -101,53 +101,6 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      */
     fun resetNavigators() {
         navigatorHosts.forEach { it.value.navigator.reset() }
-    }
-
-    /**
-     * Navigates to the specified location. The resulting destination and its presentation
-     * will be determined using the path configuration rules.
-     *
-     * @param location The location to navigate to.
-     * @param options Visit options to apply to the visit. (optional)
-     * @param bundle Bundled arguments to pass to the destination. (optional)
-     */
-    fun navigate(
-        location: String,
-        options: VisitOptions = VisitOptions(),
-        bundle: Bundle? = null
-    ) {
-        currentNavigator?.navigate(location, options, bundle)
-    }
-
-    /**
-     * Navigates up to the previous destination. See [NavController.navigateUp] for
-     * more details.
-     */
-    fun navigateUp() {
-        currentNavigator?.navigateUp()
-    }
-
-    /**
-     * Navigates back to the previous destination. See [NavController.popBackStack] for
-     * more details.
-     */
-    fun navigateBack() {
-        currentNavigator?.navigateBack()
-    }
-
-    /**
-     * Clears the navigation back stack to the start destination.
-     */
-    fun clearBackStack(onCleared: () -> Unit = {}) {
-        currentNavigator?.clearBackStack(onCleared)
-    }
-
-    /**
-     * Refresh the current destination. See [HotwireNavDestination.refresh] for
-     * more details.
-     */
-    fun refresh(displayProgress: Boolean = true) {
-        currentNavigator?.currentDestination?.refresh(displayProgress)
     }
 
     private fun listenToDestinationChanges(navController: NavController) {
