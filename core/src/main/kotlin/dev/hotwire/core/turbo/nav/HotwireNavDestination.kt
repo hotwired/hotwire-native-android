@@ -51,12 +51,6 @@ interface HotwireNavDestination {
         get() = requireNotNull(fragment.arguments?.location)
 
     /**
-     * Gets the previous back stack entry's location from the nav controller.
-     */
-    val previousLocation: String?
-        get() = navController()?.previousBackStackEntry?.arguments?.location
-
-    /**
      * Gets the path configuration properties for the location associated with this
      * destination.
      */
@@ -141,24 +135,6 @@ interface HotwireNavDestination {
     }
 
     /**
-     * Navigates to the specified location. The resulting destination and its presentation
-     * will be determined using the path configuration rules.
-     *
-     * @param location The location to navigate to.
-     * @param options Visit options to apply to the visit. (optional)
-     * @param bundle Bundled arguments to pass to the destination. (optional)
-     * @param extras Extras that can be passed to enable Fragment specific behavior. (optional)
-     */
-    fun navigate(
-        location: String,
-        options: VisitOptions = VisitOptions(),
-        bundle: Bundle? = null,
-        extras: FragmentNavigator.Extras? = null
-    ) {
-        navigator.navigate(location, options, bundle, extras)
-    }
-
-    /**
      * Gets the default set of navigation options (basic enter/exit animations) for the Android
      * Navigation component to use to execute a navigation event. This can be overridden if
      * you'd like to provide your own.
@@ -193,29 +169,6 @@ interface HotwireNavDestination {
     }
 
     /**
-     * Navigates up to the previous destination. See [NavController.navigateUp] for
-     * more details.
-     */
-    fun navigateUp() {
-        navigator.navigateUp()
-    }
-
-    /**
-     * Navigates back to the previous destination. See [NavController.popBackStack] for
-     * more details.
-     */
-    fun navigateBack() {
-        navigator.navigateBack()
-    }
-
-    /**
-     * Clears the navigation back stack to the start destination.
-     */
-    fun clearBackStack(onCleared: () -> Unit = {}) {
-        navigator.clearBackStack(onCleared)
-    }
-
-    /**
      * Gets a registered activity result launcher instance for the given `requestCode`.
      *
      * Override to provide your own [androidx.activity.result.ActivityResultLauncher]
@@ -229,30 +182,8 @@ interface HotwireNavDestination {
         return null
     }
 
-    /**
-     * Finds the nav host fragment with the given resource ID.
-     */
-    fun findNavHostFragment(@IdRes navHostFragmentId: Int): NavigatorHost {
-        return fragment.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
-            ?: fragment.parentFragment?.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
-            ?: fragment.requireActivity().supportFragmentManager.findNavHostFragment(navHostFragmentId)
-            ?: throw IllegalStateException("No NavigatorHost found with ID: $navHostFragmentId")
-    }
-
     fun prepareNavigation(onReady: () -> Unit)
 
     private val Bundle.location
         get() = getString("location")
-
-    /**
-     * Retrieve the nav controller indirectly from the parent NavHostFragment,
-     * since it's only available when the fragment is attached to its parent.
-     */
-    private fun navController(): NavController? {
-        return fragment.parentFragment?.findNavController()
-    }
-
-    private fun FragmentManager.findNavHostFragment(navHostFragmentId: Int): NavigatorHost? {
-        return findFragmentById(navHostFragmentId) as? NavigatorHost
-    }
 }

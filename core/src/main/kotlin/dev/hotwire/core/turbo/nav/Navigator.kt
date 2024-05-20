@@ -1,6 +1,8 @@
 package dev.hotwire.core.turbo.nav
 
 import android.os.Bundle
+import androidx.annotation.IdRes
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -27,6 +29,18 @@ class Navigator(val host: NavigatorHost) {
             ?: throw IllegalStateException("No current destination found in NavHostFragment")
 
     /**
+     * Gets the location for the current destination.
+     */
+    val location: String?
+        get() = navController.currentBackStackEntry?.location
+
+    /**
+     * Gets the location for the previous destination on the backstack.
+     */
+    val previousLocation: String?
+        get() = navController.previousBackStackEntry?.location
+
+    /**
      * The [Session] instance that is shared with all destinations that are
      * hosted inside this [NavigatorHost].
      */
@@ -48,6 +62,9 @@ class Navigator(val host: NavigatorHost) {
         return navController.previousBackStackEntry == null
     }
 
+    /**
+     * Navigates up to the previous destination.
+     */
     fun navigateUp() {
         navigateWhenReady {
             val currentFragment = currentDestination.fragment
@@ -59,6 +76,10 @@ class Navigator(val host: NavigatorHost) {
         }
     }
 
+    /**
+     * Navigates back to the previous destination. See [NavController.popBackStack] for
+     * more details.
+     */
     fun navigateBack() {
         navigateWhenReady {
             val currentFragment = currentDestination.fragment
@@ -70,9 +91,18 @@ class Navigator(val host: NavigatorHost) {
         }
     }
 
+    /**
+     * Navigates to the specified location. The resulting destination and its presentation
+     * will be determined using the path configuration rules.
+     *
+     * @param location The location to navigate to.
+     * @param options Visit options to apply to the visit. (optional)
+     * @param bundle Bundled arguments to pass to the destination. (optional)
+     * @param extras Extras that can be passed to enable Fragment specific behavior. (optional)
+     */
     fun navigate(
         location: String,
-        options: VisitOptions,
+        options: VisitOptions = VisitOptions(),
         bundle: Bundle? = null,
         extras: FragmentNavigator.Extras? = null
     ) {
@@ -118,6 +148,9 @@ class Navigator(val host: NavigatorHost) {
         }
     }
 
+    /**
+     * Clears the navigation back stack to the start destination.
+     */
     fun clearBackStack(onCleared: () -> Unit = {}) {
         if (isAtStartDestination()) {
             onCleared()
@@ -152,6 +185,18 @@ class Navigator(val host: NavigatorHost) {
                 }
             }
         }
+    }
+
+    /**
+     * Finds the [NavigatorHost] with the given resource ID.
+     */
+    fun findNavHostFragment(@IdRes navHostFragmentId: Int): NavigatorHost {
+        val fragment = currentDestination.fragment
+
+        return fragment.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
+            ?: fragment.parentFragment?.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
+            ?: fragment.requireActivity().supportFragmentManager.findNavHostFragment(navHostFragmentId)
+            ?: throw IllegalStateException("No NavigatorHost found with ID: $navHostFragmentId")
     }
 
     private fun navigateWhenReady(onReady: () -> Unit) {
@@ -336,6 +381,10 @@ class Navigator(val host: NavigatorHost) {
             newPathProperties = properties,
             action = action
         )
+    }
+
+    private fun FragmentManager.findNavHostFragment(navHostFragmentId: Int): NavigatorHost? {
+        return findFragmentById(navHostFragmentId) as? NavigatorHost
     }
 
     private val NavBackStackEntry?.isModalContext: Boolean

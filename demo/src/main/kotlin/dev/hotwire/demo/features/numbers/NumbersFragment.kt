@@ -34,6 +34,6 @@ class NumbersFragment : HotwireFragment(), NumbersFragmentCallback {
     }
 
     override fun onItemClicked(number: Int) {
-        navigate("${Urls.numbersUrl}/$number")
+        navigator.navigate("${Urls.numbersUrl}/$number")
     }
 }

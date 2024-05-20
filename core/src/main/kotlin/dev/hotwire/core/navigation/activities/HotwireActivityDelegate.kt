@@ -3,11 +3,11 @@ package dev.hotwire.core.navigation.activities
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import dev.hotwire.core.navigation.session.NavigatorHost
 import dev.hotwire.core.navigation.session.SessionConfiguration
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.core.turbo.nav.Navigator
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
 import dev.hotwire.core.turbo.visit.VisitOptions
 
@@ -46,16 +46,16 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     /**
-     * Gets the Activity's currently active [NavigatorHost].
+     * Get the Activity's currently active [Navigator].
      */
-    val currentNavigatorHost: NavigatorHost
-        get() = navigatorHost(currentNavigatorHostId)
-
-    /**
-     * Gets the currently active destination hosted in the current [NavigatorHost].
-     */
-    val currentNavDestination: HotwireNavDestination?
-        get() = currentFragment as HotwireNavDestination?
+    val currentNavigator: Navigator?
+        get() {
+            return if (currentNavigatorHost.isAdded && !currentNavigatorHost.isDetached) {
+                currentNavigatorHost.navigator
+            } else {
+                null
+            }
+        }
 
     /**
      * Sets the currently active session in your Activity. If you use multiple
@@ -116,7 +116,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
         options: VisitOptions = VisitOptions(),
         bundle: Bundle? = null
     ) {
-        currentNavDestination?.navigate(location, options, bundle)
+        currentNavigator?.navigate(location, options, bundle)
     }
 
     /**
@@ -124,7 +124,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      * more details.
      */
     fun navigateUp() {
-        currentNavDestination?.navigateUp()
+        currentNavigator?.navigateUp()
     }
 
     /**
@@ -132,14 +132,14 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      * more details.
      */
     fun navigateBack() {
-        currentNavDestination?.navigateBack()
+        currentNavigator?.navigateBack()
     }
 
     /**
      * Clears the navigation back stack to the start destination.
      */
     fun clearBackStack(onCleared: () -> Unit = {}) {
-        currentNavDestination?.clearBackStack(onCleared)
+        currentNavigator?.clearBackStack(onCleared)
     }
 
     /**
@@ -147,7 +147,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      * more details.
      */
     fun refresh(displayProgress: Boolean = true) {
-        currentNavDestination?.refresh(displayProgress)
+        currentNavigator?.currentDestination?.refresh(displayProgress)
     }
 
     private fun listenToDestinationChanges(navController: NavController) {
@@ -157,17 +157,11 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     private fun updateOnBackPressedCallback(navController: NavController) {
-        if (navController ==  currentNavigatorHost.navController)  {
+        if (navController == currentNavigatorHost.navController)  {
             onBackPressedCallback.isEnabled = navController.previousBackStackEntry != null
         }
     }
 
-    private val currentFragment: Fragment?
-        get() {
-            return if (currentNavigatorHost.isAdded && !currentNavigatorHost.isDetached) {
-                currentNavigatorHost.childFragmentManager.primaryNavigationFragment
-            } else {
-                null
-            }
-        }
+    private val currentNavigatorHost: NavigatorHost
+        get() = navigatorHost(currentNavigatorHostId)
 }

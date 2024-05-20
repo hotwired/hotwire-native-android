@@ -103,7 +103,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
             }
 
             it.setNavigationOnClickListener {
-                navDestination.navigateUp()
+                navigator.navigateUp()
             }
         }
     }

@@ -29,7 +29,7 @@ open class WebFragment : HotwireWebFragment() {
 
     override fun onVisitErrorReceived(location: String, error: VisitError) {
         if (error is HttpError.ClientError.Unauthorized) {
-            navigate(Urls.signInUrl, VisitOptions(action = REPLACE))
+            navigator.navigate(Urls.signInUrl, VisitOptions(action = REPLACE))
         } else {
             super.onVisitErrorReceived(location, error)
         }
