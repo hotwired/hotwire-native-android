@@ -358,7 +358,7 @@ class Navigator(val host: NavigatorHost) {
     }
 
     private fun currentControllerForLocation(location: String): NavController {
-        return currentDestination.navHostForNavigation(location).navController
+        return currentDestination.navigatorForNavigation(location).navController
     }
 
     private fun getRouteResult(location: String): Router.RouteResult {
