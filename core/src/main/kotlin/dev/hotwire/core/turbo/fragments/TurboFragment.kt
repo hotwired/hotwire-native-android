@@ -6,10 +6,12 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import dev.hotwire.core.R
+import dev.hotwire.core.navigation.navigator.NavigatorHost
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.config.title
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.observers.HotwireWindowThemeObserver
 import dev.hotwire.core.turbo.session.SessionModalResult
@@ -21,10 +23,12 @@ import dev.hotwire.core.turbo.session.SessionModalResult
  * For web fragments, refer to [TurboWebFragment].
  */
 abstract class TurboFragment : Fragment(), HotwireNavDestination {
+    override lateinit var navigator: Navigator
     internal lateinit var delegate: TurboFragmentDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        navigator = (parentFragment as NavigatorHost).navigator
         delegate = TurboFragmentDelegate(this)
     }
 
@@ -82,6 +86,10 @@ abstract class TurboFragment : Fragment(), HotwireNavDestination {
     override fun onStop() {
         super.onStop()
         delegate.onStop()
+    }
+
+    override fun prepareNavigation(onReady: () -> Unit) {
+        delegate.prepareNavigation(onReady)
     }
 
     /**

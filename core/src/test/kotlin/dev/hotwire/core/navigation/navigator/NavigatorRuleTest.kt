@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.nav
+package dev.hotwire.core.navigation.navigator
 
 import android.content.Context
 import android.net.Uri
@@ -13,6 +13,7 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.turbo.nav.*
 import dev.hotwire.core.turbo.visit.VisitOptions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -25,7 +26,7 @@ import org.robolectric.annotation.Config
 @Suppress("UsePropertyAccessSyntax")
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboNavRuleTest {
+class NavigatorRuleTest {
     private lateinit var context: Context
     private lateinit var controller: TestNavHostController
     private lateinit var pathConfiguration: PathConfiguration
@@ -85,7 +86,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.PUSH)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.REPLACE)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.IN_CONTEXT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
@@ -107,7 +108,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.MODAL)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.PUSH)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.TO_MODAL)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.TO_MODAL)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webModalUri)
         assertThat(rule.newDestination).isNotNull()
@@ -117,7 +118,7 @@ class TurboNavRuleTest {
     @Test
     fun `navigate to modal context replacing root`() {
         assertThatThrownBy { getNavigatorRule(modalRootUrl) }
-            .isInstanceOf(TurboNavException::class.java)
+            .isInstanceOf(NavigatorException::class.java)
             .hasMessage("A `modal` destination cannot use presentation `REPLACE_ROOT`")
     }
 
@@ -137,7 +138,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.CLEAR_ALL)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.IN_CONTEXT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webHomeUri)
         assertThat(rule.newDestination).isNotNull()
@@ -160,7 +161,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.REPLACE_ROOT)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.IN_CONTEXT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webHomeUri)
         assertThat(rule.newDestination).isNotNull()
@@ -187,7 +188,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.POP)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.REPLACE)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.DISMISS_MODAL)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.DISMISS_MODAL)
         assertThat(rule.newModalResult?.location).isEqualTo(featureUrl)
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
@@ -210,7 +211,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.MODAL)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.REPLACE)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.IN_CONTEXT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webModalUri)
         assertThat(rule.newDestination).isNotNull()
@@ -233,7 +234,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.MODAL)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.PUSH)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.IN_CONTEXT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webModalUri)
         assertThat(rule.newDestination).isNotNull()
@@ -256,7 +257,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.REFRESH)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.REFRESH)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.REFRESH)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
@@ -280,7 +281,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.NONE)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.DISMISS_MODAL)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.DISMISS_MODAL)
         assertThat(rule.newModalResult).isNotNull()
         assertThat(rule.newModalResult?.location).isEqualTo(resumeUrl)
         assertThat(rule.newModalResult?.shouldNavigate).isFalse()
@@ -305,7 +306,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.PUSH)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.IN_CONTEXT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
@@ -328,7 +329,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.REPLACE)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.IN_CONTEXT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
@@ -351,7 +352,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.REPLACE)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.REPLACE)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.IN_CONTEXT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
@@ -373,7 +374,7 @@ class TurboNavRuleTest {
         assertThat(rule.newPresentationContext).isEqualTo(TurboNavPresentationContext.DEFAULT)
         assertThat(rule.newPresentation).isEqualTo(TurboNavPresentation.NONE)
         assertThat(rule.newQueryStringPresentation).isEqualTo(TurboNavQueryStringPresentation.DEFAULT)
-        assertThat(rule.newNavigationMode).isEqualTo(TurboNavMode.NONE)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.NONE)
         assertThat(rule.newModalResult).isNull()
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
@@ -384,8 +385,8 @@ class TurboNavRuleTest {
         location: String,
         visitOptions: VisitOptions = VisitOptions(),
         bundle: Bundle? = null
-    ): TurboNavRule {
-        return TurboNavRule(
+    ): NavigatorRule {
+        return NavigatorRule(
             location, visitOptions, bundle, navOptions, extras, pathConfiguration, controller
         )
     }

@@ -5,7 +5,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.google.android.material.R
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.session.SessionConfiguration
+import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.core.turbo.util.colorFromThemeAttr
 
 class BrowserTabRoute : Router.Route {
@@ -15,14 +15,14 @@ class BrowserTabRoute : Router.Route {
 
     override fun matches(
         location: String,
-        sessionConfiguration: SessionConfiguration
+        configuration: NavigatorConfiguration
     ): Boolean {
-        return sessionConfiguration.startLocation.toUri().host != location.toUri().host
+        return configuration.startLocation.toUri().host != location.toUri().host
     }
 
     override fun handle(
         location: String,
-        sessionConfiguration: SessionConfiguration,
+        configuration: NavigatorConfiguration,
         activity: HotwireActivity
     ) {
         val color = activity.colorFromThemeAttr(R.attr.colorSurface)

@@ -2,7 +2,7 @@ package dev.hotwire.demo.main
 
 import android.os.Bundle
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.session.SessionConfiguration
+import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
 
@@ -12,11 +12,11 @@ class MainActivity : HotwireActivity() {
         setContentView(R.layout.activity_main)
     }
 
-    override fun sessionConfigurations() = listOf(
-        SessionConfiguration(
+    override fun navigatorConfigurations() = listOf(
+        NavigatorConfiguration(
             name = "main",
             startLocation = Urls.homeUrl,
-            navHostFragmentId = R.id.main_nav_host
+            navigatorHostId = R.id.main_navigator_host
         )
     )
 }

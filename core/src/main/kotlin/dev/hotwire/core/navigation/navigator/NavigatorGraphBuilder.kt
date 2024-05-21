@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.nav
+package dev.hotwire.core.navigation.navigator
 
 import android.net.Uri
 import androidx.core.net.toUri
@@ -11,11 +11,12 @@ import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.config.uri
+import dev.hotwire.core.turbo.nav.HotwireDestination
 import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-internal class TurboNavGraphBuilder(
+internal class NavigatorGraphBuilder(
     private val startLocation: String,
     private val navController: NavController,
     private val pathConfiguration: PathConfiguration
@@ -69,7 +70,7 @@ internal class TurboNavGraphBuilder(
 
             // Use a random value to represent a unique instance of the graph, so the
             // graph is unique every time. This lets it be reset/recreated on-demand from
-            // `SessionNavHostFragment.reset()`. Replacing an existing nav graph with
+            // `NavigatorHost.reset()`. Replacing an existing nav graph with
             // an identical one would bypass recreating the nav stack from scratch in
             // `NavController.setGraph()`.
             argument("unique_instance") {

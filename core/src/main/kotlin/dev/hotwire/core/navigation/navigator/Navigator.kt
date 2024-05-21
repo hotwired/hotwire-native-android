@@ -1,55 +1,96 @@
-package dev.hotwire.core.turbo.nav
+package dev.hotwire.core.navigation.navigator
 
 import android.os.Bundle
-import androidx.fragment.app.DialogFragment
+import androidx.annotation.IdRes
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.fragment.findNavController
+import dev.hotwire.core.bridge.Bridge
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.navigation.routing.Router
+import dev.hotwire.core.turbo.nav.*
+import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 
-internal class TurboNavigator(private val navDestination: HotwireNavDestination) {
-    private val fragment = navDestination.fragment
-    private val session = navDestination.session
+class Navigator(
+    val host: NavigatorHost,
+    val configuration: NavigatorConfiguration
+) {
+    private val navController = host.navController
 
-    var onNavigationVisit: (onNavigate: () -> Unit) -> Unit = { onReady ->
-        navDestination.onBeforeNavigation()
-        onReady()
+    /**
+     * Retrieves the currently active [HotwireNavDestination] on the backstack.
+     */
+    val currentDestination: HotwireNavDestination
+        get() = host.childFragmentManager.primaryNavigationFragment as HotwireNavDestination?
+            ?: throw IllegalStateException("No current destination found in NavigatorHost")
+
+    /**
+     * Gets the location for the current destination.
+     */
+    val location: String?
+        get() = navController.currentBackStackEntry?.location
+
+    /**
+     * Gets the location for the previous destination on the backstack.
+     */
+    val previousLocation: String?
+        get() = navController.previousBackStackEntry?.location
+
+    /**
+     * The [Session] instance that is shared with all destinations that are
+     * hosted inside this [NavigatorHost].
+     */
+    var session = createNewSession()
+        private set
+
+    internal fun createNewSession() = Session(
+        sessionName = configuration.name,
+        activity = host.activity,
+        webView = Hotwire.config.makeCustomWebView(host.requireContext())
+    ).also {
+        // Initialize bridge with new WebView instance
+        if (Hotwire.registeredBridgeComponentFactories.isNotEmpty()) {
+            Bridge.initialize(it.webView)
+        }
     }
 
     fun isAtStartDestination(): Boolean {
-        return currentController().previousBackStackEntry == null
+        return navController.previousBackStackEntry == null
     }
 
-    fun navigateUp() {
-        onNavigationVisit {
-            if (fragment is DialogFragment) {
-                fragment.requireDialog().cancel()
+    /**
+     * Pops the backstack to the previous destination.
+     */
+    fun pop() {
+        navigateWhenReady {
+            val currentFragment = currentDestination.fragment
+            if (currentFragment is HotwireNavDialogDestination) {
+                currentFragment.closeDialog()
             } else {
-                currentController().navigateUp()
+                navController.popBackStack()
             }
         }
     }
 
-    fun navigateBack() {
-        onNavigationVisit {
-            if (fragment is DialogFragment) {
-                fragment.requireDialog().cancel()
-            } else {
-                currentController().popBackStack()
-            }
-        }
-    }
-
-    fun navigate(
+    /**
+     * Routes to the specified location. The resulting destination and its presentation
+     * will be determined using the path configuration rules.
+     *
+     * @param location The location to navigate to.
+     * @param options Visit options to apply to the visit. (optional)
+     * @param bundle Bundled arguments to pass to the destination. (optional)
+     * @param extras Extras that can be passed to enable Fragment specific behavior. (optional)
+     */
+    fun route(
         location: String,
-        options: VisitOptions,
+        options: VisitOptions = VisitOptions(),
         bundle: Bundle? = null,
         extras: FragmentNavigator.Extras? = null
     ) {
@@ -58,7 +99,7 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
             return
         }
 
-        val rule = TurboNavRule(
+        val rule = NavigatorRule(
             location = location,
             visitOptions = options,
             bundle = bundle,
@@ -77,42 +118,81 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         )
 
         when (rule.newNavigationMode) {
-            TurboNavMode.DISMISS_MODAL -> {
+            NavigatorMode.DISMISS_MODAL -> {
                 dismissModalContextWithResult(rule)
             }
-            TurboNavMode.TO_MODAL -> {
+            NavigatorMode.TO_MODAL -> {
                 navigateToModalContext(rule)
             }
-            TurboNavMode.IN_CONTEXT -> {
+            NavigatorMode.IN_CONTEXT -> {
                 navigateWithinContext(rule)
             }
-            TurboNavMode.REFRESH -> {
-                navigate(rule.currentLocation, VisitOptions())
+            NavigatorMode.REFRESH -> {
+                route(rule.currentLocation, VisitOptions())
             }
-            TurboNavMode.NONE -> {
+            NavigatorMode.NONE -> {
                 // Do nothing
             }
         }
     }
 
-    fun clearBackStack(onCleared: () -> Unit = {}) {
+    /**
+     * Clears the navigation backstack to the start destination.
+     */
+    fun clearAll(onCleared: () -> Unit = {}) {
         if (isAtStartDestination()) {
             onCleared()
             return
         }
 
-        onNavigationVisit {
-            if (fragment is DialogFragment) {
-                fragment.requireDialog().cancel()
+        navigateWhenReady {
+            val currentFragment = currentDestination.fragment
+            if (currentFragment is HotwireNavDialogDestination) {
+                currentFragment.closeDialog()
             }
 
-            val controller = currentController()
-            controller.popBackStack(controller.graph.startDestinationId, false)
+            navController.popBackStack(navController.graph.startDestinationId, false)
             onCleared()
         }
     }
 
-    private fun navigateWithinContext(rule: TurboNavRule) {
+    /**
+     * Resets the [Navigator] along with its [NavigatorHost] and [Session] instance.
+     * The entire navigation graph is reset to its original starting point.
+     */
+    fun reset(onReset: () -> Unit = {}) {
+        navigateWhenReady {
+            clearAll {
+                session.reset()
+                host.initControllerGraph()
+
+                if (host.view == null) {
+                    onReset()
+                } else {
+                    host.requireView().post { onReset() }
+                }
+            }
+        }
+    }
+
+    /**
+     * Finds the [NavigatorHost] with the given resource ID.
+     */
+    fun findNavigatorHost(@IdRes navigatorHostId: Int): NavigatorHost {
+        val fragment = currentDestination.fragment
+
+        return fragment.parentFragment?.childFragmentManager?.findNavigatorHost(navigatorHostId)
+            ?: fragment.parentFragment?.parentFragment?.childFragmentManager?.findNavigatorHost(navigatorHostId)
+            ?: fragment.requireActivity().supportFragmentManager.findNavigatorHost(navigatorHostId)
+            ?: throw IllegalStateException("No NavigatorHost found with ID: $navigatorHostId")
+    }
+
+    private fun navigateWhenReady(onReady: () -> Unit) {
+        currentDestination.onBeforeNavigation()
+        currentDestination.prepareNavigation(onReady)
+    }
+
+    private fun navigateWithinContext(rule: NavigatorRule) {
         logEvent(
             "navigateWithinContext",
             "location" to rule.newLocation,
@@ -120,21 +200,21 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         )
 
         when (rule.newPresentation) {
-            TurboNavPresentation.POP -> onNavigationVisit {
+            TurboNavPresentation.POP -> navigateWhenReady {
                 popBackStack(rule)
             }
-            TurboNavPresentation.REPLACE -> onNavigationVisit {
+            TurboNavPresentation.REPLACE -> navigateWhenReady {
                 popBackStack(rule)
                 navigateToLocation(rule)
             }
-            TurboNavPresentation.PUSH -> onNavigationVisit {
+            TurboNavPresentation.PUSH -> navigateWhenReady {
                 navigateToLocation(rule)
             }
-            TurboNavPresentation.REPLACE_ROOT -> onNavigationVisit {
+            TurboNavPresentation.REPLACE_ROOT -> navigateWhenReady {
                 replaceRootLocation(rule)
             }
-            TurboNavPresentation.CLEAR_ALL -> onNavigationVisit {
-                clearBackStack()
+            TurboNavPresentation.CLEAR_ALL -> navigateWhenReady {
+                clearAll()
             }
             else -> {
                 throw IllegalStateException("Unexpected Presentation for navigating within context")
@@ -142,24 +222,24 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         }
     }
 
-    private fun navigateToModalContext(rule: TurboNavRule) {
+    private fun navigateToModalContext(rule: NavigatorRule) {
         logEvent(
             "navigateToModalContext",
             "location" to rule.newLocation
         )
 
         when (rule.newPresentation) {
-            TurboNavPresentation.REPLACE -> onNavigationVisit {
+            TurboNavPresentation.REPLACE -> navigateWhenReady {
                 popBackStack(rule)
                 navigateToLocation(rule)
             }
-            else -> onNavigationVisit {
+            else -> navigateWhenReady {
                 navigateToLocation(rule)
             }
         }
     }
 
-    private fun dismissModalContextWithResult(rule: TurboNavRule) {
+    private fun dismissModalContextWithResult(rule: NavigatorRule) {
         logEvent(
             "dismissModalContextWithResult",
             "location" to rule.newLocation,
@@ -167,8 +247,8 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
             "presentation" to rule.newPresentation
         )
 
-        onNavigationVisit {
-            val isDialog = fragment is DialogFragment
+        navigateWhenReady {
+            val isDialog = currentDestination.fragment is HotwireNavDialogDestination
             if (isDialog) {
                 // Pop the backstack before sending the modal result, since the
                 // underlying fragment is still active and will receive the
@@ -183,7 +263,7 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         }
     }
 
-    private fun popModalsFromBackStack(rule: TurboNavRule) {
+    private fun popModalsFromBackStack(rule: NavigatorRule) {
         do {
             popBackStack(rule)
         } while (
@@ -191,7 +271,7 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         )
     }
 
-    private fun popBackStack(rule: TurboNavRule) {
+    private fun popBackStack(rule: NavigatorRule) {
         logEvent(
             "popFromBackStack",
             "location" to rule.controller.currentBackStackEntry.location.orEmpty()
@@ -199,15 +279,15 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         rule.controller.popBackStack()
     }
 
-    private fun sendModalResult(rule: TurboNavRule) {
+    private fun sendModalResult(rule: NavigatorRule) {
         // Save the modal result with VisitOptions so it can be retrieved
         // by the previous destination when the backstack is popped.
-        navDestination.delegate().sessionViewModel.sendModalResult(
+        currentDestination.delegate().sessionViewModel.sendModalResult(
             checkNotNull(rule.newModalResult)
         )
     }
 
-    private fun replaceRootLocation(rule: TurboNavRule) {
+    private fun replaceRootLocation(rule: NavigatorRule) {
         if (rule.newDestination == null) {
             logEvent(
                 "replaceRootLocation",
@@ -226,11 +306,11 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         rule.controller.navigate(rule.newDestination.id, rule.newBundle, rule.newNavOptions)
     }
 
-    private fun navigateToLocation(rule: TurboNavRule) {
+    private fun navigateToLocation(rule: NavigatorRule) {
         // Save the VisitOptions so it can be retrieved by the next
         // destination. When response.responseHTML is present it is
         // too large to save directly within the args bundle.
-        navDestination.delegate().sessionViewModel.saveVisitOptions(rule.newVisitOptions)
+        currentDestination.delegate().sessionViewModel.saveVisitOptions(rule.newVisitOptions)
 
         rule.newDestination?.let {
             logEvent(
@@ -266,16 +346,12 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
         )
     }
 
-    private fun currentController(): NavController {
-        return fragment.findNavController()
-    }
-
     private fun currentControllerForLocation(location: String): NavController {
-        return navDestination.navHostForNavigation(location).navController
+        return currentDestination.navigatorForNavigation(location).navController
     }
 
     private fun getRouteResult(location: String): Router.RouteResult {
-        val result = navDestination.route(location)
+        val result = currentDestination.route(location)
 
         logEvent(
             "routeResult",
@@ -288,11 +364,15 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
     private fun navOptions(location: String, action: VisitAction): NavOptions {
         val properties = pathConfiguration.properties(location)
 
-        return navDestination.getNavigationOptions(
+        return currentDestination.getNavigationOptions(
             newLocation = location,
             newPathProperties = properties,
             action = action
         )
+    }
+
+    private fun FragmentManager.findNavigatorHost(navigatorHostId: Int): NavigatorHost? {
+        return findFragmentById(navigatorHostId) as? NavigatorHost
     }
 
     private val NavBackStackEntry?.isModalContext: Boolean
@@ -304,7 +384,7 @@ internal class TurboNavigator(private val navDestination: HotwireNavDestination)
     private fun logEvent(event: String, vararg params: Pair<String, Any>) {
         val attributes = params.toMutableList().apply {
             add(0, "session" to session.sessionName)
-            add("currentFragment" to fragment.javaClass.simpleName)
+            add("currentFragment" to currentDestination.fragment.javaClass.simpleName)
         }
         logEvent(event, attributes)
     }

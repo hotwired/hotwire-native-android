@@ -32,8 +32,8 @@ import java.util.*
 
 /**
  * This class is primarily responsible for managing an instance of an Android WebView that will
- * be shared between fragments. An implementation of [SessionNavHostFragment] will create
- * a session for you and it can be retrieved via [SessionNavHostFragment.session].
+ * be shared between destinations. A a [Navigator] will create a session for you and it can be
+ * retrieved via [Navigator.session].
  *
  * @property sessionName An arbitrary name to be used as an identifier for a given session.
  * @property activity The activity to which the session will be bound to.

@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.nav
+package dev.hotwire.core.navigation.navigator
 
 import android.net.Uri
 import android.os.Bundle
@@ -9,13 +9,14 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.navOptions
 import dev.hotwire.core.turbo.config.*
+import dev.hotwire.core.turbo.nav.*
 import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 
 @Suppress("MemberVisibilityCanBePrivate")
-internal class TurboNavRule(
+internal class NavigatorRule(
     location: String,
     visitOptions: VisitOptions,
     bundle: Bundle?,
@@ -93,7 +94,7 @@ internal class TurboNavRule(
         return navOptions
     }
 
-    private fun newNavigationMode(): TurboNavMode {
+    private fun newNavigationMode(): NavigatorMode {
         val presentationNone = newPresentation == TurboNavPresentation.NONE
         val presentationRefresh = newPresentation == TurboNavPresentation.REFRESH
 
@@ -106,16 +107,16 @@ internal class TurboNavRule(
                 newPresentation != TurboNavPresentation.REPLACE_ROOT
 
         return when {
-            dismissModalContext -> TurboNavMode.DISMISS_MODAL
-            navigateToModalContext -> TurboNavMode.TO_MODAL
-            presentationRefresh -> TurboNavMode.REFRESH
-            presentationNone -> TurboNavMode.NONE
-            else -> TurboNavMode.IN_CONTEXT
+            dismissModalContext -> NavigatorMode.DISMISS_MODAL
+            navigateToModalContext -> NavigatorMode.TO_MODAL
+            presentationRefresh -> NavigatorMode.REFRESH
+            presentationNone -> NavigatorMode.NONE
+            else -> NavigatorMode.IN_CONTEXT
         }
     }
 
     private fun newModalResult(): SessionModalResult? {
-        if (newNavigationMode != TurboNavMode.DISMISS_MODAL) {
+        if (newNavigationMode != NavigatorMode.DISMISS_MODAL) {
             return null
         }
 
@@ -129,8 +130,9 @@ internal class TurboNavRule(
 
     private fun verifyNavRules() {
         if (newPresentationContext == TurboNavPresentationContext.MODAL &&
-            newPresentation == TurboNavPresentation.REPLACE_ROOT) {
-            throw TurboNavException("A `modal` destination cannot use presentation `REPLACE_ROOT`")
+            newPresentation == TurboNavPresentation.REPLACE_ROOT
+        ) {
+            throw NavigatorException("A `modal` destination cannot use presentation `REPLACE_ROOT`")
         }
     }
 

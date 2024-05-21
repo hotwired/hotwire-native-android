@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.core.net.toUri
 import dev.hotwire.core.lib.logging.logError
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.session.SessionConfiguration
+import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 
 class BrowserRoute : Router.Route {
     override val name = "browser"
@@ -14,14 +14,14 @@ class BrowserRoute : Router.Route {
 
     override fun matches(
         location: String,
-        sessionConfiguration: SessionConfiguration
+        configuration: NavigatorConfiguration
     ): Boolean {
-        return sessionConfiguration.startLocation.toUri().host != location.toUri().host
+        return configuration.startLocation.toUri().host != location.toUri().host
     }
 
     override fun handle(
         location: String,
-        sessionConfiguration: SessionConfiguration,
+        configuration: NavigatorConfiguration,
         activity: HotwireActivity
     ) {
         val intent = Intent(Intent.ACTION_VIEW, location.toUri())

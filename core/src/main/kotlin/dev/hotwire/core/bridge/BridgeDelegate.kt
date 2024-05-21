@@ -75,7 +75,7 @@ class BridgeDelegate(
     }
 
     private fun shouldReloadBridge(): Boolean {
-        return destination.session.isReady && bridge?.isReady() == false
+        return destination.navigator.session.isReady && bridge?.isReady() == false
     }
 
     // Lifecycle events

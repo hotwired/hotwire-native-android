@@ -1,8 +1,10 @@
 package dev.hotwire.core.config
 
+import android.content.Context
 import android.webkit.WebView
 import dev.hotwire.core.bridge.StradaJsonConverter
 import dev.hotwire.core.turbo.http.TurboHttpClient
+import dev.hotwire.core.turbo.views.TurboWebView
 
 class HotwireConfig internal constructor() {
     /**
@@ -35,6 +37,15 @@ class HotwireConfig internal constructor() {
             field = value
             WebView.setWebContentsDebuggingEnabled(value)
         }
+
+    /**
+     * Called whenever a new WebView instance needs to be (re)created. Provide
+     * your own implementation and subclass [TurboWebView] if you need
+     * custom behaviors.
+     */
+    var makeCustomWebView: (context: Context) -> TurboWebView = { context ->
+        TurboWebView(context, null)
+    }
 
     /**
      * Provides a standard substring to be included in your WebView's user agent

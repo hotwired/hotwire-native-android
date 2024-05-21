@@ -9,6 +9,7 @@ import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.turbo.session.Session
 import org.junit.Assert.*
 import org.junit.Before
@@ -21,6 +22,7 @@ class BridgeDelegateTest {
     private lateinit var lifecycleOwner: TestLifecycleOwner
     private val bridge: Bridge = mock()
     private val webView: WebView = mock()
+    private val navigator: Navigator = mock()
     private val destination: HotwireNavDestination = mock()
     private val session: Session = mock()
 
@@ -31,7 +33,8 @@ class BridgeDelegateTest {
     @Before
     fun setup() {
         whenever(bridge.webView).thenReturn(webView)
-        whenever(destination.session).thenReturn(session)
+        whenever(destination.navigator).thenReturn(navigator)
+        whenever(destination.navigator.session).thenReturn(session)
         whenever(session.isReady).thenReturn(true)
 
         Hotwire.registerBridgeComponents(TestData.componentFactories)

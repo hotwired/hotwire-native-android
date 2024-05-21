@@ -7,9 +7,12 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dev.hotwire.core.R
+import dev.hotwire.core.navigation.navigator.NavigatorHost
 import dev.hotwire.core.turbo.config.title
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.core.turbo.nav.HotwireNavDialogDestination
+import dev.hotwire.core.navigation.navigator.Navigator
 
 /**
  * The base class from which all bottom sheet native fragments in a
@@ -18,11 +21,13 @@ import dev.hotwire.core.turbo.nav.HotwireNavDestination
  * For web bottom sheet fragments, refer to [TurboWebBottomSheetDialogFragment].
  */
 abstract class TurboBottomSheetDialogFragment : BottomSheetDialogFragment(),
-    HotwireNavDestination {
+    HotwireNavDestination, HotwireNavDialogDestination {
+    override lateinit var navigator: Navigator
     internal lateinit var delegate: TurboFragmentDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        navigator = (parentFragment as NavigatorHost).navigator
         delegate = TurboFragmentDelegate(this)
     }
 
@@ -85,9 +90,17 @@ abstract class TurboBottomSheetDialogFragment : BottomSheetDialogFragment(),
         super.onDismiss(dialog)
     }
 
+    override fun closeDialog() {
+        requireDialog().cancel()
+    }
+
     override fun onBeforeNavigation() {}
 
     override fun refresh(displayProgress: Boolean) {}
+
+    override fun prepareNavigation(onReady: () -> Unit) {
+        delegate.prepareNavigation(onReady)
+    }
 
     /**
      * Gets the Toolbar instance in your Fragment's view for use with
