@@ -102,7 +102,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
             }
 
             it.setNavigationOnClickListener {
-                navigator.popUp()
+                navigator.pop()
             }
         }
     }

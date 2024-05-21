@@ -66,20 +66,6 @@ class Navigator(
     }
 
     /**
-     * Pops the backstack up to the previous destination.
-     */
-    fun popUp() {
-        navigateWhenReady {
-            val currentFragment = currentDestination.fragment
-            if (currentFragment is HotwireNavDialogDestination) {
-                currentFragment.closeDialog()
-            } else {
-                navController.navigateUp()
-            }
-        }
-    }
-
-    /**
      * Pops the backstack to the previous destination.
      */
     fun pop() {
