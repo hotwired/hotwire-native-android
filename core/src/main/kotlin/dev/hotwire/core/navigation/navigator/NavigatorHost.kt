@@ -6,7 +6,6 @@ import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
 
 open class NavigatorHost : NavHostFragment() {
     internal lateinit var activity: HotwireActivity
@@ -30,7 +29,7 @@ open class NavigatorHost : NavHostFragment() {
 
     internal fun initControllerGraph() {
         navController.apply {
-            graph = TurboNavGraphBuilder(
+            graph = NavigatorGraphBuilder(
                 startLocation = configuration.startLocation,
                 pathConfiguration = pathConfiguration,
                 navController = findNavController()
