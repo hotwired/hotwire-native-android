@@ -24,8 +24,8 @@ class TurboNestedFragmentDelegate(val fragment: Fragment, navigatorHostId: Int) 
     val navigator: Navigator
         get() = navigatorHost.navigator
 
-    private fun findNavigatorHost(@IdRes navHostFragmentId: Int): NavigatorHost {
-        return fragment.childFragmentManager.findFragmentById(navHostFragmentId) as? NavigatorHost
-            ?: throw IllegalStateException("No NavigatorHost found with ID: $navHostFragmentId")
+    private fun findNavigatorHost(@IdRes navigatorHostId: Int): NavigatorHost {
+        return fragment.childFragmentManager.findFragmentById(navigatorHostId) as? NavigatorHost
+            ?: throw IllegalStateException("No NavigatorHost found with ID: $navigatorHostId")
     }
 }

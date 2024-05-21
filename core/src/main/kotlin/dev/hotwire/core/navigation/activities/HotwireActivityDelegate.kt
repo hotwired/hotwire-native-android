@@ -1,15 +1,12 @@
 package dev.hotwire.core.navigation.activities
 
-import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
 import dev.hotwire.core.navigation.session.NavigatorHost
-import dev.hotwire.core.navigation.session.SessionConfiguration
-import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.core.navigation.session.NavigatorConfiguration
 import dev.hotwire.core.turbo.nav.Navigator
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
-import dev.hotwire.core.turbo.visit.VisitOptions
 
 /**
  * Initializes the Activity for Hotwire navigation and provides all the hooks for an
@@ -27,7 +24,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
         }
     }
 
-    private var currentNavigatorHostId = activity.sessionConfigurations().first().navHostFragmentId
+    private var currentNavigatorHostId = activity.navigatorConfigurations().first().navigatorHostId
         set(value) {
             field = value
             updateOnBackPressedCallback(currentNavigatorHost.navController)
@@ -58,12 +55,12 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
         }
 
     /**
-     * Sets the currently active session in your Activity. If you use multiple
+     * Sets the currently active navigator in your Activity. If you use multiple
      *  [NavigatorHost] instances in your app (such as for bottom tabs),
-     *  you must update this whenever the current session changes.
+     *  you must update this whenever the current navigator changes.
      */
-    fun setCurrentSession(sessionConfiguration: SessionConfiguration) {
-        currentNavigatorHostId = sessionConfiguration.navHostFragmentId
+    fun setCurrentNavigator(configuration: NavigatorConfiguration) {
+        currentNavigatorHostId = configuration.navigatorHostId
     }
 
     internal fun registerNavigatorHost(host: NavigatorHost) {

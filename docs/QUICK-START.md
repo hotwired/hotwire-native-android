@@ -2,7 +2,7 @@
 
 ## Contents
 
-1. [Introduction to NavHostFragments](#introduction-to-navhostfragments)
+1. [Introduction to NavigatorHosts](#introduction-to-navhostfragments)
 1. [Create an Activity](#create-an-activity)
 1. [Configure your app](#configure-your-app)
 1. [Create a Path Configuration](#create-a-path-configuration)
@@ -10,11 +10,11 @@
 1. [Advanced Options](#advanced-options)
 2. [Local Development](#local-development)
 
-## Introduction to NavHostFragments
+## Introduction to NavigatorHosts
 
-A [`NavHostFragment`](https://developer.android.com/reference/androidx/navigation/fragment/NavHostFragment) is a component available in [Android Jetpack](https://developer.android.com/jetpack) and is primarily responsible for providing "an area in your layout for self-contained navigation to occur."
+To start, a [`NavHostFragment`](https://developer.android.com/reference/androidx/navigation/fragment/NavHostFragment) is a component available in [Android Jetpack](https://developer.android.com/jetpack) and is primarily responsible for providing "an area in your layout for self-contained navigation to occur."
 
-The Hotwire extension of this class, `SessionNavHostFragment`, along with being responsible for self-contained `HotwireFragment` navigation, also manages a `Sesssion` and a `TurboWebView` instance. You will need to place an instance of a `SessionNavHostFragment` in your main `Activity` layout.
+The Hotwire implementation of this class, `NavigatorHost`, along with being responsible for self-contained `HotwireFragment` navigation, also manages a `Navigator` with a `Sesssion` and `TurboWebView` instance.
 
 ## Create an Activity
 
@@ -22,7 +22,7 @@ It's strongly recommended to use a single-Activity architecture in your app. Gen
 
 ### Create the HotwireActivity layout resource
 
-You need to create a layout resource file that your `HotwireActivity` will use to host the `SessionNavHostFragment`.
+You need to create a layout resource file that your `HotwireActivity` will use to host the `NavigatorHost`.
 
 Android Jetpack provides a [`FragmentContainerView`](https://developer.android.com/reference/androidx/fragment/app/FragmentContainerView) to contain `NavHostFragment` navigation. In its simplest form, your Activity layout file will look like:
 
@@ -37,7 +37,7 @@ Android Jetpack provides a [`FragmentContainerView`](https://developer.android.c
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_nav_host"
-        android:name="dev.hotwire.core.navigation.session.SessionNavHostFragment"
+        android:name="dev.hotwire.core.navigation.session.NavigatorHost"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="false" />
@@ -49,14 +49,14 @@ Refer to the demo [`activity_main.xml`](../demo/src/main/res/layout/activity_mai
 
 ### Implement the HotwireActivity abstract class
 
-A Hotwire `Activity` is straightforward and needs to subclass the [`HotwireActivity`](../core/src/main/kotlin/dev/hotwire/core/turbo/activities/HotwireActivity.kt) class in order to provide `Session` configuration information.
+A Hotwire `Activity` is straightforward and needs to subclass the [`HotwireActivity`](../core/src/main/kotlin/dev/hotwire/core/turbo/activities/HotwireActivity.kt) class in order to provide `Navigator` configuration information.
 
 `HotwireActivity` extends Android Jetpack's [`AppCompatActivity`](https://developer.android.com/reference/androidx/appcompat/app/AppCompatActivity). 
 
-You'll need to provide at least one `SessionConfiguration` instance (one for each `SessionNavHostFragment` that exists in our Activity layout). This includes:
-- The `name` of the `Session` (this is arbitrary and helpful for debugging purposes, but each must be unique in your app)
+You'll need to provide at least one `NavigatorConfiguration` instance (one for each `NavigatorHost` that exists in our Activity layout). This includes:
+- The `name` of the `Navigator` (this is arbitrary and helpful for debugging purposes, but each must be unique in your app)
 - The `startLocation` url when your app starts up. Note: if you're running your app locally without HTTPS, see the [local development](#local-development) section.
-- The `navHostFragmentId`, which refers to the resource ID of the `SessionNavHostFragment` in your Activity layout.
+- The `navigatorHostId`, which refers to the resource ID of the `NavigatorHost` in your Activity layout.
 
 In its simplest form, your Activity will look like:
 
@@ -68,17 +68,17 @@ class MainActivity : HotwireActivity() {
         setContentView(R.layout.activity_main)
     }
 
-    override fun sessionConfigurations() = listOf(
-        SessionConfiguration(
+    override fun navigatorConfigurations() = listOf(
+        NavigatorConfiguration(
             name = "main",
             startLocation = Urls.homeUrl,
-            navHostFragmentId = R.id.main_nav_host
+            navigatorHostId = R.id.main_nav_host
         )
     )
 }
 ```
 
-_Note that `R.layout.activity_main` refers to the Activity layout file that you already created. `R.id.main_nav_host` refers to the `SessionNavHostFragment` that placed in the layout file._
+_Note that `R.layout.activity_main` refers to the Activity layout file that you already created. `R.id.main_nav_host` refers to the `NavigatorHost` that placed in the layout file._
 
 Refer to the demo [`MainActivity`](../demo/src/main/kotlin/dev/hotwire/demo/main/MainActivity.kt) as an example. (Don't forget to add your Activity to your app's [`AndroidManifest.xml`](../demo/src/main/AndroidManifest.xml) file.)
 

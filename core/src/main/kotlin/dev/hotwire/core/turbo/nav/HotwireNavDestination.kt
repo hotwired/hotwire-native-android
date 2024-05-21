@@ -121,7 +121,7 @@ interface HotwireNavDestination {
     fun route(newLocation: String): Router.RouteResult {
         return Hotwire.router.route(
             location = newLocation,
-            sessionConfiguration = navigator.host.sessionConfiguration,
+            configuration = navigator.host.configuration,
             activity = fragment.requireActivity() as HotwireActivity
         )
     }

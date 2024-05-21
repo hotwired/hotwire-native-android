@@ -26,7 +26,7 @@ class Navigator(val host: NavigatorHost) {
      */
     val currentDestination: HotwireNavDestination
         get() = host.childFragmentManager.primaryNavigationFragment as HotwireNavDestination?
-            ?: throw IllegalStateException("No current destination found in NavHostFragment")
+            ?: throw IllegalStateException("No current destination found in NavigatorHost")
 
     /**
      * Gets the location for the current destination.
@@ -48,7 +48,7 @@ class Navigator(val host: NavigatorHost) {
         private set
 
     internal fun createNewSession() = Session(
-        sessionName = host.sessionConfiguration.name,
+        sessionName = host.configuration.name,
         activity = host.activity,
         webView = Hotwire.config.makeCustomWebView(host.requireContext())
     ).also {
@@ -189,13 +189,13 @@ class Navigator(val host: NavigatorHost) {
     /**
      * Finds the [NavigatorHost] with the given resource ID.
      */
-    fun findNavHostFragment(@IdRes navHostFragmentId: Int): NavigatorHost {
+    fun findNavigatorHost(@IdRes navigatorHostId: Int): NavigatorHost {
         val fragment = currentDestination.fragment
 
-        return fragment.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
-            ?: fragment.parentFragment?.parentFragment?.childFragmentManager?.findNavHostFragment(navHostFragmentId)
-            ?: fragment.requireActivity().supportFragmentManager.findNavHostFragment(navHostFragmentId)
-            ?: throw IllegalStateException("No NavigatorHost found with ID: $navHostFragmentId")
+        return fragment.parentFragment?.childFragmentManager?.findNavigatorHost(navigatorHostId)
+            ?: fragment.parentFragment?.parentFragment?.childFragmentManager?.findNavigatorHost(navigatorHostId)
+            ?: fragment.requireActivity().supportFragmentManager.findNavigatorHost(navigatorHostId)
+            ?: throw IllegalStateException("No NavigatorHost found with ID: $navigatorHostId")
     }
 
     private fun navigateWhenReady(onReady: () -> Unit) {
@@ -382,8 +382,8 @@ class Navigator(val host: NavigatorHost) {
         )
     }
 
-    private fun FragmentManager.findNavHostFragment(navHostFragmentId: Int): NavigatorHost? {
-        return findFragmentById(navHostFragmentId) as? NavigatorHost
+    private fun FragmentManager.findNavigatorHost(navigatorHostId: Int): NavigatorHost? {
+        return findFragmentById(navigatorHostId) as? NavigatorHost
     }
 
     private val NavBackStackEntry?.isModalContext: Boolean

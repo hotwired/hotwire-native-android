@@ -2,7 +2,7 @@ package dev.hotwire.core.navigation.routing
 
 import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.session.SessionConfiguration
+import dev.hotwire.core.navigation.session.NavigatorConfiguration
 import dev.hotwire.core.navigation.routing.Router.Route
 
 /**
@@ -34,7 +34,7 @@ class Router(private val routes: List<Route>) {
          */
         fun matches(
             location: String,
-            sessionConfiguration: SessionConfiguration
+            configuration: NavigatorConfiguration
         ): Boolean
 
         /**
@@ -43,7 +43,7 @@ class Router(private val routes: List<Route>) {
          */
         fun handle(
             location: String,
-            sessionConfiguration: SessionConfiguration,
+            configuration: NavigatorConfiguration,
             activity: HotwireActivity
         )
     }
@@ -62,17 +62,17 @@ class Router(private val routes: List<Route>) {
 
     internal fun route(
         location: String,
-        sessionConfiguration: SessionConfiguration,
+        configuration: NavigatorConfiguration,
         activity: HotwireActivity
     ): RouteResult {
         routes.forEach { route ->
-            if (route.matches(location, sessionConfiguration)) {
+            if (route.matches(location, configuration)) {
                 logEvent("routeMatch", listOf(
                     "route" to route.name,
                     "location" to location
                 ))
 
-                route.handle(location, sessionConfiguration, activity)
+                route.handle(location, configuration, activity)
                 return route.result
             }
         }

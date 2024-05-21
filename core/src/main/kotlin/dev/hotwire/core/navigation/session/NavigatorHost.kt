@@ -14,8 +14,8 @@ open class NavigatorHost : NavHostFragment() {
     lateinit var navigator: Navigator
         private set
 
-    val sessionConfiguration get() = activity.sessionConfigurations().first {
-        id == it.navHostFragmentId
+    val configuration get() = activity.navigatorConfigurations().first {
+        id == it.navigatorHostId
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +36,7 @@ open class NavigatorHost : NavHostFragment() {
     internal fun initControllerGraph() {
         navController.apply {
             graph = TurboNavGraphBuilder(
-                startLocation = sessionConfiguration.startLocation,
+                startLocation = configuration.startLocation,
                 pathConfiguration = pathConfiguration,
                 navController = findNavController()
             ).build(

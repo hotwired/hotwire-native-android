@@ -2,8 +2,8 @@ package dev.hotwire.core.navigation.session
 
 import androidx.annotation.IdRes
 
-data class SessionConfiguration(
+data class NavigatorConfiguration(
     val name: String,
     val startLocation: String,
-    @IdRes val navHostFragmentId: Int,
+    @IdRes val navigatorHostId: Int,
 )
