@@ -118,7 +118,7 @@ class NavigatorRuleTest {
     @Test
     fun `navigate to modal context replacing root`() {
         assertThatThrownBy { getNavigatorRule(modalRootUrl) }
-            .isInstanceOf(TurboNavException::class.java)
+            .isInstanceOf(NavigatorException::class.java)
             .hasMessage("A `modal` destination cannot use presentation `REPLACE_ROOT`")
     }
 

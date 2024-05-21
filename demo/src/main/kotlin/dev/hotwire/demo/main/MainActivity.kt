@@ -16,7 +16,7 @@ class MainActivity : HotwireActivity() {
         NavigatorConfiguration(
             name = "main",
             startLocation = Urls.homeUrl,
-            navigatorHostId = R.id.main_nav_host
+            navigatorHostId = R.id.main_navigator_host
         )
     )
 }

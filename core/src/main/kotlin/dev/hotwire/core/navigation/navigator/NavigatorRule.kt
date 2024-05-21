@@ -132,7 +132,7 @@ internal class NavigatorRule(
         if (newPresentationContext == TurboNavPresentationContext.MODAL &&
             newPresentation == TurboNavPresentation.REPLACE_ROOT
         ) {
-            throw TurboNavException("A `modal` destination cannot use presentation `REPLACE_ROOT`")
+            throw NavigatorException("A `modal` destination cannot use presentation `REPLACE_ROOT`")
         }
     }
 
