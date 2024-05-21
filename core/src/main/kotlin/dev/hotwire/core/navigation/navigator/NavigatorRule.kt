@@ -94,7 +94,7 @@ internal class NavigatorRule(
         return navOptions
     }
 
-    private fun newNavigationMode(): TurboNavMode {
+    private fun newNavigationMode(): NavigatorMode {
         val presentationNone = newPresentation == TurboNavPresentation.NONE
         val presentationRefresh = newPresentation == TurboNavPresentation.REFRESH
 
@@ -107,16 +107,16 @@ internal class NavigatorRule(
                 newPresentation != TurboNavPresentation.REPLACE_ROOT
 
         return when {
-            dismissModalContext -> TurboNavMode.DISMISS_MODAL
-            navigateToModalContext -> TurboNavMode.TO_MODAL
-            presentationRefresh -> TurboNavMode.REFRESH
-            presentationNone -> TurboNavMode.NONE
-            else -> TurboNavMode.IN_CONTEXT
+            dismissModalContext -> NavigatorMode.DISMISS_MODAL
+            navigateToModalContext -> NavigatorMode.TO_MODAL
+            presentationRefresh -> NavigatorMode.REFRESH
+            presentationNone -> NavigatorMode.NONE
+            else -> NavigatorMode.IN_CONTEXT
         }
     }
 
     private fun newModalResult(): SessionModalResult? {
-        if (newNavigationMode != TurboNavMode.DISMISS_MODAL) {
+        if (newNavigationMode != NavigatorMode.DISMISS_MODAL) {
             return null
         }
 

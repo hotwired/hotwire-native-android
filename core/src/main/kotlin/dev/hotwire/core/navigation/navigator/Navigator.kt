@@ -132,19 +132,19 @@ class Navigator(
         )
 
         when (rule.newNavigationMode) {
-            TurboNavMode.DISMISS_MODAL -> {
+            NavigatorMode.DISMISS_MODAL -> {
                 dismissModalContextWithResult(rule)
             }
-            TurboNavMode.TO_MODAL -> {
+            NavigatorMode.TO_MODAL -> {
                 navigateToModalContext(rule)
             }
-            TurboNavMode.IN_CONTEXT -> {
+            NavigatorMode.IN_CONTEXT -> {
                 navigateWithinContext(rule)
             }
-            TurboNavMode.REFRESH -> {
+            NavigatorMode.REFRESH -> {
                 route(rule.currentLocation, VisitOptions())
             }
-            TurboNavMode.NONE -> {
+            NavigatorMode.NONE -> {
                 // Do nothing
             }
         }
