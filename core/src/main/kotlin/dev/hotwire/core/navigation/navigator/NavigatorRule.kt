@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.nav
+package dev.hotwire.core.navigation.navigator
 
 import android.net.Uri
 import android.os.Bundle
@@ -9,13 +9,14 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.navOptions
 import dev.hotwire.core.turbo.config.*
+import dev.hotwire.core.turbo.nav.*
 import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 
 @Suppress("MemberVisibilityCanBePrivate")
-internal class TurboNavRule(
+internal class NavigatorRule(
     location: String,
     visitOptions: VisitOptions,
     bundle: Bundle?,
@@ -129,7 +130,8 @@ internal class TurboNavRule(
 
     private fun verifyNavRules() {
         if (newPresentationContext == TurboNavPresentationContext.MODAL &&
-            newPresentation == TurboNavPresentation.REPLACE_ROOT) {
+            newPresentation == TurboNavPresentation.REPLACE_ROOT
+        ) {
             throw TurboNavException("A `modal` destination cannot use presentation `REPLACE_ROOT`")
         }
     }

@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.nav
+package dev.hotwire.core.navigation.navigator
 
 import android.content.Context
 import android.net.Uri
@@ -13,6 +13,7 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.turbo.nav.*
 import dev.hotwire.core.turbo.visit.VisitOptions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -25,7 +26,7 @@ import org.robolectric.annotation.Config
 @Suppress("UsePropertyAccessSyntax")
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboNavRuleTest {
+class NavigatorRuleTest {
     private lateinit var context: Context
     private lateinit var controller: TestNavHostController
     private lateinit var pathConfiguration: PathConfiguration
@@ -384,8 +385,8 @@ class TurboNavRuleTest {
         location: String,
         visitOptions: VisitOptions = VisitOptions(),
         bundle: Bundle? = null
-    ): TurboNavRule {
-        return TurboNavRule(
+    ): NavigatorRule {
+        return NavigatorRule(
             location, visitOptions, bundle, navOptions, extras, pathConfiguration, controller
         )
     }

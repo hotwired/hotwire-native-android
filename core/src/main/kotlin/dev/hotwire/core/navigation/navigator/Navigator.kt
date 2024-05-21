@@ -13,8 +13,6 @@ import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.nav.*
-import dev.hotwire.core.turbo.nav.TurboNavMode
-import dev.hotwire.core.turbo.nav.TurboNavRule
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.VisitAction
@@ -115,7 +113,7 @@ class Navigator(
             return
         }
 
-        val rule = TurboNavRule(
+        val rule = NavigatorRule(
             location = location,
             visitOptions = options,
             bundle = bundle,
@@ -208,7 +206,7 @@ class Navigator(
         currentDestination.prepareNavigation(onReady)
     }
 
-    private fun navigateWithinContext(rule: TurboNavRule) {
+    private fun navigateWithinContext(rule: NavigatorRule) {
         logEvent(
             "navigateWithinContext",
             "location" to rule.newLocation,
@@ -238,7 +236,7 @@ class Navigator(
         }
     }
 
-    private fun navigateToModalContext(rule: TurboNavRule) {
+    private fun navigateToModalContext(rule: NavigatorRule) {
         logEvent(
             "navigateToModalContext",
             "location" to rule.newLocation
@@ -255,7 +253,7 @@ class Navigator(
         }
     }
 
-    private fun dismissModalContextWithResult(rule: TurboNavRule) {
+    private fun dismissModalContextWithResult(rule: NavigatorRule) {
         logEvent(
             "dismissModalContextWithResult",
             "location" to rule.newLocation,
@@ -279,7 +277,7 @@ class Navigator(
         }
     }
 
-    private fun popModalsFromBackStack(rule: TurboNavRule) {
+    private fun popModalsFromBackStack(rule: NavigatorRule) {
         do {
             popBackStack(rule)
         } while (
@@ -287,7 +285,7 @@ class Navigator(
         )
     }
 
-    private fun popBackStack(rule: TurboNavRule) {
+    private fun popBackStack(rule: NavigatorRule) {
         logEvent(
             "popFromBackStack",
             "location" to rule.controller.currentBackStackEntry.location.orEmpty()
@@ -295,7 +293,7 @@ class Navigator(
         rule.controller.popBackStack()
     }
 
-    private fun sendModalResult(rule: TurboNavRule) {
+    private fun sendModalResult(rule: NavigatorRule) {
         // Save the modal result with VisitOptions so it can be retrieved
         // by the previous destination when the backstack is popped.
         currentDestination.delegate().sessionViewModel.sendModalResult(
@@ -303,7 +301,7 @@ class Navigator(
         )
     }
 
-    private fun replaceRootLocation(rule: TurboNavRule) {
+    private fun replaceRootLocation(rule: NavigatorRule) {
         if (rule.newDestination == null) {
             logEvent(
                 "replaceRootLocation",
@@ -322,7 +320,7 @@ class Navigator(
         rule.controller.navigate(rule.newDestination.id, rule.newBundle, rule.newNavOptions)
     }
 
-    private fun navigateToLocation(rule: TurboNavRule) {
+    private fun navigateToLocation(rule: NavigatorRule) {
         // Save the VisitOptions so it can be retrieved by the next
         // destination. When response.responseHTML is present it is
         // too large to save directly within the args bundle.
