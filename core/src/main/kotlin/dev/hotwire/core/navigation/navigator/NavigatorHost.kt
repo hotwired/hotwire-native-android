@@ -13,16 +13,12 @@ open class NavigatorHost : NavHostFragment() {
     lateinit var navigator: Navigator
         private set
 
-    val configuration get() = activity.navigatorConfigurations().first {
-        id == it.navigatorHostId
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         activity = requireActivity() as HotwireActivity
         activity.delegate.registerNavigatorHost(this)
-        navigator = Navigator(this)
+        navigator = Navigator(this, configuration)
 
         initControllerGraph()
     }
@@ -43,4 +39,8 @@ open class NavigatorHost : NavHostFragment() {
             )
         }
     }
+
+    private val configuration get() = activity.navigatorConfigurations().firstOrNull {
+        id == it.navigatorHostId
+    } ?: throw IllegalStateException("No configuration found for NavigatorHost")
 }

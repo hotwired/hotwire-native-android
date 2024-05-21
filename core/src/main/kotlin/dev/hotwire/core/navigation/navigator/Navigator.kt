@@ -20,7 +20,10 @@ import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 
-class Navigator(val host: NavigatorHost) {
+class Navigator(
+    val host: NavigatorHost,
+    val configuration: NavigatorConfiguration
+) {
     private val navController = host.navController
 
     /**
@@ -50,7 +53,7 @@ class Navigator(val host: NavigatorHost) {
         private set
 
     internal fun createNewSession() = Session(
-        sessionName = host.configuration.name,
+        sessionName = configuration.name,
         activity = host.activity,
         webView = Hotwire.config.makeCustomWebView(host.requireContext())
     ).also {
