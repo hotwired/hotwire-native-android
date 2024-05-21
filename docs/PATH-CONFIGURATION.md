@@ -11,9 +11,7 @@ In its simplest form, your JSON configuration will look like:
 **`assets/json/configuration.json`:**
 ```json
 {
-  "settings": {
-    "screenshots_enabled": true
-  },
+  "settings": {},
   "rules": [
     {
       "patterns": [
@@ -53,11 +51,7 @@ Here's some tips for managing path configurations:
 - Try to keep your local and remote path configuration files in sync. When your app starts, Turbo will load your local configuration file, then make a request for your remote file which will override your local file. If the files are different and your server doesn't respond quickly, it's possible to get difficult to debug behaviour. If you're making other changes to your app that will require a new native deployment, that's a good time to update your local file to match the current state of your server.
 
 ## Settings
-The `settings` object is a place to configure app-level settings. This is useful when you have a remote configuration file, since you can add your own custom settings and use them as remote feature-flags. Available settings are:
-* `screenshots_enabled` — Whether or not transitional web screenshots should be used during navigation. This gives the appearance of a more smooth experience since the session WebView is swapped between web destination Fragments, but does require more performance overhead. 
-	* Optional.
-	* Possible values: `true`, `false`. Defaults to `true`.
-* Any custom app settings that you'd like to configure here
+The `settings` object is a place to configure app-level settings. This is useful when you have a remote configuration file, since you can add your own custom settings and use them as remote feature-flags. You can provide any custom app settings that you'd like to configure here.
 
 ## Rules
 The `"rules"` array defines a list of rules that are processed in order and cascade downward, similar to CSS. The top-most declaration should establish the default behavior for all url path patterns, while each subsequent rule can override for specific behavior.

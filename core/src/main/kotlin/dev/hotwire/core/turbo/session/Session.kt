@@ -12,9 +12,7 @@ import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.*
-import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.lib.logging.logEvent
-import dev.hotwire.core.turbo.config.screenshotsEnabled
 import dev.hotwire.core.turbo.delegates.TurboFileChooserDelegate
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
@@ -63,12 +61,6 @@ class Session internal constructor(
      * Experimental: API may change, not ready for production use.
      */
     var offlineRequestHandler: TurboOfflineRequestHandler? = null
-
-    /**
-     * Returns whether transitional screenshots are enabled for this session. Default is `true`.
-     */
-    val screenshotsEnabled
-        get() = pathConfiguration.settings.screenshotsEnabled
 
     /**
      * Gets the nav destination that corresponds to the current WebView visit.
