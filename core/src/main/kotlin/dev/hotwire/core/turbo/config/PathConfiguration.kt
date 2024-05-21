@@ -145,6 +145,3 @@ val PathConfigurationProperties.title: String?
 
 val PathConfigurationProperties.pullToRefreshEnabled: Boolean
     get() = get("pull_to_refresh_enabled")?.toBoolean() ?: false
-
-val PathConfigurationSettings.screenshotsEnabled: Boolean
-    get() = get("screenshots_enabled")?.toBoolean() ?: true

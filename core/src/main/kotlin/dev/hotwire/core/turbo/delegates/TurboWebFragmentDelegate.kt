@@ -373,8 +373,6 @@ internal class TurboWebFragmentDelegate(
     }
 
     private fun screenshotView() {
-        if (!session.screenshotsEnabled) return
-
         turboView?.let {
             screenshot = it.createScreenshot()
             screenshotOrientation = it.screenshotOrientation()

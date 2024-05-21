@@ -1,7 +1,5 @@
 {
-  "settings": {
-    "screenshots_enabled": true
-  },
+  "settings": {},
   "rules": [
     {
       "patterns": [
