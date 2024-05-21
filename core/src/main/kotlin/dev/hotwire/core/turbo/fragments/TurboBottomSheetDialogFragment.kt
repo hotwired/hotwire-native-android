@@ -7,12 +7,12 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dev.hotwire.core.R
-import dev.hotwire.core.navigation.session.NavigatorHost
+import dev.hotwire.core.navigation.navigator.NavigatorHost
 import dev.hotwire.core.turbo.config.title
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.HotwireNavDialogDestination
-import dev.hotwire.core.turbo.nav.Navigator
+import dev.hotwire.core.navigation.navigator.Navigator
 
 /**
  * The base class from which all bottom sheet native fragments in a

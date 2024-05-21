@@ -5,7 +5,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.google.android.material.R
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.session.NavigatorConfiguration
+import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.core.turbo.util.colorFromThemeAttr
 
 class BrowserTabRoute : Router.Route {

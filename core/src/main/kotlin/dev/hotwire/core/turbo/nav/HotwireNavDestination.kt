@@ -11,6 +11,7 @@ import dev.hotwire.core.R
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.activities.HotwireActivity
+import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context

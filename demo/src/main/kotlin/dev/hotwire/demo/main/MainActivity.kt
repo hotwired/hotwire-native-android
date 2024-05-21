@@ -2,7 +2,7 @@ package dev.hotwire.demo.main
 
 import android.os.Bundle
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.session.NavigatorConfiguration
+import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
 

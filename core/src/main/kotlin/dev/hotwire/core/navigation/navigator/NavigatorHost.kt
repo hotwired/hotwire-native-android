@@ -1,4 +1,4 @@
-package dev.hotwire.core.navigation.session
+package dev.hotwire.core.navigation.navigator
 
 import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
@@ -6,7 +6,6 @@ import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.turbo.nav.Navigator
 import dev.hotwire.core.turbo.nav.TurboNavGraphBuilder
 
 open class NavigatorHost : NavHostFragment() {

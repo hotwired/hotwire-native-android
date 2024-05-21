@@ -3,9 +3,9 @@ package dev.hotwire.core.navigation.activities
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
-import dev.hotwire.core.navigation.session.NavigatorHost
-import dev.hotwire.core.navigation.session.NavigatorConfiguration
-import dev.hotwire.core.turbo.nav.Navigator
+import dev.hotwire.core.navigation.navigator.NavigatorHost
+import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
+import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.turbo.observers.HotwireActivityObserver
 
 /**

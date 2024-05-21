@@ -1,6 +1,6 @@
 package dev.hotwire.core.navigation.routing
 
-import dev.hotwire.core.navigation.session.NavigatorConfiguration
+import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

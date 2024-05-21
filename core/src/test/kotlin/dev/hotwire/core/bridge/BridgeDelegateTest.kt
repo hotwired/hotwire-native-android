@@ -9,7 +9,7 @@ import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
-import dev.hotwire.core.turbo.nav.Navigator
+import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.turbo.session.Session
 import org.junit.Assert.*
 import org.junit.Before

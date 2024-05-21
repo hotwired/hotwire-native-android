@@ -2,8 +2,8 @@ package dev.hotwire.core.turbo.delegates
 
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
-import dev.hotwire.core.navigation.session.NavigatorHost
-import dev.hotwire.core.turbo.nav.Navigator
+import dev.hotwire.core.navigation.navigator.NavigatorHost
+import dev.hotwire.core.navigation.navigator.Navigator
 
 /**
  * A simplified delegate that can be used when a [NavigatorHost] is nested

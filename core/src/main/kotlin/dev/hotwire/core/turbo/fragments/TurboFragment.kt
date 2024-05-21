@@ -6,12 +6,12 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import dev.hotwire.core.R
-import dev.hotwire.core.navigation.session.NavigatorHost
+import dev.hotwire.core.navigation.navigator.NavigatorHost
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.config.title
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
-import dev.hotwire.core.turbo.nav.Navigator
+import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.observers.HotwireWindowThemeObserver
 import dev.hotwire.core.turbo.session.SessionModalResult

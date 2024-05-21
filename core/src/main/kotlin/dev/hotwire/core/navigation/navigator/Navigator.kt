@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.nav
+package dev.hotwire.core.navigation.navigator
 
 import android.os.Bundle
 import androidx.annotation.IdRes
@@ -12,7 +12,9 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.navigation.routing.Router
-import dev.hotwire.core.navigation.session.NavigatorHost
+import dev.hotwire.core.turbo.nav.*
+import dev.hotwire.core.turbo.nav.TurboNavMode
+import dev.hotwire.core.turbo.nav.TurboNavRule
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.location
 import dev.hotwire.core.turbo.visit.VisitAction

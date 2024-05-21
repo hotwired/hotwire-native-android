@@ -37,7 +37,7 @@ Android Jetpack provides a [`FragmentContainerView`](https://developer.android.c
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_nav_host"
-        android:name="dev.hotwire.core.navigation.session.NavigatorHost"
+        android:name="dev.hotwire.core.navigation.navigator.NavigatorHost"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="false" />
