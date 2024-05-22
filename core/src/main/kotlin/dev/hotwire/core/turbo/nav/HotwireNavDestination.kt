@@ -16,8 +16,8 @@ import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
-import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
-import dev.hotwire.core.turbo.delegates.TurboNestedFragmentDelegate
+import dev.hotwire.core.navigation.fragments.HotwireFragmentDelegate
+import dev.hotwire.core.navigation.navigator.NestedNavigatorHostDelegate
 import dev.hotwire.core.turbo.visit.VisitAction
 
 /**
@@ -71,7 +71,7 @@ interface HotwireNavDestination {
     /**
      * Gets the delegate instance that handles the Fragment's lifecycle events.
      */
-    fun delegate(): TurboFragmentDelegate
+    fun delegate(): HotwireFragmentDelegate
 
     /**
      * Returns the [Toolbar] used for navigation by the given view.
@@ -102,7 +102,7 @@ interface HotwireNavDestination {
 
     /**
      * Gets the navigator that will be used for navigating to `newLocation`. You should
-     * not have to override this, unless you're using a [TurboNestedFragmentDelegate] to provide
+     * not have to override this, unless you're using a [NestedNavigatorHostDelegate] to provide
      * sub-navigation within your current Fragment destination and would like custom behavior.
      */
     fun navigatorForNavigation(newLocation: String): Navigator {

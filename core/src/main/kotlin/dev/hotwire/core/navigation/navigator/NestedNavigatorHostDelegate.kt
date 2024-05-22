@@ -1,9 +1,7 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.navigation.navigator
 
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
-import dev.hotwire.core.navigation.navigator.NavigatorHost
-import dev.hotwire.core.navigation.navigator.Navigator
 
 /**
  * A simplified delegate that can be used when a [NavigatorHost] is nested
@@ -15,10 +13,10 @@ import dev.hotwire.core.navigation.navigator.Navigator
  *
  * @property fragment The Fragment to bind this delegate to.
  * @param navigatorHostId The resource ID of the [NavigatorHost]
- *  instance hosted in your Activity's layout resource.
+ *  instance hosted in your Fragment's layout resource.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class TurboNestedFragmentDelegate(val fragment: Fragment, navigatorHostId: Int) {
+class NestedNavigatorHostDelegate(val fragment: Fragment, navigatorHostId: Int) {
     val navigatorHost by lazy { findNavigatorHost(navigatorHostId) }
 
     val navigator: Navigator

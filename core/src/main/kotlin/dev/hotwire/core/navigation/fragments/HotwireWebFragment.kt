@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.R
 import dev.hotwire.core.bridge.BridgeDelegate
-import dev.hotwire.core.turbo.delegates.TurboWebFragmentDelegate
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.core.turbo.session.SessionModalResult
@@ -25,8 +24,8 @@ import dev.hotwire.core.turbo.views.TurboWebView
  * For native fragments, refer to [HotwireFragment].
  */
 @HotwireDestination(uri = "turbo://fragment/web")
-open class HotwireWebFragment : HotwireFragment(), TurboWebFragmentCallback {
-    private lateinit var webDelegate: TurboWebFragmentDelegate
+open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
+    private lateinit var webDelegate: HotwireWebFragmentDelegate
 
     private val bridgeDelegate by lazy {
         BridgeDelegate(location = location, destination = this)
@@ -34,7 +33,7 @@ open class HotwireWebFragment : HotwireFragment(), TurboWebFragmentCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        webDelegate = TurboWebFragmentDelegate(delegate, this, this)
+        webDelegate = HotwireWebFragmentDelegate(delegate, this, this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -117,7 +116,7 @@ open class HotwireWebFragment : HotwireFragment(), TurboWebFragmentCallback {
     }
 
     // ----------------------------------------------------------------------------
-    // TurboWebFragmentCallback interface
+    // HotwireWebFragmentCallback interface
     // ----------------------------------------------------------------------------
 
     /**

@@ -10,7 +10,6 @@ import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.navigation.navigator.NavigatorHost
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.config.title
-import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.observers.HotwireWindowThemeObserver
@@ -24,12 +23,12 @@ import dev.hotwire.core.turbo.session.SessionModalResult
  */
 abstract class HotwireFragment : Fragment(), HotwireNavDestination {
     override lateinit var navigator: Navigator
-    internal lateinit var delegate: TurboFragmentDelegate
+    internal lateinit var delegate: HotwireFragmentDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         navigator = (parentFragment as NavigatorHost).navigator
-        delegate = TurboFragmentDelegate(this)
+        delegate = HotwireFragmentDelegate(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -125,7 +124,7 @@ abstract class HotwireFragment : Fragment(), HotwireNavDestination {
         return view?.findViewById(R.id.toolbar)
     }
 
-    final override fun delegate(): TurboFragmentDelegate {
+    final override fun delegate(): HotwireFragmentDelegate {
         return delegate
     }
 

@@ -10,7 +10,6 @@ import dev.hotwire.core.R
 import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.navigation.navigator.NavigatorHost
 import dev.hotwire.core.turbo.config.title
-import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.nav.HotwireNavDialogDestination
 
@@ -23,12 +22,12 @@ import dev.hotwire.core.turbo.nav.HotwireNavDialogDestination
 abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
     HotwireNavDestination, HotwireNavDialogDestination {
     override lateinit var navigator: Navigator
-    internal lateinit var delegate: TurboFragmentDelegate
+    internal lateinit var delegate: HotwireFragmentDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         navigator = (parentFragment as NavigatorHost).navigator
-        delegate = TurboFragmentDelegate(this)
+        delegate = HotwireFragmentDelegate(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -113,7 +112,7 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
         return view?.findViewById(R.id.toolbar)
     }
 
-    final override fun delegate(): TurboFragmentDelegate {
+    final override fun delegate(): HotwireFragmentDelegate {
         return delegate
     }
 

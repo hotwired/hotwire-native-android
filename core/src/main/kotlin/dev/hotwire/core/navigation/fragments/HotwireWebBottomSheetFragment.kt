@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.R
 import dev.hotwire.core.bridge.BridgeDelegate
-import dev.hotwire.core.turbo.delegates.TurboWebFragmentDelegate
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
@@ -25,8 +24,8 @@ import dev.hotwire.core.turbo.views.TurboWebView
  * For native bottom sheet fragments, refer to [HotwireBottomSheetFragment].
  */
 @HotwireDestination(uri = "turbo://fragment/web/modal/sheet")
-open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), TurboWebFragmentCallback {
-    private lateinit var webDelegate: TurboWebFragmentDelegate
+open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), HotwireWebFragmentCallback {
+    private lateinit var webDelegate: HotwireWebFragmentDelegate
 
     private val bridgeDelegate by lazy {
         BridgeDelegate(location = location, destination = this)
@@ -34,7 +33,7 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), TurboWe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        webDelegate = TurboWebFragmentDelegate(delegate, this, this)
+        webDelegate = HotwireWebFragmentDelegate(delegate, this, this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -99,7 +98,7 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), TurboWe
     }
 
     // ----------------------------------------------------------------------------
-    // TurboWebFragmentCallback interface
+    // HotwireWebFragmentCallback interface
     // ----------------------------------------------------------------------------
 
     /**

@@ -8,10 +8,10 @@ import dev.hotwire.core.turbo.views.TurboWebChromeClient
 import dev.hotwire.core.turbo.views.TurboWebView
 
 /**
- * Callback interface to be implemented by a [TurboWebFragment],
- * [TurboWebBottomSheetDialogFragment], or subclass.
+ * Callback interface to be implemented by a [HotwireWebFragment],
+ * [HotwireWebBottomSheetFragment], or subclass.
  */
-interface TurboWebFragmentCallback {
+interface HotwireWebFragmentCallback {
     /**
      * The TurboView instance located in the Fragment's view.
      */
