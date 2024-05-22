@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStateAtLeast
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.fragments.TurboWebFragmentCallback
+import dev.hotwire.core.navigation.fragments.TurboWebFragmentCallback
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.session.SessionCallback
 import dev.hotwire.core.turbo.session.SessionModalResult

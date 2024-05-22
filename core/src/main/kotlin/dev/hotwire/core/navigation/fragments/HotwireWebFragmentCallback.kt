@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.fragments
+package dev.hotwire.core.navigation.fragments
 
 import android.view.View
 import android.webkit.HttpAuthHandler

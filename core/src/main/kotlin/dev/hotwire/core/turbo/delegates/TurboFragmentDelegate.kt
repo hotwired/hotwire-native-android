@@ -1,7 +1,7 @@
 package dev.hotwire.core.turbo.delegates
 
 import dev.hotwire.core.lib.logging.logEvent
-import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
+import dev.hotwire.core.navigation.fragments.HotwireFragmentViewModel
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.session.SessionViewModel
@@ -19,7 +19,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     private val navigator = navDestination.navigator
 
     internal val sessionViewModel = SessionViewModel.get(navigator.session.sessionName, fragment.requireActivity())
-    internal val fragmentViewModel = TurboFragmentViewModel.get(location, fragment)
+    internal val fragmentViewModel = HotwireFragmentViewModel.get(location, fragment)
 
     fun prepareNavigation(onReady: () -> Unit) {
         onReady()

@@ -11,15 +11,13 @@ import dev.hotwire.core.R
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.navigation.activities.HotwireActivity
+import dev.hotwire.core.navigation.fragments.HotwireFragmentViewModel
 import dev.hotwire.core.navigation.navigator.Navigator
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.delegates.TurboFragmentDelegate
 import dev.hotwire.core.turbo.delegates.TurboNestedFragmentDelegate
-import dev.hotwire.core.turbo.fragments.TurboFragment
-import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
-import dev.hotwire.core.turbo.fragments.TurboWebFragment
 import dev.hotwire.core.turbo.visit.VisitAction
 
 /**
@@ -52,9 +50,9 @@ interface HotwireNavDestination {
         get() = pathConfiguration.properties(location)
 
     /**
-     * Gets the [TurboFragmentViewModel] associated with this destination.
+     * Gets the [HotwireFragmentViewModel] associated with this destination.
      */
-    val fragmentViewModel: TurboFragmentViewModel
+    val fragmentViewModel: HotwireFragmentViewModel
         get() = delegate().fragmentViewModel
 
     /**
@@ -96,9 +94,7 @@ interface HotwireNavDestination {
     fun onBeforeNavigation()
 
     /**
-     * Refresh the destination's contents. In a [TurboWebFragment], this will perform
-     * a cold boot reload of the WebView location. In an all-native [TurboFragment]
-     * each subclass is responsible for implementing how to refresh its contents.
+     * Refresh the destination's contents.
      *
      * @param displayProgress Whether progress should be displayed while refreshing.
      */

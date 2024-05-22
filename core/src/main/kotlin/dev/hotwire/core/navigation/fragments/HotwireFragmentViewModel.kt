@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.fragments
+package dev.hotwire.core.navigation.fragments
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 /**
  * Holds onto fragment-level state data.
  */
-class TurboFragmentViewModel : ViewModel() {
+class HotwireFragmentViewModel : ViewModel() {
     val title: MutableLiveData<String> = MutableLiveData()
 
     /**
@@ -19,9 +19,9 @@ class TurboFragmentViewModel : ViewModel() {
     }
 
     companion object {
-        fun get(location: String, fragment: Fragment): TurboFragmentViewModel {
+        fun get(location: String, fragment: Fragment): HotwireFragmentViewModel {
             return ViewModelProvider(fragment).get(
-                location, TurboFragmentViewModel::class.java
+                location, HotwireFragmentViewModel::class.java
             )
         }
     }
