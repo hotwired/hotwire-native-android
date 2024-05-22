@@ -6,8 +6,8 @@ import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.navigation.fragments.HotwireWebBottomSheetFragment
 import dev.hotwire.core.navigation.fragments.HotwireWebFragment
-import dev.hotwire.core.navigation.routing.AppNavigationRoute
-import dev.hotwire.core.navigation.routing.BrowserRoute
+import dev.hotwire.core.navigation.routing.AppNavigationRouteDecisionHandler
+import dev.hotwire.core.navigation.routing.BrowserRouteDecisionHandler
 import dev.hotwire.core.navigation.routing.Router
 import dev.hotwire.core.turbo.config.PathConfiguration
 import kotlin.reflect.KClass
@@ -25,8 +25,8 @@ object Hotwire {
         private set
 
     internal var router = Router(listOf(
-        AppNavigationRoute(),
-        BrowserRoute()
+        AppNavigationRouteDecisionHandler(),
+        BrowserRouteDecisionHandler()
     ))
 
     val config: HotwireConfig = HotwireConfig()
@@ -45,11 +45,11 @@ object Hotwire {
     }
 
     /**
-     * Registers the [Router.Route] instances that determine whether to route location
+     * Registers the [Router.RouteDecisionHandler] instances that determine whether to route location
      * urls within in-app navigation or with alternative custom behaviors.
      */
-    fun registerRoutes(routes: List<Router.Route>) {
-        router = Router(routes)
+    fun registerRouteDecisionHandlers(decisionHandlers: List<Router.RouteDecisionHandler>) {
+        router = Router(decisionHandlers)
     }
 
     /**

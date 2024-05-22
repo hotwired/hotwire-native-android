@@ -7,8 +7,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class BrowserRouteTest {
-    private val route = BrowserRoute()
+class BrowserTabRouteDecisionHandlerTest {
+    private val route = BrowserTabRouteDecisionHandler()
     private val config = NavigatorConfiguration(
         name = "test",
         startLocation = "https://my.app.com",
@@ -17,7 +17,7 @@ class BrowserRouteTest {
 
     @Test
     fun `matching result stops navigation`() {
-        assertEquals(Router.RouteResult.STOP, route.result)
+        assertEquals(Router.Decision.CANCEL, route.decision)
     }
 
     @Test

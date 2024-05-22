@@ -5,8 +5,8 @@ import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.navigation.routing.AppNavigationRoute
-import dev.hotwire.core.navigation.routing.BrowserTabRoute
+import dev.hotwire.core.navigation.routing.AppNavigationRouteDecisionHandler
+import dev.hotwire.core.navigation.routing.BrowserTabRouteDecisionHandler
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.demo.bridge.FormComponent
 import dev.hotwire.demo.bridge.MenuComponent
@@ -59,10 +59,10 @@ class DemoApplication : Application() {
             BridgeComponentFactory("overflow-menu", ::OverflowMenuComponent)
         ))
 
-        // Register routes
-        Hotwire.registerRoutes(listOf(
-            AppNavigationRoute(),
-            BrowserTabRoute()
+        // Register route decision handlers
+        Hotwire.registerRouteDecisionHandlers(listOf(
+            AppNavigationRouteDecisionHandler(),
+            BrowserTabRouteDecisionHandler()
         ))
 
         // Set configuration options

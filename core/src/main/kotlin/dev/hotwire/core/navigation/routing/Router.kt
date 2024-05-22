@@ -3,34 +3,35 @@ package dev.hotwire.core.navigation.routing
 import dev.hotwire.core.lib.logging.logEvent
 import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
-import dev.hotwire.core.navigation.routing.Router.Route
+import dev.hotwire.core.navigation.routing.Router.RouteDecisionHandler
 
 /**
  * Routes location urls within in-app navigation or with custom behaviors
- * provided in [Route] instances.
+ * provided in [RouteDecisionHandler] instances.
  */
-class Router(private val routes: List<Route>) {
+class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
 
     /**
-     * An interface to implement to provide custom route behaviors in your app.
+     * An interface to implement to provide custom route decision handling
+     * behaviors in your app.
      */
-    interface Route {
+    interface RouteDecisionHandler {
         /**
-         * The route name used in debug logging.
+         * The decision handler name used in debug logging.
          */
         val name: String
 
         /**
-         * To permit in-app navigation when the location matches this route,
-         * return [RouteResult.NAVIGATE]. To prevent in-app navigation return
-         * [RouteResult.STOP].
+         * To permit in-app navigation when the location matches this decision
+         * handler, return [Decision.NAVIGATE]. To prevent in-app navigation
+         * return [Decision.CANCEL].
          */
-        val result: RouteResult
+        val decision: Decision
 
         /**
-         * Determines whether the location matches this route. Use your own custom
-         * rules based on the location's domain, protocol, path, or any other
-         * factors.
+         * Determines whether the location matches this decision handler. Use
+         * your own custom rules based on the location's domain, protocol,
+         * path, or any other factors.
          */
         fun matches(
             location: String,
@@ -48,7 +49,7 @@ class Router(private val routes: List<Route>) {
         )
     }
 
-    enum class RouteResult {
+    enum class Decision {
         /**
          * Permit in-app navigation with your app's domain urls.
          */
@@ -57,27 +58,27 @@ class Router(private val routes: List<Route>) {
         /**
          * Prevent in-app navigation. Always use this for external domain urls.
          */
-        STOP
+        CANCEL
     }
 
-    internal fun route(
+    internal fun decideRoute(
         location: String,
         configuration: NavigatorConfiguration,
         activity: HotwireActivity
-    ): RouteResult {
-        routes.forEach { route ->
-            if (route.matches(location, configuration)) {
-                logEvent("routeMatch", listOf(
-                    "route" to route.name,
+    ): Decision {
+        decisionHandlers.forEach { handler ->
+            if (handler.matches(location, configuration)) {
+                logEvent("handlerMatch", listOf(
+                    "handler" to handler.name,
                     "location" to location
                 ))
 
-                route.handle(location, configuration, activity)
-                return route.result
+                handler.handle(location, configuration, activity)
+                return handler.decision
             }
         }
 
-        logEvent("noRouteForLocation", location)
-        return RouteResult.STOP
+        logEvent("noHandlerForLocation", location)
+        return Decision.CANCEL
     }
 }

@@ -95,7 +95,7 @@ class Navigator(
         extras: FragmentNavigator.Extras? = null
     ) {
 
-        if (getRouteResult(location) == Router.RouteResult.STOP) {
+        if (getRouteDecision(location) == Router.Decision.CANCEL) {
             return
         }
 
@@ -350,15 +350,15 @@ class Navigator(
         return currentDestination.navigatorForNavigation(location).navController
     }
 
-    private fun getRouteResult(location: String): Router.RouteResult {
-        val result = currentDestination.route(location)
+    private fun getRouteDecision(location: String): Router.Decision {
+        val decision = currentDestination.decideRoute(location)
 
         logEvent(
-            "routeResult",
+            "routeDecision",
             "location" to location,
-            "result" to result
+            "decision" to decision
         )
-        return result
+        return decision
     }
 
     private fun navOptions(location: String, action: VisitAction): NavOptions {

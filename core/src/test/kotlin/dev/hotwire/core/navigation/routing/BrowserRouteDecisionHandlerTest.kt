@@ -7,8 +7,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class AppNavigationRouteTest {
-    private val route = AppNavigationRoute()
+class BrowserRouteDecisionHandlerTest {
+    private val route = BrowserRouteDecisionHandler()
     private val config = NavigatorConfiguration(
         name = "test",
         startLocation = "https://my.app.com",
@@ -16,25 +16,25 @@ class AppNavigationRouteTest {
     )
 
     @Test
-    fun `matching result navigates`() {
-        assertEquals(Router.RouteResult.NAVIGATE, route.result)
+    fun `matching result stops navigation`() {
+        assertEquals(Router.Decision.CANCEL, route.decision)
     }
 
     @Test
-    fun `url on app domain matches`() {
-        val url = "https://my.app.com/page"
+    fun `url on external domain matches`() {
+        val url = "https://external.com/page"
         assertTrue(route.matches(url, config))
     }
 
     @Test
-    fun `url without subdomain does not match`() {
+    fun `url without subdomain matches`() {
         val url = "https://app.com/page"
-        assertFalse(route.matches(url, config))
+        assertTrue(route.matches(url, config))
     }
 
     @Test
-    fun `masqueraded url does not match`() {
-        val url = "https://app.my.com@fake.domain"
+    fun `url on app domain does not match`() {
+        val url = "https://my.app.com/page"
         assertFalse(route.matches(url, config))
     }
 }
