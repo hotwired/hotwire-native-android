@@ -1,7 +1,6 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.navigation.fragments
 
 import dev.hotwire.core.lib.logging.logEvent
-import dev.hotwire.core.turbo.fragments.TurboFragmentViewModel
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.session.SessionModalResult
 import dev.hotwire.core.turbo.session.SessionViewModel
@@ -13,13 +12,13 @@ import dev.hotwire.core.turbo.util.displayBackButtonAsCloseIcon
  * to this class. Note: This class should not need to be used directly
  * from within your app.
  */
-class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
+class HotwireFragmentDelegate(private val navDestination: HotwireNavDestination) {
     private val fragment = navDestination.fragment
     private val location = navDestination.location
     private val navigator = navDestination.navigator
 
     internal val sessionViewModel = SessionViewModel.get(navigator.session.sessionName, fragment.requireActivity())
-    internal val fragmentViewModel = TurboFragmentViewModel.get(location, fragment)
+    internal val fragmentViewModel = HotwireFragmentViewModel.get(location, fragment)
 
     fun prepareNavigation(onReady: () -> Unit) {
         onReady()
@@ -51,7 +50,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     }
 
     /**
-     * Provides a hook to Turbo when the Fragment has been started again after a dialog has
+     * Provides a hook when the Fragment has been started again after a dialog has
      * been dismissed/canceled and no result is passed back.
      */
     fun onStartAfterDialogCancel() {
@@ -59,7 +58,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     }
 
     /**
-     * Provides a hook to Turbo when a Fragment has been started again after receiving a
+     * Provides a hook when a Fragment has been started again after receiving a
      * modal result. Will navigate if the result indicates it should.
      */
     fun onStartAfterModalResult(result: SessionModalResult) {
@@ -70,7 +69,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     }
 
     /**
-     * Provides a hook to Turbo when the dialog has been canceled. If there is a modal
+     * Provides a hook when the dialog has been canceled. If there is a modal
      * result, an event will be created in [SessionViewModel] that can be observed.
      */
     fun onDialogCancel() {
@@ -81,7 +80,7 @@ class TurboFragmentDelegate(private val navDestination: HotwireNavDestination) {
     }
 
     /**
-     * Provides a hook to Turbo when the dialog has been dismissed.
+     * Provides a hook when the dialog has been dismissed.
      */
     fun onDialogDismiss() {
         logEvent("fragment.onDialogDismiss", "location" to location)

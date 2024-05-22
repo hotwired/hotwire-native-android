@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.navigation.fragments
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStateAtLeast
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.fragments.TurboWebFragmentCallback
 import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.session.SessionCallback
 import dev.hotwire.core.turbo.session.SessionModalResult
@@ -29,10 +28,10 @@ import kotlin.random.Random
  * Provides all the hooks for a web Fragment to delegate its lifecycle events
  * to this class.
  */
-internal class TurboWebFragmentDelegate(
-    private val delegate: TurboFragmentDelegate,
+internal class HotwireWebFragmentDelegate(
+    private val delegate: HotwireFragmentDelegate,
     private val navDestination: HotwireNavDestination,
-    private val callback: TurboWebFragmentCallback
+    private val callback: HotwireWebFragmentCallback
 ) : SessionCallback {
 
     private val location = navDestination.location
@@ -85,7 +84,7 @@ internal class TurboWebFragmentDelegate(
     }
 
     /**
-     * Provides a hook to Turbo when a fragment has been started again after receiving a
+     * Provides a hook when a fragment has been started again after receiving a
      * modal result. Will navigate if the result indicates it should.
      */
     fun onStartAfterModalResult(result: SessionModalResult) {
@@ -96,9 +95,9 @@ internal class TurboWebFragmentDelegate(
     }
 
     /**
-     * Provides a hook to Turbo when the fragment has been started again after a dialog has
+     * Provides a hook when the fragment has been started again after a dialog has
      * been dismissed/canceled and no result is passed back. Initializes all necessary views and
-     * executes the Turbo visit.
+     * executes the visit.
      */
     fun onStartAfterDialogCancel() {
         initNavigationVisit()
@@ -106,7 +105,7 @@ internal class TurboWebFragmentDelegate(
     }
 
     /**
-     * Provides a hook to Turbo when the dialog has been canceled. Detaches the WebView
+     * Provides a hook when the dialog has been canceled. Detaches the WebView
      * before navigation.
      */
     fun onDialogCancel() {
@@ -115,7 +114,7 @@ internal class TurboWebFragmentDelegate(
     }
 
     /**
-     * Provides a hook to Turbo when the dialog has been dismissed. Detaches the WebView
+     * Provides a hook when the dialog has been dismissed. Detaches the WebView
      * before navigation.
      */
     fun onDialogDismiss() {
@@ -145,7 +144,7 @@ internal class TurboWebFragmentDelegate(
     }
 
     /**
-     * Displays the error view that's implemented via [TurboWebFragmentCallback.createErrorView].
+     * Displays the error view that's implemented via [HotwireWebFragmentCallback.createErrorView].
      */
     fun showErrorView(error: VisitError) {
         turboView?.addErrorView(callback.createErrorView(error))
@@ -352,7 +351,7 @@ internal class TurboWebFragmentDelegate(
                         destinationIdentifier = identifier,
                         restoreWithCachedSnapshot = restoreWithCachedSnapshot,
                         reload = reload,
-                        callback = this@TurboWebFragmentDelegate,
+                        callback = this@HotwireWebFragmentDelegate,
                         options = options.copy(snapshotHTML = snapshot)
                     )
                 )
