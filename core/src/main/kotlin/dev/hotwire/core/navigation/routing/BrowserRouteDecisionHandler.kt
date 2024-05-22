@@ -7,10 +7,10 @@ import dev.hotwire.core.lib.logging.logError
 import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 
-class BrowserRoute : Router.Route {
+class BrowserRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "browser"
 
-    override val result = Router.RouteResult.STOP
+    override val decision = Router.Decision.CANCEL
 
     override fun matches(
         location: String,
@@ -29,7 +29,7 @@ class BrowserRoute : Router.Route {
         try {
             activity.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            logError("BrowserRoute", e)
+            logError("BrowserRouteDecisionHandler", e)
         }
     }
 }

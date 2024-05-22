@@ -4,10 +4,10 @@ import androidx.core.net.toUri
 import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 
-class AppNavigationRoute : Router.Route {
+class AppNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "app-navigation"
 
-    override val result = Router.RouteResult.NAVIGATE
+    override val decision = Router.Decision.NAVIGATE
 
     override fun matches(
         location: String,

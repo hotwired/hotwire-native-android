@@ -115,12 +115,12 @@ interface HotwireNavDestination {
 
     /**
      * Determines whether the new location should be routed within in-app navigation from the
-     * current destination. By default, the registered [Router.Route] instances are used to
+     * current destination. By default, the registered [Router.RouteDecisionHandler] instances are used to
      * determine routing logic. You can override the global behavior for a specific destination,
-     * but it's recommend to use dedicated [Router.Route] instances for routing logic.
+     * but it's recommend to use dedicated [Router.RouteDecisionHandler] instances for routing logic.
      */
-    fun route(newLocation: String): Router.RouteResult {
-        return Hotwire.router.route(
+    fun decideRoute(newLocation: String): Router.Decision {
+        return Hotwire.router.decideRoute(
             location = newLocation,
             configuration = navigator.configuration,
             activity = fragment.requireActivity() as HotwireActivity

@@ -8,10 +8,10 @@ import dev.hotwire.core.navigation.activities.HotwireActivity
 import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.core.turbo.util.colorFromThemeAttr
 
-class BrowserTabRoute : Router.Route {
+class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "browser-tab"
 
-    override val result = Router.RouteResult.STOP
+    override val decision = Router.Decision.CANCEL
 
     override fun matches(
         location: String,
