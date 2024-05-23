@@ -1,6 +1,6 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.config.HotwireCore
 import dev.hotwire.core.logging.logError
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -15,7 +15,7 @@ abstract class StradaJsonConverter {
                 "or use the provided KotlinXJsonConverter."
 
         inline fun <reified T> toObject(jsonData: String): T? {
-            val converter = requireNotNull(Hotwire.config.jsonConverter) { NO_CONVERTER }
+            val converter = requireNotNull(HotwireCore.config.jsonConverter) { NO_CONVERTER }
 
             return when (converter) {
                 is KotlinXJsonConverter -> converter.toObject<T>(jsonData)
@@ -25,7 +25,7 @@ abstract class StradaJsonConverter {
         }
 
         inline fun <reified T> toJson(data: T): String {
-            val converter = requireNotNull(Hotwire.config.jsonConverter) { NO_CONVERTER }
+            val converter = requireNotNull(HotwireCore.config.jsonConverter) { NO_CONVERTER }
 
             return when (converter) {
                 is KotlinXJsonConverter -> converter.toJson(data)

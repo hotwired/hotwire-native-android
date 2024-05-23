@@ -5,8 +5,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import com.google.gson.annotations.SerializedName
-import dev.hotwire.core.config.Hotwire
-import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentation
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
@@ -133,9 +131,8 @@ val PathConfigurationProperties.context: TurboNavPresentationContext
         TurboNavPresentationContext.DEFAULT
     }
 
-val PathConfigurationProperties.uri: Uri
-    get() = get("uri")?.toUri() ?:
-        dev.hotwire.navigation.destinations.HotwireDestination.from(Hotwire.defaultFragmentDestination).uri.toUri()
+val PathConfigurationProperties.uri: Uri?
+    get() = get("uri")?.toUri()
 
 val PathConfigurationProperties.fallbackUri: Uri?
     get() = get("fallback_uri")?.toUri()

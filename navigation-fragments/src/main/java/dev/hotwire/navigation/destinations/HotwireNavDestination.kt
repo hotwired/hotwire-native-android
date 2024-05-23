@@ -8,12 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
 import dev.hotwire.core.R
-import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.navigation.config.Hotwire
 import dev.hotwire.navigation.fragments.HotwireFragmentDelegate
 import dev.hotwire.navigation.fragments.HotwireFragmentViewModel
 import dev.hotwire.navigation.navigator.Navigator
@@ -46,7 +45,7 @@ interface HotwireNavDestination {
      * destination.
      */
     val pathProperties: PathConfigurationProperties
-        get() = pathConfiguration.properties(location)
+        get() = Hotwire.config.pathConfiguration.properties(location)
 
     /**
      * Gets the [HotwireFragmentViewModel] associated with this destination.

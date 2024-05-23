@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.TypedValue
-import android.webkit.WebResourceRequest
 import androidx.annotation.AttrRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -21,11 +20,6 @@ fun Toolbar.displayBackButtonAsCloseIcon() {
 
 internal val NavBackStackEntry?.location: String?
     get() = this?.arguments?.getString("location")
-
-internal fun WebResourceRequest.isHttpGetRequest(): Boolean {
-    return method.equals("GET", ignoreCase = true) &&
-            url.scheme?.startsWith("HTTP", ignoreCase = true) == true
-}
 
 internal fun Context.colorFromThemeAttr(
     @AttrRes attrColor: Int,

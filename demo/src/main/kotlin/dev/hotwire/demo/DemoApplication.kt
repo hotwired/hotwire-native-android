@@ -4,9 +4,6 @@ import android.app.Application
 import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
-import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.navigation.routing.AppNavigationRouteDecisionHandler
-import dev.hotwire.core.navigation.routing.BrowserTabRouteDecisionHandler
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.demo.bridge.FormComponent
 import dev.hotwire.demo.bridge.MenuComponent
@@ -18,6 +15,9 @@ import dev.hotwire.demo.features.web.WebBottomSheetFragment
 import dev.hotwire.demo.features.web.WebFragment
 import dev.hotwire.demo.features.web.WebHomeFragment
 import dev.hotwire.demo.features.web.WebModalFragment
+import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.routing.AppNavigationRouteDecisionHandler
+import dev.hotwire.navigation.routing.BrowserTabRouteDecisionHandler
 
 class DemoApplication : Application() {
     override fun onCreate() {
@@ -31,7 +31,7 @@ class DemoApplication : Application() {
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
 
         // Loads the path configuration
-        Hotwire.loadPathConfiguration(
+        Hotwire.config.loadPathConfiguration(
             context = this,
             location = PathConfiguration.Location(
                 assetFilePath = "json/configuration.json"

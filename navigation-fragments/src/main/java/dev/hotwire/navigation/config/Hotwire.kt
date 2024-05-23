@@ -1,19 +1,21 @@
-package dev.hotwire.core.config
+package dev.hotwire.navigation.config
 
-import android.content.Context
 import androidx.fragment.app.Fragment
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
-import dev.hotwire.core.navigation.fragments.HotwireWebBottomSheetFragment
-import dev.hotwire.core.navigation.fragments.HotwireWebFragment
-import dev.hotwire.core.navigation.routing.AppNavigationRouteDecisionHandler
-import dev.hotwire.core.navigation.routing.BrowserRouteDecisionHandler
-import dev.hotwire.core.navigation.routing.Router
-import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.config.HotwireConfig
+import dev.hotwire.core.config.HotwireCore
+import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
+import dev.hotwire.navigation.fragments.HotwireWebFragment
+import dev.hotwire.navigation.routing.AppNavigationRouteDecisionHandler
+import dev.hotwire.navigation.routing.BrowserRouteDecisionHandler
+import dev.hotwire.navigation.routing.Router
 import kotlin.reflect.KClass
 
 object Hotwire {
-    var registeredBridgeComponentFactories:
+    val config: HotwireConfig = HotwireCore.config
+
+    internal var registeredBridgeComponentFactories:
         List<BridgeComponentFactory<BridgeComponent>> = emptyList()
         private set
 
@@ -28,21 +30,6 @@ object Hotwire {
         AppNavigationRouteDecisionHandler(),
         BrowserRouteDecisionHandler()
     ))
-
-    val config: HotwireConfig = HotwireConfig()
-
-    /**
-     * The path configuration that defines your navigation rules.
-     */
-    val pathConfiguration = PathConfiguration()
-
-    /**
-     * Loads the [PathConfiguration] JSON file(s) from the provided location to
-     * configure navigation rules.
-     */
-    fun loadPathConfiguration(context: Context, location: PathConfiguration.Location) {
-        pathConfiguration.load(context, location)
-    }
 
     /**
      * Registers the [Router.RouteDecisionHandler] instances that determine whether to route location

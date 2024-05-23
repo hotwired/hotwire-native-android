@@ -2,6 +2,7 @@ package dev.hotwire.navigation.navigator
 
 import android.net.Uri
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -14,6 +15,8 @@ import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.util.location
 
@@ -27,6 +30,8 @@ internal class NavigatorRule(
     pathConfiguration: PathConfiguration,
     val controller: NavController
 ) {
+    val defaultUri = HotwireDestination.from(Hotwire.defaultFragmentDestination).uri.toUri()
+
     // Current destination
     val previousLocation = controller.previousBackStackEntry.location
     val currentLocation = checkNotNull(controller.currentBackStackEntry.location)
@@ -45,7 +50,7 @@ internal class NavigatorRule(
     val newPresentation = newPresentation()
     val newNavigationMode = newNavigationMode()
     val newModalResult = newModalResult()
-    val newDestinationUri = newProperties.uri
+    val newDestinationUri = newProperties.uri ?: defaultUri
     val newFallbackUri = newProperties.fallbackUri
     val newDestination = controller.destinationFor(newDestinationUri)
     val newFallbackDestination = controller.destinationFor(newFallbackUri)

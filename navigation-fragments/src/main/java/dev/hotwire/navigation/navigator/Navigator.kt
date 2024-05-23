@@ -8,13 +8,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import dev.hotwire.core.bridge.Bridge
-import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.config.Hotwire.pathConfiguration
 import dev.hotwire.core.turbo.nav.TurboNavPresentation
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.navigation.config.Hotwire
 import dev.hotwire.navigation.destinations.HotwireNavDestination
 import dev.hotwire.navigation.destinations.HotwireNavDialogDestination
 import dev.hotwire.navigation.logging.logEvent
@@ -108,7 +107,7 @@ class Navigator(
             bundle = bundle,
             navOptions = navOptions(location, options.action),
             extras = extras,
-            pathConfiguration = pathConfiguration,
+            pathConfiguration = Hotwire.config.pathConfiguration,
             controller = currentControllerForLocation(location)
         )
 
@@ -365,7 +364,7 @@ class Navigator(
     }
 
     private fun navOptions(location: String, action: VisitAction): NavOptions {
-        val properties = pathConfiguration.properties(location)
+        val properties = Hotwire.config.pathConfiguration.properties(location)
 
         return currentDestination.getNavigationOptions(
             newLocation = location,

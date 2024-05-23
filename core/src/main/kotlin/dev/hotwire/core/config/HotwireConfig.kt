@@ -3,11 +3,25 @@ package dev.hotwire.core.config
 import android.content.Context
 import android.webkit.WebView
 import dev.hotwire.core.bridge.StradaJsonConverter
+import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.http.TurboHttpClient
 import dev.hotwire.core.turbo.http.TurboOfflineRequestHandler
 import dev.hotwire.core.turbo.views.TurboWebView
 
 class HotwireConfig internal constructor() {
+    /**
+     * The path configuration that defines your navigation rules.
+     */
+    val pathConfiguration = PathConfiguration()
+
+    /**
+     * Loads the [PathConfiguration] JSON file(s) from the provided location to
+     * configure navigation rules.
+     */
+    fun loadPathConfiguration(context: Context, location: PathConfiguration.Location) {
+        pathConfiguration.load(context, location)
+    }
+
     /**
      * Set a custom JSON converter to easily decode Message.dataJson to a data
      * object in received messages and to encode a data object back to json to

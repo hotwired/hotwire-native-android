@@ -1,22 +1,19 @@
 package dev.hotwire.core.turbo.util
 
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Handler
-import android.util.TypedValue
 import android.webkit.WebResourceRequest
-import androidx.annotation.AttrRes
-import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
-import androidx.navigation.NavBackStackEntry
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import dev.hotwire.core.R
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitActionAdapter
 import java.io.File
+
+internal fun WebResourceRequest.isHttpGetRequest(): Boolean {
+    return method.equals("GET", ignoreCase = true) &&
+            url.scheme?.startsWith("HTTP", ignoreCase = true) == true
+}
 
 internal fun Context.runOnUiThread(func: () -> Unit) {
     when (mainLooper.isCurrentThread) {
