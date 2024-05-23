@@ -51,6 +51,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
+    implementation(project(":navigation-fragments"))
+
     // Material
     implementation("com.google.android.material:material:1.11.0")
 
@@ -64,5 +67,4 @@ dependencies {
     // Images
     implementation("io.coil-kt:coil:2.6.0")
 
-    implementation(project(":core"))
 }

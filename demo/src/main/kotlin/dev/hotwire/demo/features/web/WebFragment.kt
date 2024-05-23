@@ -3,14 +3,14 @@ package dev.hotwire.demo.features.web
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import dev.hotwire.core.navigation.fragments.HotwireWebFragment
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.core.turbo.visit.VisitAction.REPLACE
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
+import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.fragments.HotwireWebFragment
 
 @HotwireDestination(uri = "turbo://fragment/web")
 open class WebFragment : HotwireWebFragment() {

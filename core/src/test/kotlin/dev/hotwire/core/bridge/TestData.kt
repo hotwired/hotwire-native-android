@@ -1,6 +1,6 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.navigation.destinations.HotwireNavDestination
 import org.mockito.Mockito.mock
 
 object TestData {

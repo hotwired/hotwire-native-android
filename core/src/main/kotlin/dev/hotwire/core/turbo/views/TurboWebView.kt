@@ -26,9 +26,14 @@ import dev.hotwire.core.turbo.visit.VisitOptions
  * and available from the Turbo session.
  */
 @SuppressLint("SetJavaScriptEnabled")
-open class TurboWebView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
-    WebView(context, attrs) {
+open class TurboWebView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : WebView(context, attrs) {
     private val gson = GsonBuilder().disableHtmlEscaping().create()
+
+    var elementTouchIsScrollable = false
+        internal set
 
     init {
         id = View.generateViewId()
@@ -79,8 +84,6 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
             }
         }
     }
-
-    internal var elementTouchIsScrollable = false
 
     private fun WebView.runJavascript(javascript: String, onComplete: (String?) -> Unit = {}) {
         context.runOnUiThread {

@@ -1,6 +1,6 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.core.lib.logging.logWarning
+import dev.hotwire.core.logging.logWarning
 
 abstract class BridgeComponent(
     val name: String,

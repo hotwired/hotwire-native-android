@@ -1,10 +1,10 @@
 package dev.hotwire.demo.main
 
 import android.os.Bundle
-import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
+import dev.hotwire.navigation.activities.HotwireActivity
+import dev.hotwire.navigation.navigator.NavigatorConfiguration
 
 class MainActivity : HotwireActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

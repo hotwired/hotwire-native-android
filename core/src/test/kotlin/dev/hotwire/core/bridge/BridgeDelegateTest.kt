@@ -3,13 +3,14 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
+import androidx.navigation.Navigator
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.turbo.nav.HotwireNavDestination
-import dev.hotwire.core.navigation.navigator.Navigator
+import dev.hotwire.navigation.destinations.HotwireNavDestination
+import dev.hotwire.navigation.navigator.Navigator
 import dev.hotwire.core.turbo.session.Session
 import org.junit.Assert.*
 import org.junit.Before

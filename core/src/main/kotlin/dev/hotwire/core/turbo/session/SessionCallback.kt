@@ -2,10 +2,10 @@ package dev.hotwire.core.turbo.session
 
 import android.webkit.HttpAuthHandler
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
 
-internal interface SessionCallback {
+interface SessionCallback {
     fun onPageStarted(location: String)
     fun onPageFinished(location: String)
     fun onReceivedError(error: VisitError)
@@ -19,7 +19,7 @@ internal interface SessionCallback {
     fun visitCompleted(completedOffline: Boolean)
     fun visitLocationStarted(location: String)
     fun visitProposedToLocation(location: String, options: VisitOptions)
-    fun visitNavDestination(): HotwireNavDestination
+    fun visitDestination(): VisitDestination
     fun formSubmissionStarted(location: String)
     fun formSubmissionFinished(location: String)
 }

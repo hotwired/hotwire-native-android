@@ -4,6 +4,7 @@ import android.content.Context
 import android.webkit.WebView
 import dev.hotwire.core.bridge.StradaJsonConverter
 import dev.hotwire.core.turbo.http.TurboHttpClient
+import dev.hotwire.core.turbo.http.TurboOfflineRequestHandler
 import dev.hotwire.core.turbo.views.TurboWebView
 
 class HotwireConfig internal constructor() {
@@ -13,6 +14,11 @@ class HotwireConfig internal constructor() {
      * reply with a custom message back to the web.
      */
     var jsonConverter: StradaJsonConverter? = null
+
+    /**
+     * Experimental: API may change, not ready for production use.
+     */
+    var offlineRequestHandler: TurboOfflineRequestHandler? = null
 
     /**
      * Enables/disables debug logging. This should be disabled in production environments.

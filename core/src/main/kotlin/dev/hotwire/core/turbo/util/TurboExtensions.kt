@@ -18,15 +18,6 @@ import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitActionAdapter
 import java.io.File
 
-fun Toolbar.displayBackButton() {
-    navigationIcon = ContextCompat.getDrawable(context, R.drawable.ic_back)
-}
-
-fun Toolbar.displayBackButtonAsCloseIcon() {
-    navigationIcon = ContextCompat.getDrawable(context, R.drawable.ic_close)
-}
-
-
 internal fun Context.runOnUiThread(func: () -> Unit) {
     when (mainLooper.isCurrentThread) {
         true -> func()
@@ -38,19 +29,6 @@ internal fun Context.contentFromAsset(filePath: String): String {
     return assets.open(filePath).use {
         String(it.readBytes())
     }
-}
-
-internal fun Context.colorFromThemeAttr(
-    @AttrRes attrColor: Int,
-    typedValue: TypedValue = TypedValue(),
-    resolveRefs: Boolean = true
-): Int {
-    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
-    val attr = obtainStyledAttributes(typedValue.data, intArrayOf(attrColor))
-    val attrValue = attr.getColor(0, -1)
-    attr.recycle()
-
-    return attrValue
 }
 
 internal fun String.extract(patternRegex: String): String? {
@@ -80,30 +58,12 @@ internal fun File.deleteAllFilesInDirectory() {
     }
 }
 
-internal val NavBackStackEntry?.location: String?
-    get() = this?.arguments?.getString("location")
-
-internal fun WebResourceRequest.isHttpGetRequest(): Boolean {
-    return method.equals("GET", ignoreCase = true) &&
-        url.scheme?.startsWith("HTTP", ignoreCase = true) == true
-}
-
 internal fun Any.toJson(): String {
     return gson.toJson(this)
 }
 
 internal fun <T> String.toObject(typeToken: TypeToken<T>): T {
     return gson.fromJson(this, typeToken.type)
-}
-
-internal fun Int.animateColorTo(toColor: Int, duration: Long = 150, onUpdate: (Int) -> Unit) {
-    ValueAnimator.ofObject(ArgbEvaluator(), this, toColor).apply {
-        this.duration = duration
-        this.addUpdateListener {
-            val color = it.animatedValue as Int?
-            color?.let { onUpdate(color) }
-        }
-    }.start()
 }
 
 private val gson: Gson = GsonBuilder()

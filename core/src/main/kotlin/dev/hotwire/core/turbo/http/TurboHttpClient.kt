@@ -2,7 +2,7 @@ package dev.hotwire.core.turbo.http
 
 import android.content.Context
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.lib.logging.logError
+import dev.hotwire.core.logging.logError
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

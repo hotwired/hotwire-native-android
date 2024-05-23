@@ -3,7 +3,7 @@ package dev.hotwire.core.bridge
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
-import dev.hotwire.core.lib.logging.logEvent
+import dev.hotwire.core.logging.logEvent
 import kotlinx.serialization.json.JsonElement
 import java.lang.ref.WeakReference
 

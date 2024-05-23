@@ -13,7 +13,7 @@ import dev.hotwire.core.turbo.config.PathConfiguration
 import kotlin.reflect.KClass
 
 object Hotwire {
-    internal var registeredBridgeComponentFactories:
+    var registeredBridgeComponentFactories:
         List<BridgeComponentFactory<BridgeComponent>> = emptyList()
         private set
 
