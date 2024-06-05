@@ -1,11 +1,6 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.navigation.destinations.HotwireNavDestination
-import org.mockito.Mockito.mock
-
 object TestData {
-    private val mockNavDestination: HotwireNavDestination = mock()
-
     val componentFactories = listOf(
         BridgeComponentFactory("one", TestData::OneBridgeComponent),
         BridgeComponentFactory("two", TestData::TwoBridgeComponent)
@@ -13,17 +8,22 @@ object TestData {
 
     val bridgeDelegate = BridgeDelegate(
         location = "https://37signals.com",
-        destination = mockNavDestination
+        destination = AppBridgeDestination(),
+        componentFactories = componentFactories
     )
+
+    class AppBridgeDestination : BridgeDestination {
+        override fun bridgeWebViewIsReady() = true
+    }
 
     abstract class AppBridgeComponent(
         name: String,
-        delegate: BridgeDelegate
-    ) : BridgeComponent(name, delegate)
+        delegate: BridgeDelegate<AppBridgeDestination>
+    ) : BridgeComponent<AppBridgeDestination>(name, delegate)
 
     class OneBridgeComponent(
         name: String,
-        delegate: BridgeDelegate
+        delegate: BridgeDelegate<AppBridgeDestination>
     ) : AppBridgeComponent(name, delegate) {
         var onStartCalled = false
         var onStopCalled = false
@@ -45,7 +45,7 @@ object TestData {
 
     class TwoBridgeComponent(
         name: String,
-        delegate: BridgeDelegate
+        delegate: BridgeDelegate<AppBridgeDestination>
     ) : AppBridgeComponent(name, delegate) {
         override fun onReceive(message: Message) {}
     }

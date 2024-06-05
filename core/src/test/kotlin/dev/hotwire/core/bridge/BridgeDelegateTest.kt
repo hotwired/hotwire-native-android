@@ -3,15 +3,10 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
-import androidx.navigation.Navigator
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.whenever
-import dev.hotwire.core.config.Hotwire
-import dev.hotwire.navigation.destinations.HotwireNavDestination
-import dev.hotwire.navigation.navigator.Navigator
-import dev.hotwire.core.turbo.session.Session
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -19,13 +14,15 @@ import org.junit.Test
 import org.mockito.Mockito.verify
 
 class BridgeDelegateTest {
-    private lateinit var delegate: BridgeDelegate
+    private lateinit var delegate: BridgeDelegate<TestData.AppBridgeDestination>
     private lateinit var lifecycleOwner: TestLifecycleOwner
     private val bridge: Bridge = mock()
     private val webView: WebView = mock()
-    private val navigator: Navigator = mock()
-    private val destination: HotwireNavDestination = mock()
-    private val session: Session = mock()
+
+    private val factories = listOf(
+        BridgeComponentFactory("one", TestData::OneBridgeComponent),
+        BridgeComponentFactory("two", TestData::TwoBridgeComponent)
+    )
 
     @Rule
     @JvmField
@@ -34,14 +31,13 @@ class BridgeDelegateTest {
     @Before
     fun setup() {
         whenever(bridge.webView).thenReturn(webView)
-        whenever(destination.navigator).thenReturn(navigator)
-        whenever(destination.navigator.session).thenReturn(session)
-        whenever(session.isReady).thenReturn(true)
-
-        Hotwire.registerBridgeComponents(TestData.componentFactories)
         Bridge.initialize(bridge)
 
-        delegate = BridgeDelegate(location = "https://37signals.com", destination = destination)
+        delegate = BridgeDelegate(
+            location = "https://37signals.com",
+            destination = TestData.AppBridgeDestination(),
+            componentFactories = factories
+        )
         delegate.bridge = bridge
 
         lifecycleOwner = TestLifecycleOwner(Lifecycle.State.STARTED)

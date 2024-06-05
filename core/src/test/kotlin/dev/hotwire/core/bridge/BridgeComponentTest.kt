@@ -1,7 +1,7 @@
 package dev.hotwire.core.bridge
 
 import com.nhaarman.mockito_kotlin.*
-import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.config.HotwireCore
 import kotlinx.serialization.Serializable
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Assert.assertEquals
@@ -11,7 +11,7 @@ import org.junit.Test
 
 class BridgeComponentTest {
     private lateinit var component: TestData.OneBridgeComponent
-    private val delegate: BridgeDelegate = mock()
+    private val delegate: BridgeDelegate<TestData.AppBridgeDestination> = mock()
 
     private val message = Message(
         id = "1",
@@ -23,7 +23,7 @@ class BridgeComponentTest {
 
     @Before
     fun setup() {
-        Hotwire.config.jsonConverter = KotlinXJsonConverter()
+        HotwireCore.config.jsonConverter = KotlinXJsonConverter()
         component = TestData.OneBridgeComponent("one", delegate)
     }
 
@@ -104,7 +104,7 @@ class BridgeComponentTest {
 
     @Test
     fun replyToReplacingDataWithNoConverter() {
-        Hotwire.config.jsonConverter = null
+        HotwireCore.config.jsonConverter = null
 
         component.didReceive(message)
 
