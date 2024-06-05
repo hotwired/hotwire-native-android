@@ -8,7 +8,7 @@ import android.webkit.WebView
 import android.widget.FrameLayout.LayoutParams
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockito_kotlin.whenever
-import dev.hotwire.core.R
+import dev.hotwire.navigation.R
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
