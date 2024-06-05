@@ -65,12 +65,18 @@ dependencies {
     // Browser
     implementation("androidx.browser:browser:1.8.0")
 
+    // Exported AndroidX dependencies
+    api("androidx.activity:activity-ktx:1.9.0")
+    api("androidx.fragment:fragment-ktx:1.7.1")
+    api("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    api("androidx.navigation:navigation-ui-ktx:2.7.7")
+
     // Tests
     testImplementation("androidx.test:core:1.5.0") // Robolectric
-    testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("androidx.navigation:navigation-testing:2.7.5")
-    testImplementation("org.robolectric:robolectric:4.11.1")
-    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.assertj:assertj-core:3.25.3")
+    testImplementation("androidx.navigation:navigation-testing:2.7.7")
+    testImplementation("org.robolectric:robolectric:4.12.1")
+    testImplementation("org.mockito:mockito-core:5.11.0")
     testImplementation("com.nhaarman:mockito-kotlin:1.6.0")
     testImplementation("junit:junit:4.13.2")
 }

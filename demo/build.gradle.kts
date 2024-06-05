@@ -55,7 +55,7 @@ dependencies {
     implementation(project(":navigation-fragments"))
 
     // Material
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.12.0")
 
     // AndroidX
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
