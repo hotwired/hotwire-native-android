@@ -8,7 +8,7 @@ import androidx.annotation.AttrRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavBackStackEntry
-import dev.hotwire.core.R
+import dev.hotwire.navigation.R
 
 fun Toolbar.displayBackButton() {
     navigationIcon = ContextCompat.getDrawable(context, R.drawable.ic_back)

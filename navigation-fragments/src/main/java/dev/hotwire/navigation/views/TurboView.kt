@@ -11,7 +11,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.view.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import dev.hotwire.core.R
+import dev.hotwire.navigation.R
 
 /**
  * Turbo view that hosts the shared WebView, a progress view, an error view, and allows

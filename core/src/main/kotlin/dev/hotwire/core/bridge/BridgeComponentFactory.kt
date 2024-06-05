@@ -1,8 +1,8 @@
 package dev.hotwire.core.bridge
 
-class BridgeComponentFactory<out C : BridgeComponent> constructor(
+class BridgeComponentFactory<D : BridgeDestination, out C : BridgeComponent<D>> constructor(
     val name: String,
-    private val creator: (name: String, delegate: BridgeDelegate) -> C
+    private val creator: (name: String, delegate: BridgeDelegate<D>) -> C
 ) {
-    fun create(delegate: BridgeDelegate) = creator(name, delegate)
+    fun create(delegate: BridgeDelegate<D>) = creator(name, delegate)
 }

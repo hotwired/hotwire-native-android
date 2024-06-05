@@ -13,7 +13,6 @@ import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.VISUAL_STATE_CALLBACK
 import androidx.webkit.WebViewFeature.isFeatureSupported
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.config.HotwireCore
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.delegates.TurboFileChooserDelegate

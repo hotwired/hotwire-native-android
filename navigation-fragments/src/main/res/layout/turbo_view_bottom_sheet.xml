@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<dev.hotwire.core.turbo.views.TurboView xmlns:android="http://schemas.android.com/apk/res/android"
+<dev.hotwire.navigation.views.TurboView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/turbo_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <dev.hotwire.core.turbo.views.TurboSwipeRefreshLayout
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/turbo_webView_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:minHeight="400dp">
 
         <!-- WebView get attached/detached here -->
 
-    </dev.hotwire.core.turbo.views.TurboSwipeRefreshLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <FrameLayout
         android:id="@+id/turbo_progress_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:minHeight="400dp"
+        android:visibility="gone"
         android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone">
+        android:focusable="true">
 
         <!-- Custom progress view added/removed here -->
 
@@ -31,31 +34,23 @@
         android:id="@+id/turbo_screenshot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:clickable="true"
         android:focusable="true"
         android:scaleType="matrix"
-        android:visibility="gone"
         tools:ignore="ContentDescription" />
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/turbo_error_refresh"
+    <FrameLayout
+        android:id="@+id/turbo_error_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:minHeight="400dp"
+        android:visibility="gone"
         android:clickable="true"
-        android:fillViewport="true"
-        android:focusable="true"
-        android:visibility="gone">
+        android:focusable="true">
 
-        <ScrollView
-            android:id="@+id/turbo_error_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+        <!-- Custom error view added/removed here -->
 
-            <!-- Custom error view added/removed here -->
+    </FrameLayout>
 
-        </ScrollView>
-
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-</dev.hotwire.core.turbo.views.TurboView>
+</dev.hotwire.navigation.views.TurboView>

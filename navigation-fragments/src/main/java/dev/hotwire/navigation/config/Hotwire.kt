@@ -5,6 +5,7 @@ import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.config.HotwireConfig
 import dev.hotwire.core.config.HotwireCore
+import dev.hotwire.navigation.destinations.HotwireNavDestination
 import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
 import dev.hotwire.navigation.fragments.HotwireWebFragment
 import dev.hotwire.navigation.routing.AppNavigationRouteDecisionHandler
@@ -15,9 +16,11 @@ import kotlin.reflect.KClass
 object Hotwire {
     val config: HotwireConfig = HotwireCore.config
 
+    @Suppress("UNCHECKED_CAST")
     internal var registeredBridgeComponentFactories:
-        List<BridgeComponentFactory<BridgeComponent>> = emptyList()
-        private set
+        List<BridgeComponentFactory<HotwireNavDestination, BridgeComponent<HotwireNavDestination>>>
+        get() = config.registeredBridgeComponentFactories as List<BridgeComponentFactory<HotwireNavDestination, BridgeComponent<HotwireNavDestination>>>
+        set(value) { config.registeredBridgeComponentFactories = value }
 
     internal var registeredFragmentDestinations:
         List<KClass<out Fragment>> = listOf(
@@ -43,8 +46,8 @@ object Hotwire {
      * Register bridge components that the app supports. Every possible bridge
      * component, wrapped in a [BridgeComponentFactory], must be provided here.
      */
-    fun registerBridgeComponents(factories: List<BridgeComponentFactory<BridgeComponent>>) {
-        registeredBridgeComponentFactories = factories
+    fun registerBridgeComponents(factories: List<BridgeComponentFactory<HotwireNavDestination, BridgeComponent<HotwireNavDestination>>>) {
+        config.registeredBridgeComponentFactories = factories
     }
 
     /**

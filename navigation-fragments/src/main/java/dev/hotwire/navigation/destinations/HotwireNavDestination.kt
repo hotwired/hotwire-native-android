@@ -7,11 +7,12 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
-import dev.hotwire.core.R
+import dev.hotwire.core.bridge.BridgeDestination
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.navigation.R
 import dev.hotwire.navigation.config.Hotwire
 import dev.hotwire.navigation.fragments.HotwireFragmentDelegate
 import dev.hotwire.navigation.fragments.HotwireFragmentViewModel
@@ -22,7 +23,7 @@ import dev.hotwire.navigation.routing.Router
  * The primary interface that a navigable Fragment implements to provide the library with
  * the information it needs to properly navigate.
  */
-interface HotwireNavDestination {
+interface HotwireNavDestination : BridgeDestination {
     /**
      * Gets the navigator instance associated with this destination.
      */
@@ -170,6 +171,10 @@ interface HotwireNavDestination {
     }
 
     fun prepareNavigation(onReady: () -> Unit)
+
+    override fun bridgeWebViewIsReady(): Boolean {
+        return navigator.session.isReady
+    }
 
     private val Bundle.location
         get() = getString("location")

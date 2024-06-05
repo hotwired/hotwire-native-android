@@ -3,10 +3,10 @@ package dev.hotwire.navigation.activities
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
-import dev.hotwire.navigation.observers.HotwireActivityObserver
 import dev.hotwire.navigation.navigator.Navigator
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.navigator.NavigatorHost
+import dev.hotwire.navigation.observers.HotwireActivityObserver
 
 /**
  * Initializes the Activity for Hotwire navigation and provides all the hooks for an

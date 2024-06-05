@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dev.hotwire.core.R
 import dev.hotwire.core.turbo.config.title
+import dev.hotwire.navigation.R
 import dev.hotwire.navigation.destinations.HotwireNavDestination
 import dev.hotwire.navigation.destinations.HotwireNavDialogDestination
 import dev.hotwire.navigation.navigator.Navigator

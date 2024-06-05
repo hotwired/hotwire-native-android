@@ -7,15 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
-import dev.hotwire.core.R
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.navigation.destinations.HotwireDestination
-import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
-import dev.hotwire.navigation.views.TurboView
 import dev.hotwire.core.turbo.views.TurboWebChromeClient
 import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.navigation.R
+import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.session.SessionModalResult
+import dev.hotwire.navigation.views.TurboView
 
 /**
  * The base class from which all web "standard" fragments (non-dialogs) in a
@@ -28,7 +29,11 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     private lateinit var webDelegate: HotwireWebFragmentDelegate
 
     private val bridgeDelegate by lazy {
-        BridgeDelegate(location = location, destination = this)
+        BridgeDelegate(
+            location = location,
+            destination = this,
+            componentFactories = Hotwire.registeredBridgeComponentFactories
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
