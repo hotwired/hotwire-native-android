@@ -8,12 +8,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import dev.hotwire.core.bridge.Bridge
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.nav.TurboNavPresentation
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
-import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireNavDestination
 import dev.hotwire.navigation.destinations.HotwireNavDialogDestination
 import dev.hotwire.navigation.logging.logEvent
@@ -58,7 +59,7 @@ class Navigator(
         webView = Hotwire.config.makeCustomWebView(host.requireContext())
     ).also {
         // Initialize bridge with new WebView instance
-        if (Hotwire.registeredBridgeComponentFactories.isNotEmpty()) {
+        if (HotwireNavigation.registeredBridgeComponentFactories.isNotEmpty()) {
             Bridge.initialize(it.webView)
         }
     }

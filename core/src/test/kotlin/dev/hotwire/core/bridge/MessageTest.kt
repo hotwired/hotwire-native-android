@@ -1,6 +1,6 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.core.config.HotwireCore
+import dev.hotwire.core.config.Hotwire
 import kotlinx.serialization.Serializable
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Assert.assertEquals
@@ -12,7 +12,7 @@ class MessageTest {
 
     @Before
     fun setup() {
-        HotwireCore.config.jsonConverter = KotlinXJsonConverter()
+        Hotwire.config.jsonConverter = KotlinXJsonConverter()
     }
 
     @Test
@@ -98,7 +98,7 @@ class MessageTest {
 
     @Test
     fun replacingDataWithNoConverter() {
-        HotwireCore.config.jsonConverter = null
+        Hotwire.config.jsonConverter = null
 
         val message = Message(
             id = "1",
@@ -117,7 +117,7 @@ class MessageTest {
 
     @Test
     fun replacingDataWithInvalidConverter() {
-        HotwireCore.config.jsonConverter = InvalidJsonConverter()
+        Hotwire.config.jsonConverter = InvalidJsonConverter()
 
         val message = Message(
             id = "1",

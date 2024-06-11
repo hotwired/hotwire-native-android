@@ -8,12 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
 import dev.hotwire.core.bridge.BridgeDestination
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.navigation.R
-import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.fragments.HotwireFragmentDelegate
 import dev.hotwire.navigation.fragments.HotwireFragmentViewModel
 import dev.hotwire.navigation.navigator.Navigator
@@ -115,7 +116,7 @@ interface HotwireNavDestination : BridgeDestination {
      * but it's recommend to use dedicated [Router.RouteDecisionHandler] instances for routing logic.
      */
     fun decideRoute(newLocation: String): Router.Decision {
-        return Hotwire.router.decideRoute(
+        return HotwireNavigation.router.decideRoute(
             location = newLocation,
             configuration = navigator.configuration,
             activity = fragment.requireActivity() as dev.hotwire.navigation.activities.HotwireActivity

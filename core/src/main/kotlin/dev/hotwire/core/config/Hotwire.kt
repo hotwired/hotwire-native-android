@@ -1,5 +1,5 @@
 package dev.hotwire.core.config
 
-object HotwireCore {
+object Hotwire {
     val config: HotwireConfig = HotwireConfig()
 }

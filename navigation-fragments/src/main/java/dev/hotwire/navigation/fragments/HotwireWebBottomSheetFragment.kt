@@ -14,7 +14,7 @@ import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
 import dev.hotwire.core.turbo.views.TurboWebChromeClient
 import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.navigation.R
-import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.views.TurboView
 
@@ -32,7 +32,7 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
         BridgeDelegate(
             location = location,
             destination = this,
-            componentFactories = Hotwire.registeredBridgeComponentFactories
+            componentFactories = HotwireNavigation.registeredBridgeComponentFactories
         )
     }
 

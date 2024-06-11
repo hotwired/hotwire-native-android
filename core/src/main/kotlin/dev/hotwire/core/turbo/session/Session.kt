@@ -13,7 +13,7 @@ import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.VISUAL_STATE_CALLBACK
 import androidx.webkit.WebViewFeature.isFeatureSupported
-import dev.hotwire.core.config.HotwireCore
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.delegates.TurboFileChooserDelegate
 import dev.hotwire.core.turbo.errors.HttpError
@@ -92,7 +92,7 @@ class Session(
      * @param location Location to cache.
      */
     fun preCacheLocation(location: String) {
-        val requestHandler = checkNotNull(HotwireCore.config.offlineRequestHandler) {
+        val requestHandler = checkNotNull(Hotwire.config.offlineRequestHandler) {
             "An offline request handler must be provided to pre-cache $location"
         }
 

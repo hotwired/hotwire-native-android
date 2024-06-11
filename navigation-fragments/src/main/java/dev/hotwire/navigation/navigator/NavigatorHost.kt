@@ -3,8 +3,9 @@ package dev.hotwire.navigation.navigator
 import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.navigation.activities.HotwireActivity
-import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.config.HotwireNavigation
 
 open class NavigatorHost : NavHostFragment() {
     internal lateinit var activity: HotwireActivity
@@ -33,7 +34,7 @@ open class NavigatorHost : NavHostFragment() {
                 pathConfiguration = Hotwire.config.pathConfiguration,
                 navController = findNavController()
             ).build(
-                registeredFragments = Hotwire.registeredFragmentDestinations
+                registeredFragments = HotwireNavigation.registeredFragmentDestinations
             )
         }
     }

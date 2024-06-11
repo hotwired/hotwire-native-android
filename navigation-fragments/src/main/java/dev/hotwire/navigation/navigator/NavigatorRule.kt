@@ -9,13 +9,18 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.navOptions
-import dev.hotwire.core.turbo.config.*
+import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.turbo.config.context
+import dev.hotwire.core.turbo.config.fallbackUri
+import dev.hotwire.core.turbo.config.presentation
+import dev.hotwire.core.turbo.config.queryStringPresentation
+import dev.hotwire.core.turbo.config.uri
 import dev.hotwire.core.turbo.nav.TurboNavPresentation
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
-import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.util.location
@@ -30,7 +35,7 @@ internal class NavigatorRule(
     pathConfiguration: PathConfiguration,
     val controller: NavController
 ) {
-    val defaultUri = HotwireDestination.from(Hotwire.defaultFragmentDestination).uri.toUri()
+    val defaultUri = HotwireDestination.from(HotwireNavigation.defaultFragmentDestination).uri.toUri()
 
     // Current destination
     val previousLocation = controller.previousBackStackEntry.location

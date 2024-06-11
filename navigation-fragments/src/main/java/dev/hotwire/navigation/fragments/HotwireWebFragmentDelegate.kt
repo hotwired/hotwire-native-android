@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStateAtLeast
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.session.SessionCallback
@@ -17,7 +18,6 @@ import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
-import dev.hotwire.navigation.config.Hotwire
 import dev.hotwire.navigation.destinations.HotwireNavDestination
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.util.dispatcherProvider

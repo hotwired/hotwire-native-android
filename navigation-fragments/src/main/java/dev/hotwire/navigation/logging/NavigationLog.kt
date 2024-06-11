@@ -1,7 +1,7 @@
 package dev.hotwire.navigation.logging
 
 import android.util.Log
-import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.core.config.Hotwire
 
 internal object NavigationLog {
     private const val DEFAULT_TAG = "Hotwire-Navigation"

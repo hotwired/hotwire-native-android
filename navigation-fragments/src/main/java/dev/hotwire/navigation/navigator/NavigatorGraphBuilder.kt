@@ -4,14 +4,18 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.createGraph
 import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.DialogFragmentNavigatorDestinationBuilder
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
+import androidx.navigation.get
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.config.uri
-import dev.hotwire.navigation.config.Hotwire
+import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestination
 import java.util.UUID
 import kotlin.reflect.KClass
@@ -90,7 +94,7 @@ internal class NavigatorGraphBuilder(
 
     private fun List<FragmentDestination>.startDestination(): FragmentDestination {
         val startDestinationUri = pathConfiguration.properties(startLocation).uri ?:
-            HotwireDestination.from(Hotwire.defaultFragmentDestination).uri.toUri()
+            HotwireDestination.from(HotwireNavigation.defaultFragmentDestination).uri.toUri()
 
         return requireNotNull(firstOrNull { it.uri == startDestinationUri }) {
             "A start Fragment destination was not found for uri: $startDestinationUri"
