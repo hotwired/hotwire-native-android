@@ -7,6 +7,7 @@ import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 
+@OptIn(ExperimentalOfflineRequestHandler::class)
 internal class TurboWebViewRequestInterceptor(val session: Session) {
     private val offlineRequestHandler get() = Hotwire.config.offlineRequestHandler
     private val httpRepository get() = session.httpRepository

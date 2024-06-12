@@ -91,6 +91,7 @@ class Session(
      *
      * @param location Location to cache.
      */
+    @OptIn(ExperimentalOfflineRequestHandler::class)
     fun preCacheLocation(location: String) {
         val requestHandler = checkNotNull(Hotwire.config.offlineRequestHandler) {
             "An offline request handler must be provided to pre-cache $location"

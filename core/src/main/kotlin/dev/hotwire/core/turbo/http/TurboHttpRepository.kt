@@ -17,9 +17,7 @@ import okhttp3.Response
 import java.io.IOException
 import java.io.InputStream
 
-/**
- * Experimental: API may change, not ready for production use.
- */
+@OptIn(ExperimentalOfflineRequestHandler::class)
 internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
     private val cookieManager = CookieManager.getInstance()
 

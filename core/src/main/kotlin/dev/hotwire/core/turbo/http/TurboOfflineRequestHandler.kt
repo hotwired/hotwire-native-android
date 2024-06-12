@@ -2,9 +2,12 @@ package dev.hotwire.core.turbo.http
 
 import android.webkit.WebResourceResponse
 
-/**
- * Experimental: API may change, not ready for production use.
- */
+@RequiresOptIn(message = "This API is experimental. It may be changed in the future without notice.")
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FIELD)
+annotation class ExperimentalOfflineRequestHandler
+
+@ExperimentalOfflineRequestHandler
 interface TurboOfflineRequestHandler {
     fun getCacheStrategy(url: String): TurboOfflineCacheStrategy
     fun getCachedResponseHeaders(url: String): Map<String, String>?
