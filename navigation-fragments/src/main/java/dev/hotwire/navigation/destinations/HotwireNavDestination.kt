@@ -14,6 +14,7 @@ import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.navigation.R
+import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.fragments.HotwireFragmentDelegate
 import dev.hotwire.navigation.fragments.HotwireFragmentViewModel
@@ -119,7 +120,7 @@ interface HotwireNavDestination : BridgeDestination {
         return HotwireNavigation.router.decideRoute(
             location = newLocation,
             configuration = navigator.configuration,
-            activity = fragment.requireActivity() as dev.hotwire.navigation.activities.HotwireActivity
+            activity = fragment.requireActivity() as HotwireActivity
         )
     }
 

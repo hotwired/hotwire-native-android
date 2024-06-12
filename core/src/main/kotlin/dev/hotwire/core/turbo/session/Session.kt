@@ -135,7 +135,7 @@ class Session(
 
     /**
      * Synthetically restore the WebView's current visit without using a cached snapshot or a
-     * visit request. This is used when restoring a Fragment destination from the backstack,
+     * visit request. This is used when restoring a destination from the backstack,
      * but the WebView's current location hasn't changed from the destination's location.
      */
     fun restoreCurrentVisit(callback: SessionCallback): Boolean {
