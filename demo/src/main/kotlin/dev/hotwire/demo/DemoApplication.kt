@@ -30,12 +30,8 @@ class DemoApplication : Application() {
     }
 
     private fun configureApp() {
-        // Configure debugging
-        Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
-        Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
-
         // Loads the path configuration
-        Hotwire.config.loadPathConfiguration(
+        Hotwire.loadPathConfiguration(
             context = this,
             location = PathConfiguration.Location(
                 assetFilePath = "json/configuration.json"
@@ -70,6 +66,8 @@ class DemoApplication : Application() {
         ))
 
         // Set configuration options
+        Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
+        Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
         Hotwire.config.userAgent = "Hotwire Demo; ${Hotwire.config.userAgentSubstring()}"
     }

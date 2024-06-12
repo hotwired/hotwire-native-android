@@ -17,14 +17,6 @@ class HotwireConfig internal constructor() {
      */
     val pathConfiguration = PathConfiguration()
 
-    /**
-     * Loads the [PathConfiguration] JSON file(s) from the provided location to
-     * configure navigation rules.
-     */
-    fun loadPathConfiguration(context: Context, location: PathConfiguration.Location) {
-        pathConfiguration.load(context, location)
-    }
-
     var registeredBridgeComponentFactories:
             List<BridgeComponentFactory<*, BridgeComponent<*>>> = emptyList()
 
