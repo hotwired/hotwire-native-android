@@ -21,7 +21,7 @@ import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.navigation.config.HotwireNavigation
-import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.util.location
 
@@ -35,7 +35,7 @@ internal class NavigatorRule(
     pathConfiguration: PathConfiguration,
     val controller: NavController
 ) {
-    val defaultUri = HotwireDestination.from(HotwireNavigation.defaultFragmentDestination).uri.toUri()
+    val defaultUri = HotwireDestinationDeepLink.from(HotwireNavigation.defaultFragmentDestination).uri.toUri()
 
     // Current destination
     val previousLocation = controller.previousBackStackEntry.location

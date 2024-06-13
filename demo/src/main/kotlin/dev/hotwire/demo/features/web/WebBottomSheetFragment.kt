@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import dev.hotwire.demo.R
-import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
 
-@HotwireDestination(uri = "turbo://fragment/web/modal/sheet")
+@HotwireDestinationDeepLink(uri = "turbo://fragment/web/modal/sheet")
 class WebBottomSheetFragment : HotwireWebBottomSheetFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

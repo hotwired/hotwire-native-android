@@ -16,7 +16,7 @@ import androidx.navigation.get
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.config.uri
 import dev.hotwire.navigation.config.HotwireNavigation
-import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -40,7 +40,7 @@ internal class NavigatorGraphBuilder(
         val fragmentDestinations = registeredFragments.map {
             FragmentDestination(
                 route = currentRoute.also { currentRoute++ }.toString(),
-                uri = HotwireDestination.from(it).uri.toUri(),
+                uri = HotwireDestinationDeepLink.from(it).uri.toUri(),
                 kClass = it
             )
         }
@@ -94,7 +94,7 @@ internal class NavigatorGraphBuilder(
 
     private fun List<FragmentDestination>.startDestination(): FragmentDestination {
         val startDestinationUri = pathConfiguration.properties(startLocation).uri ?:
-            HotwireDestination.from(HotwireNavigation.defaultFragmentDestination).uri.toUri()
+            HotwireDestinationDeepLink.from(HotwireNavigation.defaultFragmentDestination).uri.toUri()
 
         return requireNotNull(firstOrNull { it.uri == startDestinationUri }) {
             "A start Fragment destination was not found for uri: $startDestinationUri"

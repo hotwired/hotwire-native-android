@@ -7,7 +7,7 @@ import kotlin.reflect.full.findAnnotation
  * Annotation for each Fragment that will be registered as a navigation destination.
  *
  * For example:
- *  `@HotwireDestination(uri = "turbo://fragment/search")`
+ *  `@HotwireDestinationDeepLink(uri = "turbo://fragment/search")`
  *  `class SearchFragment : TurboWebFragment()`
  *
  * @property uri The URI to be registered with the Android Navigation component nav graph.
@@ -15,13 +15,13 @@ import kotlin.reflect.full.findAnnotation
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
-annotation class HotwireDestination(
+annotation class HotwireDestinationDeepLink(
     val uri: String
 ) {
     companion object {
-        internal fun from(klass: KClass<out Any>): HotwireDestination {
+        internal fun from(klass: KClass<out Any>): HotwireDestinationDeepLink {
             return requireNotNull(klass.findAnnotation()) {
-                "A HotwireDestination annotation is required for the destination: ${klass.simpleName}"
+                "A HotwireDestinationDeepLink annotation is required for the destination: ${klass.simpleName}"
             }
         }
     }
