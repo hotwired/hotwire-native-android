@@ -1,6 +1,6 @@
-package dev.hotwire.core.turbo.util
+package dev.hotwire.core.files.util
 
-data class TurboUriAttributes(
+data class UriAttributes(
     val fileName: String,
     val mimeType: String,
     val fileSize: Long

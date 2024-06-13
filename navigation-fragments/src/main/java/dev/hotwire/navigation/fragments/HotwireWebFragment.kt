@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
+import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.turbo.views.TurboWebChromeClient
 import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.navigation.R
@@ -95,7 +95,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
 
     override fun activityResultLauncher(requestCode: Int): ActivityResultLauncher<Intent>? {
         return when (requestCode) {
-            TURBO_REQUEST_CODE_FILES -> webDelegate.fileChooserResultLauncher
+            HOTWIRE_REQUEST_CODE_FILES -> webDelegate.fileChooserResultLauncher
             else -> null
         }
     }

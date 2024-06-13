@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.files.delegates
 
 import android.content.Context
 import android.content.Intent
@@ -17,15 +17,15 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboCameraCaptureDelegateTest : BaseUnitTest() {
+class CameraCaptureDelegateTest : BaseUnitTest() {
     private lateinit var context: Context
-    private lateinit var delegate: TurboCameraCaptureDelegate
+    private lateinit var delegate: CameraCaptureDelegate
 
     @Before
     override fun setup() {
         super.setup()
         context = ApplicationProvider.getApplicationContext()
-        delegate = TurboCameraCaptureDelegate(context)
+        delegate = CameraCaptureDelegate(context)
     }
 
     @Test
@@ -46,7 +46,7 @@ class TurboCameraCaptureDelegateTest : BaseUnitTest() {
 
             assertThat(intent).isNotNull()
             assertThat(intent?.action).isEqualTo(MediaStore.ACTION_IMAGE_CAPTURE)
-            assertThat(uri).startsWith("content://dev.hotwire.core.test.turbo.fileprovider/shared")
+            assertThat(uri).startsWith("content://dev.hotwire.core.test.hotwire.fileprovider/shared")
             assertThat(uri).contains("/Capture_")
             assertThat(uri).endsWith(".jpg")
         }

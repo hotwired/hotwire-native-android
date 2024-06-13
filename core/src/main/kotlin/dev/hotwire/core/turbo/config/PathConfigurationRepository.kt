@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import dev.hotwire.core.logging.logError
-import dev.hotwire.core.turbo.http.TurboHttpClient
+import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.util.toJson
 import kotlinx.coroutines.withContext
@@ -37,7 +37,7 @@ internal class PathConfigurationRepository {
 
     private fun issueRequest(request: Request): String? {
         return try {
-            val call = TurboHttpClient.instance.newCall(request)
+            val call = HotwireHttpClient.instance.newCall(request)
 
             call.execute().use { response ->
                 if (response.isSuccessful) {

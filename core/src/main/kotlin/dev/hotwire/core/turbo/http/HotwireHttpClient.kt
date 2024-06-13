@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Experimental: API may change, not ready for production use.
  */
-object TurboHttpClient {
+object HotwireHttpClient {
     private var cache: Cache? = null
     private var httpCacheSize = 100L * 1024L * 1024L // 100 MBs
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -43,7 +43,7 @@ object TurboHttpClient {
     internal fun enableCachingWith(context: Context) {
         if (cache == null) {
             cache = Cache(
-                directory = File(context.cacheDir, "turbo_cache"),
+                directory = File(context.cacheDir, "hotwire_cache"),
                 maxSize = httpCacheSize
             )
             reset()

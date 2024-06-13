@@ -1,18 +1,20 @@
-package dev.hotwire.core.turbo.util
+package dev.hotwire.core.files.util
 
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
+import dev.hotwire.core.turbo.util.deleteAllFilesInDirectory
+import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 
-class TurboFileProvider : FileProvider() {
+class HotwireFileProvider : FileProvider() {
     companion object {
         private const val sharedDir = "shared"
 
         fun authority(context: Context): String {
-            return "${context.packageName}.turbo.fileprovider"
+            return "${context.packageName}.hotwire.fileprovider"
         }
 
         fun directory(context: Context, dirName: String = sharedDir): File {
@@ -30,13 +32,13 @@ class TurboFileProvider : FileProvider() {
         }
 
         @Suppress("unused")
-        fun uriAttributes(context: Context, uri: Uri): TurboUriAttributes? {
-            val uriHelper = TurboUriHelper(context)
+        fun uriAttributes(context: Context, uri: Uri): UriAttributes? {
+            val uriHelper = UriHelper(context)
             return uriHelper.getAttributes(uri)
         }
 
         suspend fun writeUriToFile(context: Context, uri: Uri, dirName: String = sharedDir): File? {
-            val uriHelper = TurboUriHelper(context)
+            val uriHelper = UriHelper(context)
             return uriHelper.writeFileTo(uri, directory(context, dirName))
         }
 

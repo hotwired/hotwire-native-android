@@ -1,9 +1,10 @@
-package dev.hotwire.core.turbo.http
+package dev.hotwire.core.turbo.offline
 
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ import java.io.InputStream
 /**
  * Experimental: API may change, not ready for production use.
  */
-internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
+internal class OfflineHttpRepository(private val coroutineScope: CoroutineScope) {
     private val cookieManager = CookieManager.getInstance()
 
     // Limit pre-cache requests to 2 concurrently
@@ -33,7 +34,7 @@ internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
     )
 
     internal fun preCache(
-        requestHandler: TurboOfflineRequestHandler,
+        requestHandler: OfflineRequestHandler,
         resourceRequest: WebResourceRequest
     ) {
         coroutineScope.launch {
@@ -46,19 +47,19 @@ internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
     }
 
     internal fun fetch(
-        requestHandler: TurboOfflineRequestHandler,
+        requestHandler: OfflineRequestHandler,
         resourceRequest: WebResourceRequest
     ): Result {
         val url = resourceRequest.url.toString()
 
         return when (requestHandler.getCacheStrategy(url)) {
-            TurboOfflineCacheStrategy.APP -> fetchAppCacheRequest(requestHandler, resourceRequest)
-            TurboOfflineCacheStrategy.NONE -> Result(null, false)
+            OfflineCacheStrategy.APP -> fetchAppCacheRequest(requestHandler, resourceRequest)
+            OfflineCacheStrategy.NONE -> Result(null, false)
         }
     }
 
     private fun fetchAppCacheRequest(
-        requestHandler: TurboOfflineRequestHandler,
+        requestHandler: OfflineRequestHandler,
         resourceRequest: WebResourceRequest
     ): Result {
         val url = resourceRequest.url.toString()
@@ -126,7 +127,7 @@ internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
 
     private fun getResponse(request: Request): Response? {
         val location = request.url.toString()
-        val call = TurboHttpClient.instance.newCall(request)
+        val call = HotwireHttpClient.instance.newCall(request)
 
         return call.execute().let { response ->
             if (response.isSuccessful) {

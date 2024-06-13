@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.http
+package dev.hotwire.core.turbo.offline
 
 import android.net.Uri
 import android.webkit.CookieManager
@@ -7,7 +7,7 @@ import android.webkit.WebResourceRequest
 /**
  * Experimental: API may change, not ready for production use.
  */
-internal class TurboPreCacheRequest(val url: String, val userAgent: String) : WebResourceRequest {
+internal class OfflinePreCacheRequest(val url: String, val userAgent: String) : WebResourceRequest {
     private val cookieManager = CookieManager.getInstance()
 
     override fun getUrl(): Uri {

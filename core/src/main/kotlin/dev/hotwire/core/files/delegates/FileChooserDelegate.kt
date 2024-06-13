@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.files.delegates
 
 import android.app.Activity
 import android.content.Context
@@ -10,19 +10,19 @@ import androidx.activity.result.ActivityResult
 import dev.hotwire.core.R
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.turbo.session.Session
-import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
-import dev.hotwire.core.turbo.util.TurboFileProvider
+import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
+import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class TurboFileChooserDelegate(val session: Session) : CoroutineScope {
+class FileChooserDelegate(val session: Session) : CoroutineScope {
     private val context: Context = session.context
     private var uploadCallback: ValueCallback<Array<Uri>>? = null
-    private val browseFilesDelegate = TurboBrowseFilesDelegate(context)
-    private val cameraCaptureDelegate = TurboCameraCaptureDelegate(context)
+    private val browseFilesDelegate = BrowseFilesDelegate(context)
+    private val cameraCaptureDelegate = CameraCaptureDelegate(context)
 
     override val coroutineContext: CoroutineContext
         get() = dispatcherProvider.io + Job()
@@ -47,7 +47,7 @@ class TurboFileChooserDelegate(val session: Session) : CoroutineScope {
 
     fun deleteCachedFiles() {
         launch {
-            TurboFileProvider.deleteAllFiles(context)
+            HotwireFileProvider.deleteAllFiles(context)
         }
     }
 
@@ -69,7 +69,7 @@ class TurboFileChooserDelegate(val session: Session) : CoroutineScope {
         val destination = session.currentVisit?.callback?.visitDestination() ?: return false
 
         return try {
-            destination.activityResultLauncher(TURBO_REQUEST_CODE_FILES)?.launch(intent)
+            destination.activityResultLauncher(HOTWIRE_REQUEST_CODE_FILES)?.launch(intent)
             true
         } catch (e: Exception) {
             logError("startIntentError", e)

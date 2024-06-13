@@ -1,18 +1,18 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.files.delegates
 
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.WebChromeClient.FileChooserParams
-import dev.hotwire.core.turbo.util.TurboFileProvider
+import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-internal class TurboBrowseFilesDelegate(val context: Context) : CoroutineScope {
+internal class BrowseFilesDelegate(val context: Context) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = dispatcherProvider.io + Job()
 
@@ -74,8 +74,8 @@ internal class TurboBrowseFilesDelegate(val context: Context) : CoroutineScope {
     }
 
     private suspend fun writeToCachedFile(uri: Uri): Uri? {
-        return TurboFileProvider.writeUriToFile(context, uri)?.let {
-            TurboFileProvider.contentUriForFile(context, it)
+        return HotwireFileProvider.writeUriToFile(context, uri)?.let {
+            HotwireFileProvider.contentUriForFile(context, it)
         }
     }
 }

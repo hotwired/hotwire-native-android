@@ -1,23 +1,23 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.files.delegates
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.WebChromeClient.FileChooserParams
+import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.logging.logError
-import dev.hotwire.core.turbo.util.TurboFileProvider
 import java.io.File
 import java.io.IOException
 
-internal class TurboCameraCaptureDelegate(val context: Context) {
+internal class CameraCaptureDelegate(val context: Context) {
     private var cameraImagePath: String? = null
 
     fun buildIntent(params: FileChooserParams): Intent? {
         if (!params.allowsCameraCapture()) return null
 
         val file = createEmptyImageFile() ?: return null
-        val uri = TurboFileProvider.contentUriForFile(context, file)
+        val uri = HotwireFileProvider.contentUriForFile(context, file)
 
         cameraImagePath = file.absolutePath
 
@@ -35,7 +35,7 @@ internal class TurboCameraCaptureDelegate(val context: Context) {
 
     private fun buildCameraImageResult(): Array<Uri>? {
         val file = cameraImagePath?.let { File(it) } ?: return null
-        val uri = TurboFileProvider.contentUriForFile(context, file)
+        val uri = HotwireFileProvider.contentUriForFile(context, file)
 
         return when (file.length()) {
             0L -> null
@@ -45,7 +45,7 @@ internal class TurboCameraCaptureDelegate(val context: Context) {
 
     private fun createEmptyImageFile(): File? {
         return try {
-            val directory: File = TurboFileProvider.directory(context)
+            val directory: File = HotwireFileProvider.directory(context)
             return File.createTempFile("Capture_", ".jpg", directory)
         } catch (e: IOException) {
             logError("createTempFileError", e)

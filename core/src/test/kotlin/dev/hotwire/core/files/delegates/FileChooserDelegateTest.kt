@@ -1,12 +1,12 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.files.delegates
 
 import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
+import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.session.Session
-import dev.hotwire.core.turbo.util.TurboFileProvider
 import dev.hotwire.core.turbo.views.TurboWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -24,7 +24,7 @@ import java.io.File
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboFileChooserDelegateTest : BaseRepositoryTest() {
+class FileChooserDelegateTest : BaseRepositoryTest() {
     @Mock
     private lateinit var webView: TurboWebView
     private lateinit var activity: AppCompatActivity
@@ -43,7 +43,7 @@ class TurboFileChooserDelegateTest : BaseRepositoryTest() {
 
     @Test
     fun fileProviderDirectoryIsCleared() {
-        val dir = TurboFileProvider.directory(context)
+        val dir = HotwireFileProvider.directory(context)
 
         File(dir, "testFile.txt").apply {
             writeText("text")

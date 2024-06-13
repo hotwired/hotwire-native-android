@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.http
+package dev.hotwire.core.turbo.offline
 
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -7,7 +7,7 @@ import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 
-internal class TurboWebViewRequestInterceptor(val session: Session) {
+internal class OfflineWebViewRequestInterceptor(val session: Session) {
     private val offlineRequestHandler get() = Hotwire.config.offlineRequestHandler
     private val httpRepository get() = session.httpRepository
     private val currentVisit get() = session.currentVisit
@@ -43,7 +43,7 @@ internal class TurboWebViewRequestInterceptor(val session: Session) {
         return request.isHttpGetRequest()
     }
 
-    private fun logCurrentVisitResult(url: String, result: TurboHttpRepository.Result) {
+    private fun logCurrentVisitResult(url: String, result: OfflineHttpRepository.Result) {
         logEvent(
             "location" to url,
             "redirectToLocation" to result.redirectToLocation.toString(),

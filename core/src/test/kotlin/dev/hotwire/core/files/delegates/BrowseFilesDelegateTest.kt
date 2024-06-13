@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.delegates
+package dev.hotwire.core.files.delegates
 
 import android.content.Context
 import android.content.Intent
@@ -17,15 +17,15 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboBrowseFilesDelegateTest : BaseUnitTest() {
+class BrowseFilesDelegateTest : BaseUnitTest() {
     private lateinit var context: Context
-    private lateinit var delegate: TurboBrowseFilesDelegate
+    private lateinit var delegate: BrowseFilesDelegate
 
     @Before
     override fun setup() {
         super.setup()
         context = ApplicationProvider.getApplicationContext()
-        delegate = TurboBrowseFilesDelegate(context)
+        delegate = BrowseFilesDelegate(context)
     }
 
     @Test

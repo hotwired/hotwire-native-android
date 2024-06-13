@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.util
+package dev.hotwire.core.files.util
 
 import android.content.Context
 import android.os.Build
@@ -13,7 +13,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboFileProviderTest : BaseUnitTest() {
+class HotwireFileProviderTest : BaseUnitTest() {
     private lateinit var context: Context
 
     @Before
@@ -24,13 +24,13 @@ class TurboFileProviderTest : BaseUnitTest() {
 
     @Test
     fun authority() {
-        val authority = TurboFileProvider.authority(context)
-        assertThat(authority).isEqualTo("dev.hotwire.core.test.turbo.fileprovider")
+        val authority = HotwireFileProvider.authority(context)
+        assertThat(authority).isEqualTo("dev.hotwire.core.test.hotwire.fileprovider")
     }
 
     @Test
     fun directory() {
-        val directory = TurboFileProvider.directory(context)
+        val directory = HotwireFileProvider.directory(context)
         assertThat(directory.path).endsWith("dev.hotwire.core.test-dataDir/files/shared")
     }
 }

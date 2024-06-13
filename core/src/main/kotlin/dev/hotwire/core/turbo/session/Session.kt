@@ -15,12 +15,13 @@ import androidx.webkit.WebViewFeature.VISUAL_STATE_CALLBACK
 import androidx.webkit.WebViewFeature.isFeatureSupported
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logEvent
-import dev.hotwire.core.turbo.delegates.TurboFileChooserDelegate
+import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.errors.WebSslError
-import dev.hotwire.core.turbo.http.*
+import dev.hotwire.core.turbo.http.HotwireHttpClient
+import dev.hotwire.core.turbo.offline.*
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 import dev.hotwire.core.turbo.util.runOnUiThread
 import dev.hotwire.core.turbo.util.toJson
@@ -50,8 +51,8 @@ class Session(
     internal var visitPending = false
     internal var restorationIdentifiers = SparseArray<String>()
     internal val context: Context = activity.applicationContext
-    internal val httpRepository = TurboHttpRepository(activity.lifecycleScope)
-    internal val requestInterceptor = TurboWebViewRequestInterceptor(this)
+    internal val httpRepository = OfflineHttpRepository(activity.lifecycleScope)
+    internal val requestInterceptor = OfflineWebViewRequestInterceptor(this)
 
     // User accessible
 
@@ -75,18 +76,18 @@ class Session(
     var isRenderProcessGone = false
         internal set
 
-    val fileChooserDelegate = TurboFileChooserDelegate(this)
+    val fileChooserDelegate = FileChooserDelegate(this)
 
     init {
         initializeWebView()
-        TurboHttpClient.enableCachingWith(context)
+        HotwireHttpClient.enableCachingWith(context)
         fileChooserDelegate.deleteCachedFiles()
     }
 
     // Public
 
     /**
-     * Fetches a given location and returns the response to the [TurboOfflineRequestHandler]
+     * Fetches a given location and returns the response to the [OfflineRequestHandler]
      * Allows an offline cache to contain specific items instead of solely relying on visited items.
      *
      * @param location Location to cache.
@@ -97,7 +98,7 @@ class Session(
         }
 
         httpRepository.preCache(
-            requestHandler, TurboPreCacheRequest(
+            requestHandler, OfflinePreCacheRequest(
                 url = location, userAgent = webView.settings.userAgentString
             )
         )

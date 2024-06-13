@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.util
+package dev.hotwire.core.files.util
 
 import android.content.Context
 import android.database.Cursor
@@ -6,11 +6,13 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.turbo.util.dispatcherProvider
+import dev.hotwire.core.turbo.util.extract
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 
-internal class TurboUriHelper(val context: Context) {
+internal class UriHelper(val context: Context) {
     @Suppress("BlockingMethodInNonBlockingContext") // https://youtrack.jetbrains.com/issue/KT-39684
     suspend fun writeFileTo(uri: Uri, destDirectory: File): File? {
         val uriAttributes = getAttributes(uri) ?: return null
@@ -39,7 +41,7 @@ internal class TurboUriHelper(val context: Context) {
         }
     }
 
-    fun getAttributes(uri: Uri): TurboUriAttributes? {
+    fun getAttributes(uri: Uri): UriAttributes? {
         return when (uri.scheme) {
             "file" -> getFileUriAttributes(uri)
             "content" -> getContentUriAttributes(context, uri)
@@ -47,21 +49,21 @@ internal class TurboUriHelper(val context: Context) {
         }
     }
 
-    private fun getFileUriAttributes(uri: Uri): TurboUriAttributes? {
+    private fun getFileUriAttributes(uri: Uri): UriAttributes? {
         val file = uri.getFile() ?: return null
 
         if (file.originIsAppResource()) {
             return null
         }
 
-        return TurboUriAttributes(
+        return UriAttributes(
             fileName = file.name,
             mimeType = uri.mimeType(),
             fileSize = file.length()
         )
     }
 
-    private fun getContentUriAttributes(context: Context, uri: Uri): TurboUriAttributes? {
+    private fun getContentUriAttributes(context: Context, uri: Uri): UriAttributes? {
         val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
         val mimeType: String? = context.contentResolver.getType(uri)
         val cursor = try {
@@ -80,7 +82,7 @@ internal class TurboUriHelper(val context: Context) {
         return cursorAttributes ?: uriAttributesDerivedFromUri(uri, mimeType)
     }
 
-    private fun uriAttributesFromContentQuery(uri: Uri, mimeType: String?, cursor: Cursor): TurboUriAttributes? {
+    private fun uriAttributesFromContentQuery(uri: Uri, mimeType: String?, cursor: Cursor): UriAttributes? {
         val columnName = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME).takeIf { it >= 0 }
         val columnSize = cursor.getColumnIndex(OpenableColumns.SIZE).takeIf { it >= 0 }
         val fileName: String? = columnName?.let { cursor.getString(it) }
@@ -90,21 +92,21 @@ internal class TurboUriHelper(val context: Context) {
             return null
         }
 
-        return TurboUriAttributes(
+        return UriAttributes(
             fileName = fileName ?: "attachment",
             mimeType = mimeType ?: uri.mimeType(),
             fileSize = fileSize ?: 0L
         )
     }
 
-    private fun uriAttributesDerivedFromUri(uri: Uri, mimeType: String?): TurboUriAttributes? {
+    private fun uriAttributesDerivedFromUri(uri: Uri, mimeType: String?): UriAttributes? {
         val fileName: String? = uri.lastPathSegment
 
         if (fileName == null && mimeType == null) {
             return null
         }
 
-        return TurboUriAttributes(
+        return UriAttributes(
             fileName = fileName ?: "attachment",
             mimeType = mimeType ?: uri.mimeType(),
             fileSize = 0
