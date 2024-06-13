@@ -8,7 +8,7 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import androidx.activity.result.ActivityResult
 import dev.hotwire.core.R
-import dev.hotwire.core.lib.logging.logError
+import dev.hotwire.core.logging.logError
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
 import dev.hotwire.core.turbo.util.TurboFileProvider
@@ -18,7 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-internal class TurboFileChooserDelegate(val session: Session) : CoroutineScope {
+class TurboFileChooserDelegate(val session: Session) : CoroutineScope {
     private val context: Context = session.context
     private var uploadCallback: ValueCallback<Array<Uri>>? = null
     private val browseFilesDelegate = TurboBrowseFilesDelegate(context)
@@ -66,7 +66,7 @@ internal class TurboFileChooserDelegate(val session: Session) : CoroutineScope {
     }
 
     private fun startIntent(intent: Intent): Boolean {
-        val destination = session.currentVisitNavDestination ?: return false
+        val destination = session.currentVisit?.callback?.visitDestination() ?: return false
 
         return try {
             destination.activityResultLauncher(TURBO_REQUEST_CODE_FILES)?.launch(intent)

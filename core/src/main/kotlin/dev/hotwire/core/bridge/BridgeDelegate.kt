@@ -3,24 +3,22 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.lib.logging.logEvent
-import dev.hotwire.core.lib.logging.logWarning
-import dev.hotwire.core.turbo.nav.HotwireNavDestination
+import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logWarning
 
 @Suppress("unused")
-class BridgeDelegate(
+class BridgeDelegate<D : BridgeDestination>(
     val location: String,
-    val destination: HotwireNavDestination
+    val destination: D,
+    private val componentFactories: List<BridgeComponentFactory<D, BridgeComponent<D>>>
 ) : DefaultLifecycleObserver {
     internal var bridge: Bridge? = null
     private var destinationIsActive: Boolean = false
-    private val componentFactories = Hotwire.registeredBridgeComponentFactories
-    private val initializedComponents = hashMapOf<String, BridgeComponent>()
+    private val initializedComponents = hashMapOf<String, BridgeComponent<D>>()
     private val resolvedLocation: String
         get() = bridge?.webView?.url ?: location
 
-    val activeComponents: List<BridgeComponent>
+    val activeComponents: List<BridgeComponent<D>>
         get() = initializedComponents.map { it.value }.takeIf { destinationIsActive }.orEmpty()
 
     fun onColdBootPageCompleted() {
@@ -75,7 +73,7 @@ class BridgeDelegate(
     }
 
     private fun shouldReloadBridge(): Boolean {
-        return destination.navigator.session.isReady && bridge?.isReady() == false
+        return destination.bridgeWebViewIsReady() && bridge?.isReady() == false
     }
 
     // Lifecycle events
@@ -107,7 +105,7 @@ class BridgeDelegate(
         activeComponents.filterIsInstance<C>().forEach { action(it) }
     }
 
-    private fun getOrCreateComponent(name: String): BridgeComponent? {
+    private fun getOrCreateComponent(name: String): BridgeComponent<D>? {
         val factory = componentFactories.firstOrNull { it.name == name } ?: return null
         return initializedComponents.getOrPut(name) { factory.create(this) }
     }

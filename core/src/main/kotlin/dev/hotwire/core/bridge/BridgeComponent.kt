@@ -1,10 +1,10 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.core.lib.logging.logWarning
+import dev.hotwire.core.logging.logWarning
 
-abstract class BridgeComponent(
+abstract class BridgeComponent<in D : BridgeDestination>(
     val name: String,
-    private val delegate: BridgeDelegate
+    private val delegate: BridgeDelegate<D>
 ) {
     private val receivedMessages = hashMapOf<String, Message>()
 

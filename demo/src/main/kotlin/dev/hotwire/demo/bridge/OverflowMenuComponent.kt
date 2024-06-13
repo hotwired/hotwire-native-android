@@ -7,6 +7,7 @@ import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.bridge.Message
 import dev.hotwire.demo.R
+import dev.hotwire.navigation.destinations.HotwireNavDestination
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -16,8 +17,8 @@ import kotlinx.serialization.Serializable
  */
 class OverflowMenuComponent(
     name: String,
-    private val delegate: BridgeDelegate
-) : BridgeComponent(name, delegate) {
+    private val delegate: BridgeDelegate<HotwireNavDestination>
+) : BridgeComponent<HotwireNavDestination>(name, delegate) {
 
     private val fragment: Fragment
         get() = delegate.destination.fragment

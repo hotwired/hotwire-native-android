@@ -5,8 +5,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import com.google.gson.annotations.SerializedName
-import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.core.turbo.nav.TurboNavPresentation
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
@@ -60,7 +58,7 @@ class PathConfiguration {
      * Loads and parses the specified configuration file(s) from their local
      * and/or remote locations.
      */
-    internal fun load(context: Context, location: Location) {
+    fun load(context: Context, location: Location) {
         if (loader == null) {
             loader = PathConfigurationLoader(context.applicationContext)
         }
@@ -133,9 +131,8 @@ val PathConfigurationProperties.context: TurboNavPresentationContext
         TurboNavPresentationContext.DEFAULT
     }
 
-val PathConfigurationProperties.uri: Uri
-    get() = get("uri")?.toUri() ?:
-        HotwireDestination.from(Hotwire.defaultFragmentDestination).uri.toUri()
+val PathConfigurationProperties.uri: Uri?
+    get() = get("uri")?.toUri()
 
 val PathConfigurationProperties.fallbackUri: Uri?
     get() = get("fallback_uri")?.toUri()

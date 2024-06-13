@@ -5,8 +5,6 @@ import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.navigation.routing.AppNavigationRouteDecisionHandler
-import dev.hotwire.core.navigation.routing.BrowserTabRouteDecisionHandler
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.demo.bridge.FormComponent
 import dev.hotwire.demo.bridge.MenuComponent
@@ -18,6 +16,12 @@ import dev.hotwire.demo.features.web.WebBottomSheetFragment
 import dev.hotwire.demo.features.web.WebFragment
 import dev.hotwire.demo.features.web.WebHomeFragment
 import dev.hotwire.demo.features.web.WebModalFragment
+import dev.hotwire.navigation.config.defaultFragmentDestination
+import dev.hotwire.navigation.config.registerBridgeComponents
+import dev.hotwire.navigation.config.registerFragmentDestinations
+import dev.hotwire.navigation.config.registerRouteDecisionHandlers
+import dev.hotwire.navigation.routing.AppNavigationRouteDecisionHandler
+import dev.hotwire.navigation.routing.BrowserTabRouteDecisionHandler
 
 class DemoApplication : Application() {
     override fun onCreate() {
@@ -26,10 +30,6 @@ class DemoApplication : Application() {
     }
 
     private fun configureApp() {
-        // Configure debugging
-        Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
-        Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
-
         // Loads the path configuration
         Hotwire.loadPathConfiguration(
             context = this,
@@ -66,6 +66,8 @@ class DemoApplication : Application() {
         ))
 
         // Set configuration options
+        Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
+        Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
         Hotwire.config.userAgent = "Hotwire Demo; ${Hotwire.config.userAgentSubstring()}"
     }

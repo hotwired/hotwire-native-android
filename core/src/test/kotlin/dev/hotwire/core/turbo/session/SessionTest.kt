@@ -5,13 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.turbo.errors.HttpError.ServerError
 import dev.hotwire.core.turbo.errors.LoadError
-import dev.hotwire.core.turbo.nav.HotwireNavDestination
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
-import dev.hotwire.core.turbo.errors.HttpError.ServerError
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -31,7 +31,6 @@ class SessionTest {
     @Mock
     private lateinit var webView: TurboWebView
     @Mock
-    private lateinit var navDestination: HotwireNavDestination
     private lateinit var activity: AppCompatActivity
     private lateinit var session: Session
     private lateinit var visit: Visit
@@ -52,8 +51,12 @@ class SessionTest {
             options = VisitOptions()
         )
 
-        whenever(callback.visitNavDestination()).thenReturn(navDestination)
-        whenever(navDestination.isActive).thenReturn(true)
+        val visitDestination = object : VisitDestination {
+            override fun isActive() = true
+            override fun activityResultLauncher(requestCode: Int) = null
+        }
+
+        whenever(callback.visitDestination()).thenReturn(visitDestination)
     }
 
     @Test

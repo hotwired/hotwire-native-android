@@ -7,7 +7,7 @@ import org.junit.Test
 class UserAgentTest {
     @Test
     fun userAgentSubstring() {
-        Hotwire.registerBridgeComponents(TestData.componentFactories)
+        Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
 
         val userAgentSubstring = Hotwire.config.userAgentSubstring()
         assertEquals(userAgentSubstring, "Turbo Native Android; bridge-components: [one two];")
@@ -15,7 +15,7 @@ class UserAgentTest {
 
     @Test
     fun userAgent() {
-        Hotwire.registerBridgeComponents(TestData.componentFactories)
+        Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
         Hotwire.config.userAgent = "Test; ${Hotwire.config.userAgentSubstring()}"
 
         val userAgent = Hotwire.config.userAgent

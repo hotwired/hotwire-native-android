@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.nav.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.demo.R
 
 @HotwireDestination(uri = "turbo://fragment/web/home")

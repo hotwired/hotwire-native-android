@@ -2,17 +2,34 @@ package dev.hotwire.core.config
 
 import android.content.Context
 import android.webkit.WebView
+import dev.hotwire.core.bridge.BridgeComponent
+import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.StradaJsonConverter
+import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.http.TurboHttpClient
+import dev.hotwire.core.turbo.http.TurboOfflineRequestHandler
 import dev.hotwire.core.turbo.views.TurboWebView
 
 class HotwireConfig internal constructor() {
+    /**
+     * The path configuration that defines your navigation rules.
+     */
+    val pathConfiguration = PathConfiguration()
+
+    var registeredBridgeComponentFactories:
+            List<BridgeComponentFactory<*, BridgeComponent<*>>> = emptyList()
+
     /**
      * Set a custom JSON converter to easily decode Message.dataJson to a data
      * object in received messages and to encode a data object back to json to
      * reply with a custom message back to the web.
      */
     var jsonConverter: StradaJsonConverter? = null
+
+    /**
+     * Experimental: API may be removed, not ready for production use.
+     */
+    var offlineRequestHandler: TurboOfflineRequestHandler? = null
 
     /**
      * Enables/disables debug logging. This should be disabled in production environments.
@@ -55,7 +72,7 @@ class HotwireConfig internal constructor() {
      * calling this so the bridge component names are included in your user agent.
      */
     fun userAgentSubstring(): String {
-        val components = Hotwire.registeredBridgeComponentFactories.joinToString(" ") { it.name }
+        val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
         return "Turbo Native Android; bridge-components: [$components];"
     }
 
