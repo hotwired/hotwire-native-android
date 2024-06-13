@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.navigation.destinations.HotwireNavDestination
+import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
 import dev.hotwire.navigation.fragments.HotwireWebFragment
 import dev.hotwire.navigation.routing.AppNavigationRouteDecisionHandler
@@ -26,8 +26,8 @@ internal object HotwireNavigation {
     )
 
     @Suppress("UNCHECKED_CAST")
-    var registeredBridgeComponentFactories: List<BridgeComponentFactory<HotwireNavDestination, BridgeComponent<HotwireNavDestination>>>
-        get() = Hotwire.config.registeredBridgeComponentFactories as List<BridgeComponentFactory<HotwireNavDestination, BridgeComponent<HotwireNavDestination>>>
+    var registeredBridgeComponentFactories: List<BridgeComponentFactory<HotwireDestination, BridgeComponent<HotwireDestination>>>
+        get() = Hotwire.config.registeredBridgeComponentFactories as List<BridgeComponentFactory<HotwireDestination, BridgeComponent<HotwireDestination>>>
         set(value) { Hotwire.config.registeredBridgeComponentFactories = value }
 }
 
@@ -43,7 +43,7 @@ fun Hotwire.registerRouteDecisionHandlers(decisionHandlers: List<Router.RouteDec
  * Register bridge components that the app supports. Every possible bridge
  * component, wrapped in a [BridgeComponentFactory], must be provided here.
  */
-fun Hotwire.registerBridgeComponents(factories: List<BridgeComponentFactory<HotwireNavDestination, BridgeComponent<HotwireNavDestination>>>) {
+fun Hotwire.registerBridgeComponents(factories: List<BridgeComponentFactory<HotwireDestination, BridgeComponent<HotwireDestination>>>) {
     config.registeredBridgeComponentFactories = factories
 }
 

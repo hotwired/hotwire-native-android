@@ -25,7 +25,7 @@ import dev.hotwire.navigation.routing.Router
  * The primary interface that a navigable Fragment implements to provide the library with
  * the information it needs to properly navigate.
  */
-interface HotwireNavDestination : BridgeDestination {
+interface HotwireDestination : BridgeDestination {
     /**
      * Gets the navigator instance associated with this destination.
      */
