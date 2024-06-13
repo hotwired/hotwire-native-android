@@ -3,7 +3,7 @@ package dev.hotwire.navigation.fragments
 import android.view.View
 import android.webkit.HttpAuthHandler
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.navigation.views.TurboView
+import dev.hotwire.navigation.views.HotwireView
 import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
 import dev.hotwire.core.turbo.webview.HotwireWebView
 
@@ -13,9 +13,9 @@ import dev.hotwire.core.turbo.webview.HotwireWebView
  */
 interface HotwireWebFragmentCallback {
     /**
-     * The TurboView instance located in the Fragment's view.
+     * The HotwireView instance located in the Fragment's view.
      */
-    val turboView: TurboView?
+    val hotwireView: HotwireView?
 
     /**
      * Inflate and return a new view to serve as an error view.

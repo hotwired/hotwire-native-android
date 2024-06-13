@@ -20,18 +20,18 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class TurboViewTest {
+class HotwireViewTest {
     @Mock private lateinit var webView: WebView
     private lateinit var context: Context
     private lateinit var view: ViewGroup
-    private lateinit var turboView: TurboView
+    private lateinit var hotwireView: HotwireView
 
     @Before fun setup() {
         MockitoAnnotations.openMocks(this)
 
         context = ApplicationProvider.getApplicationContext()
-        view = LayoutInflater.from(context).inflate(R.layout.turbo_view, null) as ViewGroup
-        turboView = view.findViewById(R.id.turbo_view)
+        view = LayoutInflater.from(context).inflate(R.layout.hotwire_view, null) as ViewGroup
+        hotwireView = view.findViewById(R.id.hotwire_view)
 
         whenever(webView.layoutParams).thenReturn(
             LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
@@ -39,13 +39,13 @@ class TurboViewTest {
     }
 
     @Test fun refreshLayoutIsFirstChild() {
-        assertThat(turboView.getChildAt(0) is TurboSwipeRefreshLayout).isTrue()
+        assertThat(hotwireView.getChildAt(0) is HotwireSwipeRefreshLayout).isTrue()
     }
 
     @Test fun webviewAttachedToRefreshLayout() {
-        turboView.attachWebView(webView) {
+        hotwireView.attachWebView(webView) {
             // Child at 0 is CircleImageView
-            assertThat(turboView.webViewRefresh?.getChildAt(1)).isEqualTo(webView)
+            assertThat(hotwireView.webViewRefresh?.getChildAt(1)).isEqualTo(webView)
         }
     }
 }

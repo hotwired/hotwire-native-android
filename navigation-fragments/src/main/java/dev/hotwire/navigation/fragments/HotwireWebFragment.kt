@@ -16,7 +16,7 @@ import dev.hotwire.navigation.R
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.session.SessionModalResult
-import dev.hotwire.navigation.views.TurboView
+import dev.hotwire.navigation.views.HotwireView
 
 /**
  * The base class from which all web "standard" fragments (non-dialogs) in a
@@ -42,7 +42,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.turbo_fragment_web, container, false)
+        return inflater.inflate(R.layout.hotwire_fragment_web, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -125,20 +125,20 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     // ----------------------------------------------------------------------------
 
     /**
-     * Gets the TurboView instance in the Fragment's view
+     * Gets the HotwireView instance in the Fragment's view
      * with resource ID R.id.turbo_view.
      */
-    final override val turboView: TurboView?
-        get() = view?.findViewById(R.id.turbo_view)
+    final override val hotwireView: HotwireView?
+        get() = view?.findViewById(R.id.hotwire_view)
 
     @SuppressLint("InflateParams")
     override fun createProgressView(location: String): View {
-        return layoutInflater.inflate(R.layout.turbo_progress, null)
+        return layoutInflater.inflate(R.layout.hotwire_progress, null)
     }
 
     @SuppressLint("InflateParams")
     override fun createErrorView(error: VisitError): View {
-        return layoutInflater.inflate(R.layout.turbo_error, null)
+        return layoutInflater.inflate(R.layout.hotwire_error, null)
     }
 
     override fun createWebChromeClient(): HotwireWebChromeClient {

@@ -6,7 +6,7 @@ import androidx.core.view.children
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import dev.hotwire.core.turbo.webview.HotwireWebView
 
-internal class TurboSwipeRefreshLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+internal class HotwireSwipeRefreshLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
         SwipeRefreshLayout(context, attrs) {
 
     init {

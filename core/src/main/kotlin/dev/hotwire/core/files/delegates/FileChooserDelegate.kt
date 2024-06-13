@@ -98,8 +98,8 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
 
     private fun FileChooserParams.title(): String {
         return title?.toString() ?: when (allowsMultiple()) {
-            true -> session.context.getString(R.string.turbo_file_chooser_select_multiple)
-            else -> session.context.getString(R.string.turbo_file_chooser_select)
+            true -> session.context.getString(R.string.hotwire_file_chooser_select_multiple)
+            else -> session.context.getString(R.string.hotwire_file_chooser_select)
         }
     }
 

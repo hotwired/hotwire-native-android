@@ -8,13 +8,13 @@
 
     <com.google.android.material.textview.MaterialTextView
         style="@style/TextAppearance.MaterialComponents.Headline6"
-        android:id="@+id/turbo_error_message"
+        android:id="@+id/hotwire_error_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:gravity="center_horizontal"
-        android:text="@string/turbo_error_message"
+        android:text="@string/hotwire_error_message"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias=".40" />

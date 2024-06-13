@@ -17,16 +17,16 @@ import dev.hotwire.navigation.R
  * Turbo view that hosts the shared WebView, a progress view, an error view, and allows
  * pull-to-refresh behavior.
  */
-class TurboView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+class HotwireView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr) {
 
-    private val webViewContainer: ViewGroup get() = findViewById(R.id.turbo_webView_container)
-    private val progressContainer: ViewGroup get() = findViewById(R.id.turbo_progress_container)
-    private val errorContainer: ViewGroup get() = findViewById(R.id.turbo_error_container)
-    private val screenshotView: ImageView get() = findViewById(R.id.turbo_screenshot)
+    private val webViewContainer: ViewGroup get() = findViewById(R.id.hotwire_webView_container)
+    private val progressContainer: ViewGroup get() = findViewById(R.id.hotwire_progress_container)
+    private val errorContainer: ViewGroup get() = findViewById(R.id.hotwire_error_container)
+    private val screenshotView: ImageView get() = findViewById(R.id.hotwire_screenshot)
 
     internal val webViewRefresh: SwipeRefreshLayout? get() = webViewContainer as? SwipeRefreshLayout
-    internal val errorRefresh: SwipeRefreshLayout? get() = findViewById(R.id.turbo_error_refresh)
+    internal val errorRefresh: SwipeRefreshLayout? get() = findViewById(R.id.hotwire_error_refresh)
 
     internal fun attachWebView(webView: WebView, onAttachedToNewDestination: (Boolean) -> Unit) {
         if (webView.parent != null) {

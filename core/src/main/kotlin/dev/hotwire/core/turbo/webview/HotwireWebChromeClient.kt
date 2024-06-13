@@ -18,7 +18,7 @@ open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
 
         MaterialAlertDialogBuilder(context)
             .setMessage(message)
-            .setPositiveButton(context.getString(R.string.turbo_dialog_ok)) { dialog, _ ->
+            .setPositiveButton(context.getString(R.string.hotwire_dialog_ok)) { dialog, _ ->
                 dialog.cancel()
                 result?.confirm()
             }
@@ -34,11 +34,11 @@ open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
 
         MaterialAlertDialogBuilder(context)
             .setMessage(message)
-            .setNegativeButton(context.getString(R.string.turbo_dialog_cancel)) { dialog, _ ->
+            .setNegativeButton(context.getString(R.string.hotwire_dialog_cancel)) { dialog, _ ->
                 dialog.cancel()
                 result?.cancel()
             }
-            .setPositiveButton(context.getString(R.string.turbo_dialog_ok)) { dialog, _ ->
+            .setPositiveButton(context.getString(R.string.hotwire_dialog_ok)) { dialog, _ ->
                 dialog.cancel()
                 result?.confirm()
             }

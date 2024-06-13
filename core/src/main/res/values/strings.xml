@@ -1,7 +1,7 @@
 <resources>
-    <string name="turbo_error_message">Error loading page</string>
-    <string name="turbo_file_chooser_select">Select file</string>
-    <string name="turbo_file_chooser_select_multiple">Select file(s)</string>
-    <string name="turbo_dialog_ok">OK</string>
-    <string name="turbo_dialog_cancel">Cancel</string>
+    <string name="hotwire_error_message">Error loading page</string>
+    <string name="hotwire_file_chooser_select">Select file</string>
+    <string name="hotwire_file_chooser_select_multiple">Select file(s)</string>
+    <string name="hotwire_dialog_ok">OK</string>
+    <string name="hotwire_dialog_cancel">Cancel</string>
 </resources>

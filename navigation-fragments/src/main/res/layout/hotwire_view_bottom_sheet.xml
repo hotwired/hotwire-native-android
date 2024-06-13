@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<dev.hotwire.navigation.views.TurboView
+<dev.hotwire.navigation.views.HotwireView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/turbo_view"
+    android:id="@+id/hotwire_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/turbo_webView_container"
+        android:id="@+id/hotwire_webView_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -18,7 +18,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <FrameLayout
-        android:id="@+id/turbo_progress_container"
+        android:id="@+id/hotwire_progress_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:minHeight="400dp"
@@ -31,7 +31,7 @@
     </FrameLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/turbo_screenshot"
+        android:id="@+id/hotwire_screenshot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
@@ -41,7 +41,7 @@
         tools:ignore="ContentDescription" />
 
     <FrameLayout
-        android:id="@+id/turbo_error_container"
+        android:id="@+id/hotwire_error_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:minHeight="400dp"
@@ -53,4 +53,4 @@
 
     </FrameLayout>
 
-</dev.hotwire.navigation.views.TurboView>
+</dev.hotwire.navigation.views.HotwireView>
