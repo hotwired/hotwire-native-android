@@ -1,10 +1,10 @@
 package dev.hotwire.core.turbo.nav
 
 /**
- * Describes the UI context (eg, modal or normal) within which the [TurboNavPresentation] is
+ * Describes the UI context (eg, modal or normal) within which the [Presentation] is
  * executed.
  */
-enum class TurboNavPresentationContext {
+enum class PresentationContext {
     /**
      * A standard context where navigation is pushed or popped to/from the stack. Typically these
      * views are the full size of the app, and have a back button.

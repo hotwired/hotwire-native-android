@@ -9,8 +9,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import dev.hotwire.core.bridge.Bridge
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.turbo.nav.TurboNavPresentation
-import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
+import dev.hotwire.core.turbo.nav.Presentation
+import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
@@ -203,20 +203,20 @@ class Navigator(
         )
 
         when (rule.newPresentation) {
-            TurboNavPresentation.POP -> navigateWhenReady {
+            Presentation.POP -> navigateWhenReady {
                 popBackStack(rule)
             }
-            TurboNavPresentation.REPLACE -> navigateWhenReady {
+            Presentation.REPLACE -> navigateWhenReady {
                 popBackStack(rule)
                 navigateToLocation(rule)
             }
-            TurboNavPresentation.PUSH -> navigateWhenReady {
+            Presentation.PUSH -> navigateWhenReady {
                 navigateToLocation(rule)
             }
-            TurboNavPresentation.REPLACE_ROOT -> navigateWhenReady {
+            Presentation.REPLACE_ROOT -> navigateWhenReady {
                 replaceRootLocation(rule)
             }
-            TurboNavPresentation.CLEAR_ALL -> navigateWhenReady {
+            Presentation.CLEAR_ALL -> navigateWhenReady {
                 clearAll()
             }
             else -> {
@@ -232,7 +232,7 @@ class Navigator(
         )
 
         when (rule.newPresentation) {
-            TurboNavPresentation.REPLACE -> navigateWhenReady {
+            Presentation.REPLACE -> navigateWhenReady {
                 popBackStack(rule)
                 navigateToLocation(rule)
             }
@@ -381,7 +381,7 @@ class Navigator(
     private val NavBackStackEntry?.isModalContext: Boolean
         get() {
             val context = this?.arguments?.getSerializable("presentation-context")
-            return context as? TurboNavPresentationContext == TurboNavPresentationContext.MODAL
+            return context as? PresentationContext == PresentationContext.MODAL
         }
 
     private fun logEvent(event: String, vararg params: Pair<String, Any>) {

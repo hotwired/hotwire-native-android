@@ -7,7 +7,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.config.title
-import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
+import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.navigation.R
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.navigator.Navigator
@@ -167,6 +167,6 @@ abstract class HotwireFragment : Fragment(), HotwireDestination {
 
     private fun shouldHandleModalResults(): Boolean {
         // Only handle modal results in non-modal contexts
-        return pathProperties.context != TurboNavPresentationContext.MODAL
+        return pathProperties.context != PresentationContext.MODAL
     }
 }

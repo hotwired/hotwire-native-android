@@ -13,7 +13,7 @@ package dev.hotwire.core.turbo.nav
  *  current location: /feature?filter=a
  *  new location:     /feature?filter=b
  */
-enum class TurboNavQueryStringPresentation {
+enum class QueryStringPresentation {
     /**
      * A generic default value when no specific presentation value is provided and results in
      * generally accepted "normal" behavior — replacing the root when on the start destination and

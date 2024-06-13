@@ -4,7 +4,7 @@ package dev.hotwire.core.turbo.nav
  * Represents how a given navigation destination should be presented and how the app's
  * backstack will be affected.
  */
-enum class TurboNavPresentation {
+enum class Presentation {
     /**
      * A generic default value when no specific presentation value is provided and results in
      * generally accepted "normal" behavior — replacing the root when on the start destination and
