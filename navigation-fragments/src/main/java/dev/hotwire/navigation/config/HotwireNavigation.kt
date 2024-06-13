@@ -35,16 +35,18 @@ internal object HotwireNavigation {
  * Registers the [Router.RouteDecisionHandler] instances that determine whether to route location
  * urls within in-app navigation or with alternative custom behaviors.
  */
-fun Hotwire.registerRouteDecisionHandlers(decisionHandlers: List<Router.RouteDecisionHandler>) {
-    HotwireNavigation.router = Router(decisionHandlers)
+fun Hotwire.registerRouteDecisionHandlers(vararg decisionHandlers: Router.RouteDecisionHandler) {
+    HotwireNavigation.router = Router(decisionHandlers.toList())
 }
 
 /**
  * Register bridge components that the app supports. Every possible bridge
  * component, wrapped in a [BridgeComponentFactory], must be provided here.
  */
-fun Hotwire.registerBridgeComponents(factories: List<BridgeComponentFactory<HotwireDestination, BridgeComponent<HotwireDestination>>>) {
-    config.registeredBridgeComponentFactories = factories
+fun Hotwire.registerBridgeComponents(
+    vararg factories: BridgeComponentFactory<HotwireDestination, BridgeComponent<HotwireDestination>>
+) {
+    config.registeredBridgeComponentFactories = factories.toList()
 }
 
 /**
@@ -60,6 +62,6 @@ var Hotwire.defaultFragmentDestination: KClass<out Fragment>
  * Register fragment destinations that can be navigated to. Every possible
  * destination must be provided here.
  */
-fun Hotwire.registerFragmentDestinations(destinations: List<KClass<out Fragment>>) {
-    HotwireNavigation.registeredFragmentDestinations = destinations
+fun Hotwire.registerFragmentDestinations(vararg destinations: KClass<out Fragment>) {
+    HotwireNavigation.registeredFragmentDestinations = destinations.toList()
 }

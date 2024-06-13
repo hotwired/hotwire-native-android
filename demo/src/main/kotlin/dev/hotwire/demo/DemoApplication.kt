@@ -42,7 +42,7 @@ class DemoApplication : Application() {
         Hotwire.defaultFragmentDestination = WebFragment::class
 
         // Register fragment destinations
-        Hotwire.registerFragmentDestinations(listOf(
+        Hotwire.registerFragmentDestinations(
             WebFragment::class,
             WebHomeFragment::class,
             WebModalFragment::class,
@@ -50,20 +50,20 @@ class DemoApplication : Application() {
             NumbersFragment::class,
             NumberBottomSheetFragment::class,
             ImageViewerFragment::class
-        ))
+        )
 
         // Register bridge components
-        Hotwire.registerBridgeComponents(listOf(
+        Hotwire.registerBridgeComponents(
             BridgeComponentFactory("form", ::FormComponent),
             BridgeComponentFactory("menu", ::MenuComponent),
             BridgeComponentFactory("overflow-menu", ::OverflowMenuComponent)
-        ))
+        )
 
         // Register route decision handlers
-        Hotwire.registerRouteDecisionHandlers(listOf(
+        Hotwire.registerRouteDecisionHandlers(
             AppNavigationRouteDecisionHandler(),
             BrowserTabRouteDecisionHandler()
-        ))
+        )
 
         // Set configuration options
         Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
