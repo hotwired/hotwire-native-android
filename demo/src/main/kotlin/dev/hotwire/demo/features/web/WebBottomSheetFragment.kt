@@ -7,7 +7,7 @@ import dev.hotwire.demo.R
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
 
-@HotwireDestinationDeepLink(uri = "turbo://fragment/web/modal/sheet")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/web/modal/sheet")
 class WebBottomSheetFragment : HotwireWebBottomSheetFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

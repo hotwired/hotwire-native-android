@@ -48,9 +48,9 @@ class NavigatorRuleTest {
     private val webModalDestinationId = 2
     private val webHomeDestinationId = 3
 
-    private val webUri = Uri.parse("turbo://fragment/web")
-    private val webModalUri = Uri.parse("turbo://fragment/web/modal")
-    private val webHomeUri = Uri.parse("turbo://fragment/web/home")
+    private val webUri = Uri.parse("hotwire://fragment/web")
+    private val webModalUri = Uri.parse("hotwire://fragment/web/modal")
+    private val webHomeUri = Uri.parse("hotwire://fragment/web/home")
 
     private val extras = null
     private val navOptions = navOptions {

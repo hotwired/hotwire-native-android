@@ -7,10 +7,10 @@ import kotlin.reflect.full.findAnnotation
  * Annotation for each Fragment that will be registered as a navigation destination.
  *
  * For example:
- *  `@HotwireDestinationDeepLink(uri = "turbo://fragment/search")`
- *  `class SearchFragment : TurboWebFragment()`
+ *  `@HotwireDestinationDeepLink(uri = "hotwire://fragment/search")`
+ *  `class SearchFragment : HotwireWebFragment()`
  *
- * @property uri The URI to be registered with the Android Navigation component nav graph.
+ * @property uri The deeplink URI to be registered with the Android Navigation component nav graph.
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)

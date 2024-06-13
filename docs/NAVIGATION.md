@@ -9,7 +9,7 @@ In your web Fragment, this would look like:
 
 **`WebFragment.kt`:**
 ```kotlin
-@TurboNavGraphDestination(uri = "turbo://fragment/web")
+@TurboNavGraphDestination(uri = "hotwire://fragment/web")
 class WebFragment : TurboWebFragment() {
 
     // ...
@@ -52,7 +52,7 @@ In your Fragment, this would look like:
 
 **`WebFragment.kt`:**
 ```kotlin
-@TurboNavGraphDestination(uri = "turbo://fragment/web")
+@TurboNavGraphDestination(uri = "hotwire://fragment/web")
 class WebFragment : TurboWebFragment() {
 
     // ...

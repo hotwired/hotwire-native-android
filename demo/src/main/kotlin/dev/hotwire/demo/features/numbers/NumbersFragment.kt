@@ -11,7 +11,7 @@ import dev.hotwire.demo.Urls
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireFragment
 
-@HotwireDestinationDeepLink(uri = "turbo://fragment/numbers")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/numbers")
 class NumbersFragment : HotwireFragment(), NumbersFragmentCallback {
     private val numbersAdapter = NumbersAdapter(this)
 

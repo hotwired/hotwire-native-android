@@ -11,7 +11,7 @@ import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireFragment
 import dev.hotwire.navigation.util.displayBackButtonAsCloseIcon
 
-@HotwireDestinationDeepLink(uri = "turbo://fragment/image_viewer")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/image_viewer")
 class ImageViewerFragment : HotwireFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_image_viewer, container, false)

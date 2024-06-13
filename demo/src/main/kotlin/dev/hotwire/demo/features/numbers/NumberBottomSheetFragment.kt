@@ -11,7 +11,7 @@ import dev.hotwire.demo.R
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireBottomSheetFragment
 
-@HotwireDestinationDeepLink(uri = "turbo://fragment/numbers/sheet")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/numbers/sheet")
 class NumberBottomSheetFragment : HotwireBottomSheetFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_number_bottom_sheet, container, false)

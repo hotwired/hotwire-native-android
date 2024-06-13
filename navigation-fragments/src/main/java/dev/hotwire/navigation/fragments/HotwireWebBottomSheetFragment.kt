@@ -24,7 +24,7 @@ import dev.hotwire.navigation.views.TurboView
  *
  * For native bottom sheet fragments, refer to [HotwireBottomSheetFragment].
  */
-@HotwireDestinationDeepLink(uri = "turbo://fragment/web/modal/sheet")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/web/modal/sheet")
 open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), HotwireWebFragmentCallback {
     private lateinit var webDelegate: HotwireWebFragmentDelegate
 

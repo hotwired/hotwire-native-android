@@ -24,7 +24,7 @@ import dev.hotwire.navigation.views.TurboView
  *
  * For native fragments, refer to [HotwireFragment].
  */
-@HotwireDestinationDeepLink(uri = "turbo://fragment/web")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/web")
 open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     private lateinit var webDelegate: HotwireWebFragmentDelegate
 
