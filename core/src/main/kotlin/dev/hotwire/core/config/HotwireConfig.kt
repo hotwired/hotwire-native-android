@@ -6,7 +6,6 @@ import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.StradaJsonConverter
 import dev.hotwire.core.turbo.config.PathConfiguration
-import dev.hotwire.core.turbo.http.ExperimentalOfflineRequestHandler
 import dev.hotwire.core.turbo.http.TurboHttpClient
 import dev.hotwire.core.turbo.http.TurboOfflineRequestHandler
 import dev.hotwire.core.turbo.views.TurboWebView
@@ -30,7 +29,6 @@ class HotwireConfig internal constructor() {
     /**
      * Experimental: API may be removed, not ready for production use.
      */
-    @OptIn(ExperimentalOfflineRequestHandler::class)
     var offlineRequestHandler: TurboOfflineRequestHandler? = null
 
     /**

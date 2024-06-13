@@ -12,7 +12,6 @@ import androidx.lifecycle.whenStateAtLeast
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.http.ExperimentalOfflineRequestHandler
 import dev.hotwire.core.turbo.session.SessionCallback
 import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.core.turbo.visit.Visit
@@ -374,7 +373,6 @@ internal class HotwireWebFragmentDelegate(
         }
     }
 
-    @OptIn(ExperimentalOfflineRequestHandler::class)
     private suspend fun fetchCachedSnapshot(): String? {
         return withContext(dispatcherProvider.io) {
             val response = Hotwire.config.offlineRequestHandler?.getCachedSnapshot(
