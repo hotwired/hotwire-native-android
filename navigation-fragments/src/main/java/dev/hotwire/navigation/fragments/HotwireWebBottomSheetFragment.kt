@@ -15,7 +15,7 @@ import dev.hotwire.core.turbo.views.TurboWebChromeClient
 import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.navigation.R
 import dev.hotwire.navigation.config.HotwireNavigation
-import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.views.TurboView
 
 /**
@@ -24,7 +24,7 @@ import dev.hotwire.navigation.views.TurboView
  *
  * For native bottom sheet fragments, refer to [HotwireBottomSheetFragment].
  */
-@HotwireDestination(uri = "turbo://fragment/web/modal/sheet")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/web/modal/sheet")
 open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), HotwireWebFragmentCallback {
     private lateinit var webDelegate: HotwireWebFragmentDelegate
 

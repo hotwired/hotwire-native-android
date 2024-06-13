@@ -9,7 +9,7 @@ import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.config.title
 import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
 import dev.hotwire.navigation.R
-import dev.hotwire.navigation.destinations.HotwireNavDestination
+import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.navigator.Navigator
 import dev.hotwire.navigation.navigator.NavigatorHost
 import dev.hotwire.navigation.observers.HotwireWindowThemeObserver
@@ -21,7 +21,7 @@ import dev.hotwire.navigation.session.SessionModalResult
  *
  * For web fragments, refer to [HotwireWebFragment].
  */
-abstract class HotwireFragment : Fragment(), HotwireNavDestination {
+abstract class HotwireFragment : Fragment(), HotwireDestination {
     override lateinit var navigator: Navigator
     internal lateinit var delegate: HotwireFragmentDelegate
 
@@ -66,7 +66,7 @@ abstract class HotwireFragment : Fragment(), HotwireNavDestination {
      * Use [registerForActivityResult] with the appropriate
      * [androidx.activity.result.contract.ActivityResultContract] and its callback.
      *
-     * Turbo provides the [HotwireNavDestination.activityResultLauncher] interface
+     * Turbo provides the [HotwireDestination.activityResultLauncher] interface
      * to obtain registered result launchers from any destination.
      */
     @Suppress("DEPRECATION")

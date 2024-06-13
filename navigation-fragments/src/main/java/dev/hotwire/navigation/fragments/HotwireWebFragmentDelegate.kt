@@ -18,7 +18,7 @@ import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
-import dev.hotwire.navigation.destinations.HotwireNavDestination
+import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.util.dispatcherProvider
 import dev.hotwire.navigation.views.TurboView
@@ -32,7 +32,7 @@ import kotlin.random.Random
  */
 internal class HotwireWebFragmentDelegate(
     private val delegate: HotwireFragmentDelegate,
-    private val navDestination: HotwireNavDestination,
+    private val navDestination: HotwireDestination,
     private val callback: HotwireWebFragmentCallback
 ) : SessionCallback, VisitDestination {
 
@@ -129,8 +129,7 @@ internal class HotwireWebFragmentDelegate(
     }
 
     /**
-     * Should be called by the implementing Fragment during
-     * [dev.hotwire.core.turbo.nav.HotwireNavDestination.refresh]
+     * Should be called by the implementing Fragment during [HotwireDestination.refresh].
      */
     fun refresh(displayProgress: Boolean) {
         if (webView.url == null) return

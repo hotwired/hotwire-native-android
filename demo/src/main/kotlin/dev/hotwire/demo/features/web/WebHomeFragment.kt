@@ -6,10 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.demo.R
 
-@HotwireDestination(uri = "turbo://fragment/web/home")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/web/home")
 class WebHomeFragment : WebFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_web_home, container, false)

@@ -19,7 +19,7 @@ In its simplest form, your JSON configuration will look like:
       ],
       "properties": {
         "context": "default",
-        "uri": "turbo://fragment/web",
+        "uri": "hotwire://fragment/web",
         "pull_to_refresh_enabled": true
       }
     }

@@ -8,8 +8,8 @@ import androidx.appcompat.widget.Toolbar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dev.hotwire.core.turbo.config.title
 import dev.hotwire.navigation.R
-import dev.hotwire.navigation.destinations.HotwireNavDestination
-import dev.hotwire.navigation.destinations.HotwireNavDialogDestination
+import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDialogDestination
 import dev.hotwire.navigation.navigator.Navigator
 import dev.hotwire.navigation.navigator.NavigatorHost
 
@@ -20,7 +20,7 @@ import dev.hotwire.navigation.navigator.NavigatorHost
  * For web bottom sheet fragments, refer to [HotwireWebBottomSheetFragment].
  */
 abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
-    HotwireNavDestination, HotwireNavDialogDestination {
+    HotwireDestination, HotwireDialogDestination {
     override lateinit var navigator: Navigator
     internal lateinit var delegate: HotwireFragmentDelegate
 
@@ -61,7 +61,7 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
      * Use [registerForActivityResult] with the appropriate
      * [androidx.activity.result.contract.ActivityResultContract] and its callback.
      *
-     * Turbo provides the [HotwireNavDestination.activityResultLauncher] interface
+     * Turbo provides the [HotwireDestination.activityResultLauncher] interface
      * to obtain registered result launchers from any destination.
      */
     @Suppress("DEPRECATION")

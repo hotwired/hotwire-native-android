@@ -1,6 +1,6 @@
 package dev.hotwire.demo.features.web
 
-import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 
-@HotwireDestination(uri = "turbo://fragment/web/modal")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/web/modal")
 class WebModalFragment : WebFragment()

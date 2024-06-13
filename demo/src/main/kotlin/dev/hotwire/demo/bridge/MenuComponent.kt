@@ -9,7 +9,7 @@ import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.bridge.Message
 import dev.hotwire.demo.databinding.MenuComponentBottomSheetBinding
-import dev.hotwire.navigation.destinations.HotwireNavDestination
+import dev.hotwire.navigation.destinations.HotwireDestination
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,8 +19,8 @@ import kotlinx.serialization.Serializable
  */
 class MenuComponent(
     name: String,
-    private val delegate: BridgeDelegate<HotwireNavDestination>
-) : BridgeComponent<HotwireNavDestination>(name, delegate) {
+    private val delegate: BridgeDelegate<HotwireDestination>
+) : BridgeComponent<HotwireDestination>(name, delegate) {
 
     private val fragment: Fragment
         get() = delegate.destination.fragment

@@ -14,7 +14,7 @@ In its simplest form, your web Fragment will look like:
 
 **`WebFragment.kt`:**
 ```kotlin
-@TurboNavGraphDestination(uri = "turbo://fragment/web")
+@TurboNavGraphDestination(uri = "hotwire://fragment/web")
 class WebFragment : TurboWebFragment()
 ```
 
@@ -56,7 +56,7 @@ In its simplest form, your native Fragment will look like:
 
 **`ImageViewerFragment.kt`:**
 ```kotlin
-@TurboNavGraphDestination(uri = "turbo://fragment/image_viewer")
+@TurboNavGraphDestination(uri = "hotwire://fragment/image_viewer")
 class ImageViewerFragment : TurboFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_image_viewer, container, false)
@@ -87,7 +87,7 @@ In its simplest form, your web bottom sheet Fragment will look like:
 
 **`WebBottomSheetFragment.kt`:**
 ```kotlin
-@TurboNavGraphDestination(uri = "turbo://fragment/web/modal/sheet")
+@TurboNavGraphDestination(uri = "hotwire://fragment/web/modal/sheet")
 class WebBottomSheetFragment : TurboWebBottomSheetDialogFragment()
 ```
 The library automatically inflates a default `R.layout.turbo_fragment_web_bottom_sheet` layout to host a `TurboView`. If you'd like to create your own custom layout for your web bottom sheet Fragment, you can override the `onCreateView()` function and inflate your own layout.

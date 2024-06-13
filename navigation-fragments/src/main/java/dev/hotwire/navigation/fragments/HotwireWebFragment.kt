@@ -14,7 +14,7 @@ import dev.hotwire.core.turbo.views.TurboWebChromeClient
 import dev.hotwire.core.turbo.views.TurboWebView
 import dev.hotwire.navigation.R
 import dev.hotwire.navigation.config.HotwireNavigation
-import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.views.TurboView
 
@@ -24,7 +24,7 @@ import dev.hotwire.navigation.views.TurboView
  *
  * For native fragments, refer to [HotwireFragment].
  */
-@HotwireDestination(uri = "turbo://fragment/web")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/web")
 open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     private lateinit var webDelegate: HotwireWebFragmentDelegate
 

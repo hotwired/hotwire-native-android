@@ -15,8 +15,8 @@ import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.navigation.config.HotwireNavigation
-import dev.hotwire.navigation.destinations.HotwireNavDestination
-import dev.hotwire.navigation.destinations.HotwireNavDialogDestination
+import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDialogDestination
 import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.routing.Router
 import dev.hotwire.navigation.util.location
@@ -28,10 +28,10 @@ class Navigator(
     private val navController = host.navController
 
     /**
-     * Retrieves the currently active [HotwireNavDestination] on the backstack.
+     * Retrieves the currently active [HotwireDestination] on the backstack.
      */
-    val currentDestination: HotwireNavDestination
-        get() = host.childFragmentManager.primaryNavigationFragment as HotwireNavDestination?
+    val currentDestination: HotwireDestination
+        get() = host.childFragmentManager.primaryNavigationFragment as HotwireDestination?
             ?: throw IllegalStateException("No current destination found in NavigatorHost")
 
     /**
@@ -74,7 +74,7 @@ class Navigator(
     fun pop() {
         navigateWhenReady {
             val currentFragment = currentDestination.fragment
-            if (currentFragment is HotwireNavDialogDestination) {
+            if (currentFragment is HotwireDialogDestination) {
                 currentFragment.closeDialog()
             } else {
                 navController.popBackStack()
@@ -150,7 +150,7 @@ class Navigator(
 
         navigateWhenReady {
             val currentFragment = currentDestination.fragment
-            if (currentFragment is HotwireNavDialogDestination) {
+            if (currentFragment is HotwireDialogDestination) {
                 currentFragment.closeDialog()
             }
 
@@ -251,7 +251,7 @@ class Navigator(
         )
 
         navigateWhenReady {
-            val isDialog = currentDestination.fragment is HotwireNavDialogDestination
+            val isDialog = currentDestination.fragment is HotwireDialogDestination
             if (isDialog) {
                 // Pop the backstack before sending the modal result, since the
                 // underlying fragment is still active and will receive the
