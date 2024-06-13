@@ -25,7 +25,7 @@ import dev.hotwire.core.turbo.offline.*
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 import dev.hotwire.core.turbo.util.runOnUiThread
 import dev.hotwire.core.turbo.util.toJson
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
@@ -37,13 +37,13 @@ import java.util.Date
  *
  * @property sessionName An arbitrary name to be used as an identifier for a given session.
  * @property activity The activity to which the session will be bound to.
- * @property webView An instance of a [TurboWebView] to be shared/managed.
+ * @property webView An instance of a [HotwireWebView] to be shared/managed.
  */
 @Suppress("unused")
 class Session(
     internal val sessionName: String,
     private val activity: AppCompatActivity,
-    val webView: TurboWebView
+    val webView: HotwireWebView
 ) {
     internal var coldBootVisitIdentifier = ""
     internal var previousOverrideUrlTime = 0L

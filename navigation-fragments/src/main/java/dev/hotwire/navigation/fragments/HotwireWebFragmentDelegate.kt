@@ -13,7 +13,7 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.session.SessionCallback
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitDestination
@@ -53,7 +53,7 @@ internal class HotwireWebFragmentDelegate(
     /**
      * Get the session's WebView instance
      */
-    val webView: TurboWebView
+    val webView: HotwireWebView
         get() = session.webView
 
     /**

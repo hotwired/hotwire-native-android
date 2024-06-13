@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.views
+package dev.hotwire.core.turbo.webview
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -26,7 +26,7 @@ import dev.hotwire.core.turbo.visit.VisitOptions
  * and available from the Turbo session.
  */
 @SuppressLint("SetJavaScriptEnabled")
-open class TurboWebView @JvmOverloads constructor(
+open class HotwireWebView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : WebView(context, attrs) {

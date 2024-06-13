@@ -7,7 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.session.Session
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +26,7 @@ import java.io.File
 @Config(sdk = [Build.VERSION_CODES.R])
 class FileChooserDelegateTest : BaseRepositoryTest() {
     @Mock
-    private lateinit var webView: TurboWebView
+    private lateinit var webView: HotwireWebView
     private lateinit var activity: AppCompatActivity
     private lateinit var context: Context
     private lateinit var session: Session

@@ -8,7 +8,7 @@ import dev.hotwire.core.bridge.StradaJsonConverter
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.webview.HotwireWebView
 
 class HotwireConfig internal constructor() {
     /**
@@ -57,11 +57,11 @@ class HotwireConfig internal constructor() {
 
     /**
      * Called whenever a new WebView instance needs to be (re)created. Provide
-     * your own implementation and subclass [TurboWebView] if you need
+     * your own implementation and subclass [HotwireWebView] if you need
      * custom behaviors.
      */
-    var makeCustomWebView: (context: Context) -> TurboWebView = { context ->
-        TurboWebView(context, null)
+    var makeCustomWebView: (context: Context) -> HotwireWebView = { context ->
+        HotwireWebView(context, null)
     }
 
     /**

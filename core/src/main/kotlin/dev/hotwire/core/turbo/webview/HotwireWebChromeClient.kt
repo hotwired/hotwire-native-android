@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.views
+package dev.hotwire.core.turbo.webview
 
 import android.net.Uri
 import android.os.Message
@@ -12,7 +12,7 @@ import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.visit.VisitOptions
 
-open class TurboWebChromeClient(val session: Session) : WebChromeClient() {
+open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
     override fun onJsAlert(view: WebView?, url: String?, message: String?, result: JsResult?): Boolean {
         val context = view?.context ?: return false
 

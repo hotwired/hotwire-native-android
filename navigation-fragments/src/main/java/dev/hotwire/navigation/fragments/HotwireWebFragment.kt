@@ -10,8 +10,8 @@ import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
-import dev.hotwire.core.turbo.views.TurboWebChromeClient
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.navigation.R
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
@@ -112,11 +112,11 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
         bridgeDelegate.onColdBootPageCompleted()
     }
 
-    override fun onWebViewAttached(webView: TurboWebView) {
+    override fun onWebViewAttached(webView: HotwireWebView) {
         bridgeDelegate.onWebViewAttached(webView)
     }
 
-    override fun onWebViewDetached(webView: TurboWebView) {
+    override fun onWebViewDetached(webView: HotwireWebView) {
         bridgeDelegate.onWebViewDetached()
     }
 
@@ -141,8 +141,8 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
         return layoutInflater.inflate(R.layout.turbo_error, null)
     }
 
-    override fun createWebChromeClient(): TurboWebChromeClient {
-        return TurboWebChromeClient(navigator.session)
+    override fun createWebChromeClient(): HotwireWebChromeClient {
+        return HotwireWebChromeClient(navigator.session)
     }
 
     override fun onVisitErrorReceived(location: String, error: VisitError) {

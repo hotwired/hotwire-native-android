@@ -4,8 +4,8 @@ import android.view.View
 import android.webkit.HttpAuthHandler
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.navigation.views.TurboView
-import dev.hotwire.core.turbo.views.TurboWebChromeClient
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
+import dev.hotwire.core.turbo.webview.HotwireWebView
 
 /**
  * Callback interface to be implemented by a [HotwireWebFragment],
@@ -30,17 +30,17 @@ interface HotwireWebFragmentCallback {
     /**
      * Create and return a new web chrome client instance.
      */
-    fun createWebChromeClient(): TurboWebChromeClient
+    fun createWebChromeClient(): HotwireWebChromeClient
 
     /**
      * Called when the WebView has been attached to the current destination.
      */
-    fun onWebViewAttached(webView: TurboWebView) {}
+    fun onWebViewAttached(webView: HotwireWebView) {}
 
     /**
      * Called when the WebView has been detached from the current destination.
      */
-    fun onWebViewDetached(webView: TurboWebView) {}
+    fun onWebViewDetached(webView: HotwireWebView) {}
 
     /**
      * Called when Turbo begins a WebView cold boot (fresh resources).
