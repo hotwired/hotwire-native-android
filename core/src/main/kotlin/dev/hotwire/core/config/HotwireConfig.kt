@@ -6,9 +6,9 @@ import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.StradaJsonConverter
 import dev.hotwire.core.turbo.config.PathConfiguration
-import dev.hotwire.core.turbo.http.TurboHttpClient
-import dev.hotwire.core.turbo.http.TurboOfflineRequestHandler
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.http.HotwireHttpClient
+import dev.hotwire.core.turbo.offline.OfflineRequestHandler
+import dev.hotwire.core.turbo.webview.HotwireWebView
 
 class HotwireConfig internal constructor() {
     /**
@@ -29,7 +29,7 @@ class HotwireConfig internal constructor() {
     /**
      * Experimental: API may be removed, not ready for production use.
      */
-    var offlineRequestHandler: TurboOfflineRequestHandler? = null
+    var offlineRequestHandler: OfflineRequestHandler? = null
 
     /**
      * Enables/disables debug logging. This should be disabled in production environments.
@@ -40,7 +40,7 @@ class HotwireConfig internal constructor() {
     var debugLoggingEnabled = false
         set(value) {
             field = value
-            TurboHttpClient.reset()
+            HotwireHttpClient.reset()
         }
 
     /**
@@ -57,11 +57,11 @@ class HotwireConfig internal constructor() {
 
     /**
      * Called whenever a new WebView instance needs to be (re)created. Provide
-     * your own implementation and subclass [TurboWebView] if you need
+     * your own implementation and subclass [HotwireWebView] if you need
      * custom behaviors.
      */
-    var makeCustomWebView: (context: Context) -> TurboWebView = { context ->
-        TurboWebView(context, null)
+    var makeCustomWebView: (context: Context) -> HotwireWebView = { context ->
+        HotwireWebView(context, null)
     }
 
     /**

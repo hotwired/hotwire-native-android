@@ -8,7 +8,7 @@ import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.turbo.errors.HttpError.ServerError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.util.toJson
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
@@ -29,7 +29,7 @@ class SessionTest {
     @Mock
     private lateinit var callback: SessionCallback
     @Mock
-    private lateinit var webView: TurboWebView
+    private lateinit var webView: HotwireWebView
     @Mock
     private lateinit var activity: AppCompatActivity
     private lateinit var session: Session

@@ -13,7 +13,7 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.session.SessionCallback
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitDestination
@@ -21,7 +21,7 @@ import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.util.dispatcherProvider
-import dev.hotwire.navigation.views.TurboView
+import dev.hotwire.navigation.views.HotwireView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -47,13 +47,13 @@ internal class HotwireWebFragmentDelegate(
     private var currentlyZoomed = false
     private val navigator = navDestination.navigator
     private val session get() = navigator.session
-    private val turboView get() = callback.turboView
+    private val turboView get() = callback.hotwireView
     private val viewTreeLifecycleOwner get() = turboView?.findViewTreeLifecycleOwner()
 
     /**
      * Get the session's WebView instance
      */
-    val webView: TurboWebView
+    val webView: HotwireWebView
         get() = session.webView
 
     /**
@@ -397,8 +397,8 @@ internal class HotwireWebFragmentDelegate(
         turboView?.addProgressView(callback.createProgressView(location))
     }
 
-    private fun initializePullToRefresh(turboView: TurboView) {
-        turboView.webViewRefresh?.apply {
+    private fun initializePullToRefresh(hotwireView: HotwireView) {
+        hotwireView.webViewRefresh?.apply {
             isEnabled = navDestination.pathProperties.pullToRefreshEnabled
             setOnRefreshListener {
                 refresh(displayProgress = true)
@@ -406,8 +406,8 @@ internal class HotwireWebFragmentDelegate(
         }
     }
 
-    private fun initializeErrorPullToRefresh(turboView: TurboView) {
-        turboView.errorRefresh?.apply {
+    private fun initializeErrorPullToRefresh(hotwireView: HotwireView) {
+        hotwireView.errorRefresh?.apply {
             setOnRefreshListener {
                 refresh(displayProgress = true)
             }
@@ -418,11 +418,11 @@ internal class HotwireWebFragmentDelegate(
         turboView?.webViewRefresh?.isEnabled = enabled
     }
 
-    private fun showScreenshotIfAvailable(turboView: TurboView) {
-        if (screenshotOrientation == turboView.screenshotOrientation() &&
+    private fun showScreenshotIfAvailable(hotwireView: HotwireView) {
+        if (screenshotOrientation == hotwireView.screenshotOrientation() &&
             screenshotZoomed == currentlyZoomed
         ) {
-            screenshot?.let { turboView.addScreenshot(it) }
+            screenshot?.let { hotwireView.addScreenshot(it) }
         }
     }
 

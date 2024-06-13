@@ -7,7 +7,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
-import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
+import dev.hotwire.core.turbo.nav.PresentationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -44,11 +44,11 @@ class PathConfigurationTest : BaseRepositoryTest() {
     @Test
     fun presentationContext() {
         assertThat(pathConfiguration.properties("$url/home").context).isEqualTo(
-            TurboNavPresentationContext.DEFAULT)
+            PresentationContext.DEFAULT)
         assertThat(pathConfiguration.properties("$url/new").context).isEqualTo(
-            TurboNavPresentationContext.MODAL)
+            PresentationContext.MODAL)
         assertThat(pathConfiguration.properties("$url/edit").context).isEqualTo(
-            TurboNavPresentationContext.MODAL)
+            PresentationContext.MODAL)
     }
 
     @Test

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dev.hotwire.navigation.views.HotwireView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/hotwire_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <dev.hotwire.navigation.views.HotwireSwipeRefreshLayout
+        android:id="@+id/hotwire_webView_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <!-- WebView get attached/detached here -->
+
+    </dev.hotwire.navigation.views.HotwireSwipeRefreshLayout>
+
+    <FrameLayout
+        android:id="@+id/hotwire_progress_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <!-- Custom progress view added/removed here -->
+
+    </FrameLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/hotwire_screenshot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="matrix"
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/hotwire_error_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:fillViewport="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <ScrollView
+            android:id="@+id/hotwire_error_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <!-- Custom error view added/removed here -->
+
+        </ScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</dev.hotwire.navigation.views.HotwireView>

@@ -5,9 +5,9 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import com.google.gson.annotations.SerializedName
-import dev.hotwire.core.turbo.nav.TurboNavPresentation
-import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
-import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
+import dev.hotwire.core.turbo.nav.Presentation
+import dev.hotwire.core.turbo.nav.PresentationContext
+import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import java.net.URL
 
 /**
@@ -107,28 +107,28 @@ class PathConfiguration {
 typealias PathConfigurationProperties = HashMap<String, String>
 typealias PathConfigurationSettings = HashMap<String, String>
 
-val PathConfigurationProperties.presentation: TurboNavPresentation
+val PathConfigurationProperties.presentation: Presentation
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("presentation") ?: "default"
-        TurboNavPresentation.valueOf(value.uppercase())
+        Presentation.valueOf(value.uppercase())
     } catch (e: IllegalArgumentException) {
-        TurboNavPresentation.DEFAULT
+        Presentation.DEFAULT
     }
 
-val PathConfigurationProperties.queryStringPresentation: TurboNavQueryStringPresentation
+val PathConfigurationProperties.queryStringPresentation: QueryStringPresentation
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("query_string_presentation") ?: "default"
-        TurboNavQueryStringPresentation.valueOf(value.uppercase())
+        QueryStringPresentation.valueOf(value.uppercase())
     } catch (e: IllegalArgumentException) {
-        TurboNavQueryStringPresentation.DEFAULT
+        QueryStringPresentation.DEFAULT
     }
 
-val PathConfigurationProperties.context: TurboNavPresentationContext
+val PathConfigurationProperties.context: PresentationContext
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("context") ?: "default"
-        TurboNavPresentationContext.valueOf(value.uppercase())
+        PresentationContext.valueOf(value.uppercase())
     } catch (e: IllegalArgumentException) {
-        TurboNavPresentationContext.DEFAULT
+        PresentationContext.DEFAULT
     }
 
 val PathConfigurationProperties.uri: Uri?

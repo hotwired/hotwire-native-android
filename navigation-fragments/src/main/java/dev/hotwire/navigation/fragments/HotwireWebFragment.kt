@@ -9,14 +9,14 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.util.TURBO_REQUEST_CODE_FILES
-import dev.hotwire.core.turbo.views.TurboWebChromeClient
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
+import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.navigation.R
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.session.SessionModalResult
-import dev.hotwire.navigation.views.TurboView
+import dev.hotwire.navigation.views.HotwireView
 
 /**
  * The base class from which all web "standard" fragments (non-dialogs) in a
@@ -42,7 +42,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.turbo_fragment_web, container, false)
+        return inflater.inflate(R.layout.hotwire_fragment_web, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -95,7 +95,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
 
     override fun activityResultLauncher(requestCode: Int): ActivityResultLauncher<Intent>? {
         return when (requestCode) {
-            TURBO_REQUEST_CODE_FILES -> webDelegate.fileChooserResultLauncher
+            HOTWIRE_REQUEST_CODE_FILES -> webDelegate.fileChooserResultLauncher
             else -> null
         }
     }
@@ -112,11 +112,11 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
         bridgeDelegate.onColdBootPageCompleted()
     }
 
-    override fun onWebViewAttached(webView: TurboWebView) {
+    override fun onWebViewAttached(webView: HotwireWebView) {
         bridgeDelegate.onWebViewAttached(webView)
     }
 
-    override fun onWebViewDetached(webView: TurboWebView) {
+    override fun onWebViewDetached(webView: HotwireWebView) {
         bridgeDelegate.onWebViewDetached()
     }
 
@@ -125,24 +125,24 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     // ----------------------------------------------------------------------------
 
     /**
-     * Gets the TurboView instance in the Fragment's view
+     * Gets the HotwireView instance in the Fragment's view
      * with resource ID R.id.turbo_view.
      */
-    final override val turboView: TurboView?
-        get() = view?.findViewById(R.id.turbo_view)
+    final override val hotwireView: HotwireView?
+        get() = view?.findViewById(R.id.hotwire_view)
 
     @SuppressLint("InflateParams")
     override fun createProgressView(location: String): View {
-        return layoutInflater.inflate(R.layout.turbo_progress, null)
+        return layoutInflater.inflate(R.layout.hotwire_progress, null)
     }
 
     @SuppressLint("InflateParams")
     override fun createErrorView(error: VisitError): View {
-        return layoutInflater.inflate(R.layout.turbo_error, null)
+        return layoutInflater.inflate(R.layout.hotwire_error, null)
     }
 
-    override fun createWebChromeClient(): TurboWebChromeClient {
-        return TurboWebChromeClient(navigator.session)
+    override fun createWebChromeClient(): HotwireWebChromeClient {
+        return HotwireWebChromeClient(navigator.session)
     }
 
     override fun onVisitErrorReceived(location: String, error: VisitError) {

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dev.hotwire.navigation.views.HotwireView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/hotwire_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/hotwire_webView_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:minHeight="400dp">
+
+        <!-- WebView get attached/detached here -->
+
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/hotwire_progress_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:minHeight="400dp"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Custom progress view added/removed here -->
+
+    </FrameLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/hotwire_screenshot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="matrix"
+        tools:ignore="ContentDescription" />
+
+    <FrameLayout
+        android:id="@+id/hotwire_error_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:minHeight="400dp"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Custom error view added/removed here -->
+
+    </FrameLayout>
+
+</dev.hotwire.navigation.views.HotwireView>

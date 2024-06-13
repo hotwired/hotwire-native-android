@@ -15,9 +15,9 @@ import dev.hotwire.core.turbo.config.fallbackUri
 import dev.hotwire.core.turbo.config.presentation
 import dev.hotwire.core.turbo.config.queryStringPresentation
 import dev.hotwire.core.turbo.config.uri
-import dev.hotwire.core.turbo.nav.TurboNavPresentation
-import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
-import dev.hotwire.core.turbo.nav.TurboNavQueryStringPresentation
+import dev.hotwire.core.turbo.nav.Presentation
+import dev.hotwire.core.turbo.nav.PresentationContext
+import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.navigation.config.HotwireNavigation
@@ -65,12 +65,12 @@ internal class NavigatorRule(
         verifyNavRules()
     }
 
-    private fun newPresentation(): TurboNavPresentation {
+    private fun newPresentation(): Presentation {
         // Check if we should use the custom presentation provided in the path configuration
-        if (newProperties.presentation != TurboNavPresentation.DEFAULT) {
-            return if (isAtStartDestination && newProperties.presentation == TurboNavPresentation.POP) {
+        if (newProperties.presentation != Presentation.DEFAULT) {
+            return if (isAtStartDestination && newProperties.presentation == Presentation.POP) {
                 // You cannot pop from the start destination, prevent visit
-                TurboNavPresentation.NONE
+                Presentation.NONE
             } else {
                 // Use the custom presentation
                 newProperties.presentation
@@ -82,16 +82,16 @@ internal class NavigatorRule(
         val replace = newVisitOptions.action == VisitAction.REPLACE
 
         return when {
-            locationIsCurrent && isAtStartDestination -> TurboNavPresentation.REPLACE_ROOT
-            locationIsPrevious -> TurboNavPresentation.POP
-            locationIsCurrent || replace -> TurboNavPresentation.REPLACE
-            else -> TurboNavPresentation.PUSH
+            locationIsCurrent && isAtStartDestination -> Presentation.REPLACE_ROOT
+            locationIsPrevious -> Presentation.POP
+            locationIsCurrent || replace -> Presentation.REPLACE
+            else -> Presentation.PUSH
         }
     }
 
     private fun newNavOptions(navOptions: NavOptions): NavOptions {
         // Use separate NavOptions if we need to pop up to the new root destination
-        if (newPresentation == TurboNavPresentation.REPLACE_ROOT && newDestination != null) {
+        if (newPresentation == Presentation.REPLACE_ROOT && newDestination != null) {
             return navOptions {
                 popUpTo(controller.graph.id) { inclusive = true }
                 anim {
@@ -107,16 +107,16 @@ internal class NavigatorRule(
     }
 
     private fun newNavigationMode(): NavigatorMode {
-        val presentationNone = newPresentation == TurboNavPresentation.NONE
-        val presentationRefresh = newPresentation == TurboNavPresentation.REFRESH
+        val presentationNone = newPresentation == Presentation.NONE
+        val presentationRefresh = newPresentation == Presentation.REFRESH
 
-        val dismissModalContext = currentPresentationContext == TurboNavPresentationContext.MODAL &&
-                newPresentationContext == TurboNavPresentationContext.DEFAULT &&
-                newPresentation != TurboNavPresentation.REPLACE_ROOT
+        val dismissModalContext = currentPresentationContext == PresentationContext.MODAL &&
+                newPresentationContext == PresentationContext.DEFAULT &&
+                newPresentation != Presentation.REPLACE_ROOT
 
-        val navigateToModalContext = currentPresentationContext == TurboNavPresentationContext.DEFAULT &&
-                newPresentationContext == TurboNavPresentationContext.MODAL &&
-                newPresentation != TurboNavPresentation.REPLACE_ROOT
+        val navigateToModalContext = currentPresentationContext == PresentationContext.DEFAULT &&
+                newPresentationContext == PresentationContext.MODAL &&
+                newPresentation != Presentation.REPLACE_ROOT
 
         return when {
             dismissModalContext -> NavigatorMode.DISMISS_MODAL
@@ -136,13 +136,13 @@ internal class NavigatorRule(
             location = newLocation,
             options = newVisitOptions,
             bundle = newBundle,
-            shouldNavigate = newProperties.presentation != TurboNavPresentation.NONE
+            shouldNavigate = newProperties.presentation != Presentation.NONE
         )
     }
 
     private fun verifyNavRules() {
-        if (newPresentationContext == TurboNavPresentationContext.MODAL &&
-            newPresentation == TurboNavPresentation.REPLACE_ROOT
+        if (newPresentationContext == PresentationContext.MODAL &&
+            newPresentation == Presentation.REPLACE_ROOT
         ) {
             throw NavigatorException("A `modal` destination cannot use presentation `REPLACE_ROOT`")
         }
@@ -170,10 +170,10 @@ internal class NavigatorRule(
         val secondUri = Uri.parse(second)
 
         return when (newQueryStringPresentation) {
-            TurboNavQueryStringPresentation.REPLACE -> {
+            QueryStringPresentation.REPLACE -> {
                 firstUri.path == secondUri.path
             }
-            TurboNavQueryStringPresentation.DEFAULT -> {
+            QueryStringPresentation.DEFAULT -> {
                 firstUri.path == secondUri.path && firstUri.query == secondUri.query
             }
         }

@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.turbo.BaseRepositoryTest
-import dev.hotwire.core.turbo.http.TurboHttpClient
+import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +27,7 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
     override fun setup() {
         super.setup()
         context = ApplicationProvider.getApplicationContext()
-        TurboHttpClient.instance = client()
+        HotwireHttpClient.instance = client()
     }
 
     @Test

@@ -11,7 +11,7 @@ import dev.hotwire.core.bridge.BridgeDestination
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
-import dev.hotwire.core.turbo.nav.TurboNavPresentationContext
+import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.navigation.R
 import dev.hotwire.navigation.activities.HotwireActivity
@@ -67,7 +67,7 @@ interface HotwireDestination : BridgeDestination {
      * Specifies whether the destination was presented in a modal context.
      */
     val isModal: Boolean
-        get() = pathProperties.context == TurboNavPresentationContext.MODAL
+        get() = pathProperties.context == PresentationContext.MODAL
 
     /**
      * Gets the delegate instance that handles the Fragment's lifecycle events.
@@ -134,7 +134,7 @@ interface HotwireDestination : BridgeDestination {
         newPathProperties: PathConfigurationProperties,
         action: VisitAction
     ): NavOptions {
-        val modal = newPathProperties.context == TurboNavPresentationContext.MODAL
+        val modal = newPathProperties.context == PresentationContext.MODAL
         val replace = action == VisitAction.REPLACE
 
         return if (modal) {
