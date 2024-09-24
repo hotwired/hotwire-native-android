@@ -8,7 +8,7 @@ object Urls {
     private const val localDevUrl = "http://192.168.1.1:45678"
 
     // Remote demo server
-    private const val remoteUrl = "https://turbo-native-demo.glitch.me"
+    private const val remoteUrl = "https://hotwire-native-demo.dev"
 
     // Base app url
     private val appUrl = if (useLocalDev) localDevUrl else remoteUrl
