@@ -5,13 +5,13 @@ import dev.hotwire.core.logging.logError
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-abstract class StradaJsonConverter {
+abstract class BridgeComponentJsonConverter {
     companion object {
         const val NO_CONVERTER =
-            "A Strada.config.jsonConverter must be set to encode or decode json"
+            "A Hotwire.config.jsonConverter must be set to encode or decode json"
 
         const val INVALID_CONVERTER =
-            "The configured json converter must implement a StradaJsonTypeConverter " +
+            "The configured json converter must implement a BridgeComponentJsonTypeConverter " +
                 "or use the provided KotlinXJsonConverter."
 
         inline fun <reified T> toObject(jsonData: String): T? {
@@ -19,7 +19,7 @@ abstract class StradaJsonConverter {
 
             return when (converter) {
                 is KotlinXJsonConverter -> converter.toObject<T>(jsonData)
-                is StradaJsonTypeConverter -> converter.toObject(jsonData, T::class.java)
+                is BridgeComponentJsonTypeConverter -> converter.toObject(jsonData, T::class.java)
                 else -> throw IllegalStateException(INVALID_CONVERTER)
             }
         }
@@ -29,19 +29,19 @@ abstract class StradaJsonConverter {
 
             return when (converter) {
                 is KotlinXJsonConverter -> converter.toJson(data)
-                is StradaJsonTypeConverter -> converter.toJson(data, T::class.java)
+                is BridgeComponentJsonTypeConverter -> converter.toJson(data, T::class.java)
                 else -> throw IllegalStateException(INVALID_CONVERTER)
             }
         }
     }
 }
 
-abstract class StradaJsonTypeConverter : StradaJsonConverter() {
+abstract class BridgeComponentJsonTypeConverter : BridgeComponentJsonConverter() {
     abstract fun <T> toObject(jsonData: String, type: Class<T>): T?
     abstract fun <T> toJson(data: T, type: Class<T>): String
 }
 
-class KotlinXJsonConverter : StradaJsonConverter() {
+class KotlinXJsonConverter : BridgeComponentJsonConverter() {
     val json = Json { ignoreUnknownKeys = true }
 
     inline fun <reified T> toObject(jsonData: String): T? {

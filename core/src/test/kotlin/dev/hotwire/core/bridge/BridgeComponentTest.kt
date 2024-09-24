@@ -110,7 +110,7 @@ class BridgeComponentTest {
 
         assertThatThrownBy { component.replyTo("connect", MessageData(title = "Page-title")) }
             .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessage(StradaJsonConverter.NO_CONVERTER)
+            .hasMessage(BridgeComponentJsonConverter.NO_CONVERTER)
     }
 
     @Test

@@ -4,7 +4,7 @@ import android.content.Context
 import android.webkit.WebView
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
-import dev.hotwire.core.bridge.StradaJsonConverter
+import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
@@ -24,7 +24,7 @@ class HotwireConfig internal constructor() {
      * object in received messages and to encode a data object back to json to
      * reply with a custom message back to the web.
      */
-    var jsonConverter: StradaJsonConverter? = null
+    var jsonConverter: BridgeComponentJsonConverter? = null
 
     /**
      * Experimental: API may be removed, not ready for production use.

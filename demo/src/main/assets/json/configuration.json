@@ -25,7 +25,7 @@
     {
       "patterns": [
         "/signin$",
-        "/strada-form$"
+        "/bridge-form$"
       ],
       "properties": {
         "context": "modal",
