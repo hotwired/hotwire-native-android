@@ -30,7 +30,7 @@
                 android:contentDescription="@string/app_name"
                 android:padding="12dp"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_turbo_logo" />
+                app:srcCompat="@drawable/ic_logo" />
 
         </FrameLayout>
 
