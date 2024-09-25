@@ -6,7 +6,7 @@ plugins {
 }
 
 val libVersionName by extra(version as String)
-val libraryName by extra("Hotwire Native for Android")
+val libraryName by extra("Hotwire Native for Android - Core")
 val libraryDescription by extra("Android framework for making Hotwire Native apps")
 
 val publishedGroupId by extra("dev.hotwire")

@@ -1,7 +1,24 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("maven-publish")
 }
+
+val libVersionName by extra(version as String)
+val libraryName by extra("Hotwire Native for Android - Fragment Navigation")
+val libraryDescription by extra("Android framework for making Hotwire Native apps")
+
+val publishedGroupId by extra("dev.hotwire")
+val publishedArtifactId by extra("navigation-fragments")
+
+val siteUrl by extra("https://github.com/hotwired/hotwire-native-android")
+val gitUrl by extra("https://github.com/hotwired/hotwire-native-android.git")
+
+val licenseType by extra("MIT License")
+val licenseUrl by extra("https://github.com/hotwired/hotwire-native-android/blob/main/LICENSE")
+
+val developerId by extra("basecamp")
+val developerEmail by extra("androidteam@basecamp.com")
 
 android {
     namespace = "dev.hotwire.navigation"
@@ -46,6 +63,12 @@ android {
         named("test")  { java { srcDirs("src/test/kotlin") } }
         named("debug") { java { srcDirs("src/debug/kotlin") } }
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
@@ -81,4 +104,55 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 }
 
-// TODO add publishing support
+// Publish to GitHub Packages via:
+//   ./gradlew -Pversion=<version> clean build publish
+//   https://github.com/orgs/hotwired/packages?repo_name=hotwire-native-android
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = publishedGroupId
+            artifactId = publishedArtifactId
+            version = libVersionName
+
+            pom {
+                name.set(libraryName)
+                description.set(libraryDescription)
+                url.set(siteUrl)
+
+                licenses {
+                    license {
+                        name.set(licenseType)
+                        url.set(licenseUrl)
+                    }
+                }
+                developers {
+                    developer {
+                        id.set(developerId)
+                        name.set(developerId)
+                        email.set(developerEmail)
+                    }
+                }
+                scm {
+                    url.set(gitUrl)
+                }
+            }
+
+            // Applies the component for the release build variant
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/hotwired/hotwire-native-android")
+
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
