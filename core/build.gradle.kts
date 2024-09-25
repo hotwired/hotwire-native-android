@@ -24,11 +24,6 @@ val developerEmail by extra("androidteam@basecamp.com")
 
 val isSonatypeRelease by extra(project.hasProperty("sonatype"))
 
-repositories {
-    google()
-    mavenCentral()
-}
-
 android {
     namespace = "dev.hotwire.core"
     compileSdk = 34
