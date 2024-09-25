@@ -21,6 +21,8 @@ val licenseUrl by extra("https://github.com/hotwired/hotwire-native-android/blob
 val developerId by extra("basecamp")
 val developerEmail by extra("androidteam@basecamp.com")
 
+val isSonatypeRelease by extra(project.hasProperty("sonatype"))
+
 android {
     namespace = "dev.hotwire.core"
     compileSdk = 34
@@ -112,9 +114,33 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 }
 
+tasks {
+    // Only sign Sonatype release artifacts
+    withType<Sign>().configureEach {
+        onlyIf { isSonatypeRelease }
+    }
+}
+
+// Sign Sonatype published release artifacts
+if (isSonatypeRelease) {
+    signing {
+        val keyId = System.getenv("GPG_KEY_ID")
+        val secretKey = System.getenv("GPG_SECRET_KEY")
+        val password = System.getenv("GPG_PASSWORD")
+
+        useInMemoryPgpKeys(keyId, secretKey, password)
+
+        setRequired({ gradle.taskGraph.hasTask("publish") })
+        sign(publishing.publications)
+    }
+}
+
 // Publish to GitHub Packages via:
 //   ./gradlew -Pversion=<version> clean build publish
 //   https://github.com/orgs/hotwired/packages?repo_name=hotwire-native-android
+// Publish to Maven Central via:
+//   ./gradlew -Psonatype -Pversion=<version> clean build publish
+//   https://search.maven.org/artifact/dev.hotwire/core
 publishing {
     publications {
         register<MavenPublication>("release") {
@@ -152,13 +178,24 @@ publishing {
         }
     }
     repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/hotwired/hotwire-native-android")
+        if (isSonatypeRelease) {
+            maven {
+                url = uri("https://s01.oss.sonatype.org/content/repositories/releases/")
 
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                credentials {
+                    username = System.getenv("SONATYPE_USER")
+                    password = System.getenv("SONATYPE_PASSWORD")
+                }
+            }
+        } else {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/hotwired/hotwire-native-android")
+
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
             }
         }
     }
