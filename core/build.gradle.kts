@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("maven-publish")
+    id("signing")
 }
 
 val libVersionName by extra(version as String)
