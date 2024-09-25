@@ -7,9 +7,9 @@ import dev.hotwire.core.logging.logEvent
 import kotlinx.serialization.json.JsonElement
 import java.lang.ref.WeakReference
 
-// These need to match whatever is set in strada.js
+// These need to match whatever is set in bridge_components.js
 private const val bridgeGlobal = "window.nativeBridge"
-private const val bridgeJavascriptInterface = "StradaNative"
+private const val bridgeJavascriptInterface = "BridgeComponentsNative"
 
 @Suppress("unused")
 class Bridge internal constructor(webView: WebView) {

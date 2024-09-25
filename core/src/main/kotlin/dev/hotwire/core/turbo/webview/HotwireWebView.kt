@@ -74,7 +74,7 @@ open class HotwireWebView @JvmOverloads constructor(
 
     internal fun installBridge(onBridgeInstalled: () -> Unit) {
         val script = "window.turboNative == null"
-        val bridge = context.contentFromAsset("js/turbo_bridge.js")
+        val bridge = context.contentFromAsset("js/turbo.js")
 
         runJavascript(script) { s ->
             if (s?.toBoolean() == true) {

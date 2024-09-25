@@ -32,7 +32,7 @@
     registerAdapter() {
       this.adapterIsRegistered = true
 
-      if (this.isStradaAvailable) {
+      if (this.isBridgeAvailable) {
         this.webBridge.setAdapter(this)
       } else {
         document.addEventListener("web-bridge:ready", () => this.webBridge.setAdapter(this))
@@ -42,7 +42,7 @@
     notifyBridgeOfSupportedComponentsUpdate() {
       this.supportedComponentsUpdated()
 
-      if (this.isStradaAvailable) {
+      if (this.isBridgeAvailable) {
         this.webBridge.adapterDidUpdateSupportedComponents()
       }
     }
@@ -53,7 +53,7 @@
 
     // Reply to web with message
     replyWith(message) {
-      if (this.isStradaAvailable) {
+      if (this.isBridgeAvailable) {
         this.webBridge.receive(JSON.parse(message))
       }
     }
@@ -70,20 +70,20 @@
     // Native handler
 
     ready() {
-      StradaNative.bridgeDidInitialize()
+      BridgeComponentsNative.bridgeDidInitialize()
     }
 
     supportedComponentsUpdated() {
-      StradaNative.bridgeDidUpdateSupportedComponents()
+      BridgeComponentsNative.bridgeDidUpdateSupportedComponents()
     }
 
     postMessage(message) {
-      StradaNative.bridgeDidReceiveMessage(message)
+      BridgeComponentsNative.bridgeDidReceiveMessage(message)
     }
 
     // Web global
 
-    get isStradaAvailable() {
+    get isBridgeAvailable() {
       return window.Strada
     }
 

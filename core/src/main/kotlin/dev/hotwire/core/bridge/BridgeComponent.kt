@@ -116,7 +116,7 @@ abstract class BridgeComponent<in D : BridgeDestination>(
      * reply will be ignored.
      */
     inline fun <reified T> replyTo(event: String, data: T): Boolean {
-        return replyTo(event, jsonData = StradaJsonConverter.toJson(data))
+        return replyTo(event, jsonData = BridgeComponentJsonConverter.toJson(data))
     }
 
     private fun reply(message: Message): Boolean {
