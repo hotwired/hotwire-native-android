@@ -60,7 +60,7 @@ var Hotwire.defaultFragmentDestination: KClass<out Fragment>
 
 /**
  * Register fragment destinations that can be navigated to. Every possible
- * destination must be provided here.
+ * destination must be provided here, including one set via [defaultFragmentDestination].
  */
 fun Hotwire.registerFragmentDestinations(vararg destinations: KClass<out Fragment>) {
     HotwireNavigation.registeredFragmentDestinations = destinations.toList()
