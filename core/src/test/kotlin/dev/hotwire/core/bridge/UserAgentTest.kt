@@ -10,7 +10,7 @@ class UserAgentTest {
         Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
 
         val userAgentSubstring = Hotwire.config.userAgentSubstring()
-        assertEquals(userAgentSubstring, "Turbo Native Android; bridge-components: [one two];")
+        assertEquals(userAgentSubstring, "Hotwire Native Android; bridge-components: [one two];")
     }
 
     @Test
@@ -19,6 +19,6 @@ class UserAgentTest {
         Hotwire.config.userAgent = "Test; ${Hotwire.config.userAgentSubstring()}"
 
         val userAgent = Hotwire.config.userAgent
-        assertEquals(userAgent, "Test; Turbo Native Android; bridge-components: [one two];")
+        assertEquals(userAgent, "Test; Hotwire Native Android; bridge-components: [one two];")
     }
 }
