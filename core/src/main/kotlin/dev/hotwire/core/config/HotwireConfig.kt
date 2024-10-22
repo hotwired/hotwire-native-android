@@ -73,7 +73,7 @@ class HotwireConfig internal constructor() {
      */
     fun userAgentSubstring(): String {
         val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
-        return "Hotwire Native Android; bridge-components: [$components];"
+        return "Hotwire Native Android; Turbo Native Android; bridge-components: [$components];"
     }
 
     /**
