@@ -86,10 +86,14 @@ class HotwireFragmentDelegate(private val navDestination: HotwireDestination) {
     }
 
     /**
-     * Provides a hook when the dialog has been dismissed.
+     * Provides a hook when the dialog has been dismissed. If there is a modal
+     * result, an event will be created in [SessionViewModel] that can be observed.
      */
     fun onDialogDismiss() {
         logEvent("fragment.onDialogDismiss", "location" to location)
+        if (!sessionViewModel.modalResultExists) {
+            sessionViewModel.sendDialogResult()
+        }
     }
 
     // ----------------------------------------------------------------------------
