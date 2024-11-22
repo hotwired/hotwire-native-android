@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import dev.hotwire.core.navigation.fragments.HotwireFragment
-import dev.hotwire.core.turbo.nav.HotwireDestination
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
+import dev.hotwire.navigation.fragments.HotwireFragment
 
-@HotwireDestination(uri = "turbo://fragment/numbers")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/numbers")
 class NumbersFragment : HotwireFragment(), NumbersFragmentCallback {
     private val numbersAdapter = NumbersAdapter(this)
 
@@ -34,6 +34,6 @@ class NumbersFragment : HotwireFragment(), NumbersFragmentCallback {
     }
 
     override fun onItemClicked(number: Int) {
-        navigate("${Urls.numbersUrl}/$number")
+        navigator.route("${Urls.numbersUrl}/$number")
     }
 }

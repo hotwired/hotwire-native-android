@@ -112,7 +112,7 @@ class MessageTest {
 
         assertThatThrownBy { message.replacing(data = data) }
             .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessage(StradaJsonConverter.NO_CONVERTER)
+            .hasMessage(BridgeComponentJsonConverter.NO_CONVERTER)
     }
 
     @Test
@@ -131,7 +131,7 @@ class MessageTest {
 
         assertThatThrownBy { message.replacing(data = data) }
             .isInstanceOf(IllegalStateException::class.java)
-            .hasMessage(StradaJsonConverter.INVALID_CONVERTER)
+            .hasMessage(BridgeComponentJsonConverter.INVALID_CONVERTER)
     }
 
     @Serializable
@@ -139,5 +139,5 @@ class MessageTest {
 
     private class InvalidMessageData()
 
-    private class InvalidJsonConverter : StradaJsonConverter()
+    private class InvalidJsonConverter : BridgeComponentJsonConverter()
 }

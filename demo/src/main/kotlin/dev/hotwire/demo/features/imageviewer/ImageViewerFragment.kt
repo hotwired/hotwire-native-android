@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import coil.load
-import dev.hotwire.core.navigation.fragments.HotwireFragment
-import dev.hotwire.core.turbo.nav.HotwireDestination
-import dev.hotwire.core.turbo.util.displayBackButtonAsCloseIcon
 import dev.hotwire.demo.R
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
+import dev.hotwire.navigation.fragments.HotwireFragment
+import dev.hotwire.navigation.util.displayBackButtonAsCloseIcon
 
-@HotwireDestination(uri = "turbo://fragment/image_viewer")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/image_viewer")
 class ImageViewerFragment : HotwireFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_image_viewer, container, false)

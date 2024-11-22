@@ -11,6 +11,7 @@ import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.bridge.Message
 import dev.hotwire.demo.R
 import dev.hotwire.demo.databinding.FormComponentSubmitBinding
+import dev.hotwire.navigation.destinations.HotwireDestination
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -20,8 +21,8 @@ import kotlinx.serialization.Serializable
  */
 class FormComponent(
     name: String,
-    private val delegate: BridgeDelegate
-) : BridgeComponent(name, delegate) {
+    private val delegate: BridgeDelegate<HotwireDestination>
+) : BridgeComponent<HotwireDestination>(name, delegate) {
 
     private val submitButtonItemId = 37
     private var submitMenuItem: MenuItem? = null

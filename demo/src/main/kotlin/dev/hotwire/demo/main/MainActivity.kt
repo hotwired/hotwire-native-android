@@ -1,27 +1,22 @@
 package dev.hotwire.demo.main
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import dev.hotwire.core.navigation.activities.HotwireActivity
-import dev.hotwire.core.navigation.activities.HotwireActivityDelegate
-import dev.hotwire.core.navigation.session.SessionConfiguration
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
+import dev.hotwire.navigation.activities.HotwireActivity
+import dev.hotwire.navigation.navigator.NavigatorConfiguration
 
-class MainActivity : AppCompatActivity(), HotwireActivity {
-    override val delegate by lazy { HotwireActivityDelegate(this) }
-    override val appCompatActivity = this
-
+class MainActivity : HotwireActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
 
-    override fun sessionConfigurations() = listOf(
-        SessionConfiguration(
+    override fun navigatorConfigurations() = listOf(
+        NavigatorConfiguration(
             name = "main",
             startLocation = Urls.homeUrl,
-            navHostFragmentId = R.id.main_nav_host
+            navigatorHostId = R.id.main_navigator_host
         )
     )
 }

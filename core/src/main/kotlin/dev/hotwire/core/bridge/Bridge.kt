@@ -3,13 +3,13 @@ package dev.hotwire.core.bridge
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
-import dev.hotwire.core.lib.logging.logEvent
+import dev.hotwire.core.logging.logEvent
 import kotlinx.serialization.json.JsonElement
 import java.lang.ref.WeakReference
 
-// These need to match whatever is set in strada.js
+// These need to match whatever is set in bridge_components.js
 private const val bridgeGlobal = "window.nativeBridge"
-private const val bridgeJavascriptInterface = "StradaNative"
+private const val bridgeJavascriptInterface = "BridgeComponentsNative"
 
 @Suppress("unused")
 class Bridge internal constructor(webView: WebView) {
@@ -18,7 +18,7 @@ class Bridge internal constructor(webView: WebView) {
 
     internal val webView: WebView? get() = webViewRef.get()
     internal var repository = Repository()
-    internal var delegate: BridgeDelegate? = null
+    internal var delegate: BridgeDelegate<*>? = null
 
     init {
         // Use a weak reference in case the WebView is no longer being
@@ -120,7 +120,7 @@ class Bridge internal constructor(webView: WebView) {
     companion object {
         private val instances = mutableListOf<Bridge>()
 
-        internal fun initialize(webView: WebView) {
+        fun initialize(webView: WebView) {
             if (getBridgeFor(webView) == null) {
                 initialize(Bridge(webView))
             }

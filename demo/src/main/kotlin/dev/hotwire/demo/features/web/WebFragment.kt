@@ -8,17 +8,17 @@ import android.view.View
 import android.webkit.GeolocationPermissions
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import dev.hotwire.core.navigation.fragments.HotwireWebFragment
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.core.turbo.nav.HotwireDestination
-import dev.hotwire.core.turbo.views.TurboWebChromeClient
 import dev.hotwire.core.turbo.visit.VisitAction.REPLACE
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
 import dev.hotwire.demo.R
 import dev.hotwire.demo.Urls
+import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
+import dev.hotwire.navigation.fragments.HotwireWebFragment
 
-@HotwireDestination(uri = "turbo://fragment/web")
+@HotwireDestinationDeepLink(uri = "hotwire://fragment/web")
 open class WebFragment : HotwireWebFragment() {
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -41,14 +41,14 @@ open class WebFragment : HotwireWebFragment() {
 
     override fun onVisitErrorReceived(location: String, error: VisitError) {
         if (error is HttpError.ClientError.Unauthorized) {
-            navigate(Urls.signInUrl, VisitOptions(action = REPLACE))
+            navigator.route(Urls.signInUrl, VisitOptions(action = REPLACE))
         } else {
             super.onVisitErrorReceived(location, error)
         }
     }
 
-    override fun createWebChromeClient(): TurboWebChromeClient {
-        return object : TurboWebChromeClient(session) {
+    override fun createWebChromeClient(): HotwireWebChromeClient {
+        return object : HotwireWebChromeClient(navigator.session) {
             override fun onGeolocationPermissionsShowPrompt(
                 origin: String?,
                 callback: GeolocationPermissions.Callback?

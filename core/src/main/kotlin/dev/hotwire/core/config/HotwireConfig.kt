@@ -1,16 +1,35 @@
 package dev.hotwire.core.config
 
+import android.content.Context
 import android.webkit.WebView
-import dev.hotwire.core.bridge.StradaJsonConverter
-import dev.hotwire.core.turbo.http.TurboHttpClient
+import dev.hotwire.core.bridge.BridgeComponent
+import dev.hotwire.core.bridge.BridgeComponentFactory
+import dev.hotwire.core.bridge.BridgeComponentJsonConverter
+import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.turbo.http.HotwireHttpClient
+import dev.hotwire.core.turbo.offline.OfflineRequestHandler
+import dev.hotwire.core.turbo.webview.HotwireWebView
 
 class HotwireConfig internal constructor() {
+    /**
+     * The path configuration that defines your navigation rules.
+     */
+    val pathConfiguration = PathConfiguration()
+
+    var registeredBridgeComponentFactories:
+            List<BridgeComponentFactory<*, BridgeComponent<*>>> = emptyList()
+
     /**
      * Set a custom JSON converter to easily decode Message.dataJson to a data
      * object in received messages and to encode a data object back to json to
      * reply with a custom message back to the web.
      */
-    var jsonConverter: StradaJsonConverter? = null
+    var jsonConverter: BridgeComponentJsonConverter? = null
+
+    /**
+     * Experimental: API may be removed, not ready for production use.
+     */
+    var offlineRequestHandler: OfflineRequestHandler? = null
 
     /**
      * Enables/disables debug logging. This should be disabled in production environments.
@@ -21,7 +40,7 @@ class HotwireConfig internal constructor() {
     var debugLoggingEnabled = false
         set(value) {
             field = value
-            TurboHttpClient.reset()
+            HotwireHttpClient.reset()
         }
 
     /**
@@ -37,6 +56,15 @@ class HotwireConfig internal constructor() {
         }
 
     /**
+     * Called whenever a new WebView instance needs to be (re)created. Provide
+     * your own implementation and subclass [HotwireWebView] if you need
+     * custom behaviors.
+     */
+    var makeCustomWebView: (context: Context) -> HotwireWebView = { context ->
+        HotwireWebView(context, null)
+    }
+
+    /**
      * Provides a standard substring to be included in your WebView's user agent
      * to identify itself as a Hotwire Native app.
      *
@@ -44,8 +72,8 @@ class HotwireConfig internal constructor() {
      * calling this so the bridge component names are included in your user agent.
      */
     fun userAgentSubstring(): String {
-        val components = Hotwire.registeredBridgeComponentFactories.joinToString(" ") { it.name }
-        return "Turbo Native Android; bridge-components: [$components];"
+        val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
+        return "Hotwire Native Android; Turbo Native Android; bridge-components: [$components];"
     }
 
     /**

@@ -48,11 +48,11 @@ data class Message constructor(
         event: String = this.event,
         data: T
     ): Message {
-        return replacing(event, StradaJsonConverter.toJson(data))
+        return replacing(event, BridgeComponentJsonConverter.toJson(data))
     }
 
     inline fun <reified T> data(): T? {
-        return StradaJsonConverter.toObject(jsonData)
+        return BridgeComponentJsonConverter.toObject(jsonData)
     }
 }
 

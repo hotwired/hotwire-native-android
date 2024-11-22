@@ -7,18 +7,18 @@ import org.junit.Test
 class UserAgentTest {
     @Test
     fun userAgentSubstring() {
-        Hotwire.registerBridgeComponents(TestData.componentFactories)
+        Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
 
         val userAgentSubstring = Hotwire.config.userAgentSubstring()
-        assertEquals(userAgentSubstring, "Turbo Native Android; bridge-components: [one two];")
+        assertEquals(userAgentSubstring, "Hotwire Native Android; Turbo Native Android; bridge-components: [one two];")
     }
 
     @Test
     fun userAgent() {
-        Hotwire.registerBridgeComponents(TestData.componentFactories)
+        Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
         Hotwire.config.userAgent = "Test; ${Hotwire.config.userAgentSubstring()}"
 
         val userAgent = Hotwire.config.userAgent
-        assertEquals(userAgent, "Test; Turbo Native Android; bridge-components: [one two];")
+        assertEquals(userAgent, "Test; Hotwire Native Android; Turbo Native Android; bridge-components: [one two];")
     }
 }

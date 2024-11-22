@@ -51,8 +51,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
+    implementation(project(":navigation-fragments"))
+
     // Material
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.12.0")
 
     // AndroidX
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -64,5 +67,4 @@ dependencies {
     // Images
     implementation("io.coil-kt:coil:2.6.0")
 
-    implementation(project(":core"))
 }

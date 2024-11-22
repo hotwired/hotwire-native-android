@@ -1,7 +1,5 @@
 {
-  "settings": {
-    "screenshots_enabled": true
-  },
+  "settings": {},
   "rules": [
     {
       "patterns": [
@@ -9,8 +7,8 @@
       ],
       "properties": {
         "context": "default",
-        "uri": "turbo://fragment/web",
-        "fallback_uri": "turbo://fragment/web",
+        "uri": "hotwire://fragment/web",
+        "fallback_uri": "hotwire://fragment/web",
         "pull_to_refresh_enabled": true
       }
     },
@@ -20,18 +18,18 @@
         "^/$"
       ],
       "properties": {
-        "uri": "turbo://fragment/web/home",
+        "uri": "hotwire://fragment/web/home",
         "presentation": "replace_root"
       }
     },
     {
       "patterns": [
         "/signin$",
-        "/strada-form$"
+        "/bridge-form$"
       ],
       "properties": {
         "context": "modal",
-        "uri": "turbo://fragment/web/modal",
+        "uri": "hotwire://fragment/web/modal",
         "pull_to_refresh_enabled": false
       }
     },
@@ -41,7 +39,7 @@
       ],
       "properties": {
         "context": "modal",
-        "uri": "turbo://fragment/web/modal/sheet",
+        "uri": "hotwire://fragment/web/modal/sheet",
         "pull_to_refresh_enabled": false
       }
     },
@@ -50,7 +48,7 @@
         "/numbers$"
       ],
       "properties": {
-        "uri": "turbo://fragment/numbers",
+        "uri": "hotwire://fragment/numbers",
         "title": "Numbers"
       }
     },
@@ -60,7 +58,7 @@
       ],
       "properties": {
         "context": "modal",
-        "uri": "turbo://fragment/numbers/sheet",
+        "uri": "hotwire://fragment/numbers/sheet",
         "title": "Number",
         "description": "This is a native bottom sheet fragment"
       }
@@ -70,7 +68,7 @@
         ".+\\.(?:bmp|gif|heic|jpg|jpeg|png|svg|webp)"
       ],
       "properties": {
-        "uri": "turbo://fragment/image_viewer"
+        "uri": "hotwire://fragment/image_viewer"
       }
     }
   ]

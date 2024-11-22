@@ -11,7 +11,7 @@ import org.junit.Test
 
 class BridgeComponentTest {
     private lateinit var component: TestData.OneBridgeComponent
-    private val delegate: BridgeDelegate = mock()
+    private val delegate: BridgeDelegate<TestData.AppBridgeDestination> = mock()
 
     private val message = Message(
         id = "1",
@@ -110,7 +110,7 @@ class BridgeComponentTest {
 
         assertThatThrownBy { component.replyTo("connect", MessageData(title = "Page-title")) }
             .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessage(StradaJsonConverter.NO_CONVERTER)
+            .hasMessage(BridgeComponentJsonConverter.NO_CONVERTER)
     }
 
     @Test

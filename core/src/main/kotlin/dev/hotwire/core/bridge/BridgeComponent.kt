@@ -1,10 +1,10 @@
 package dev.hotwire.core.bridge
 
-import dev.hotwire.core.lib.logging.logWarning
+import dev.hotwire.core.logging.logWarning
 
-abstract class BridgeComponent(
+abstract class BridgeComponent<in D : BridgeDestination>(
     val name: String,
-    private val delegate: BridgeDelegate
+    private val delegate: BridgeDelegate<D>
 ) {
     private val receivedMessages = hashMapOf<String, Message>()
 
@@ -116,7 +116,7 @@ abstract class BridgeComponent(
      * reply will be ignored.
      */
     inline fun <reified T> replyTo(event: String, data: T): Boolean {
-        return replyTo(event, jsonData = StradaJsonConverter.toJson(data))
+        return replyTo(event, jsonData = BridgeComponentJsonConverter.toJson(data))
     }
 
     private fun reply(message: Message): Boolean {

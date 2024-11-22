@@ -30,14 +30,14 @@
                 android:contentDescription="@string/app_name"
                 android:padding="12dp"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_turbo_logo" />
+                app:srcCompat="@drawable/ic_logo" />
 
         </FrameLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <include
-        layout="@layout/turbo_view"
+        layout="@layout/hotwire_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

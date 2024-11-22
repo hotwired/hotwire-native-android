@@ -11,70 +11,56 @@ import androidx.lifecycle.lifecycleScope
 import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
-import androidx.webkit.WebViewFeature.*
-import dev.hotwire.core.config.Hotwire.pathConfiguration
-import dev.hotwire.core.lib.logging.logEvent
-import dev.hotwire.core.turbo.config.screenshotsEnabled
-import dev.hotwire.core.turbo.delegates.TurboFileChooserDelegate
+import androidx.webkit.WebViewFeature.VISUAL_STATE_CALLBACK
+import androidx.webkit.WebViewFeature.isFeatureSupported
+import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.errors.WebSslError
-import dev.hotwire.core.turbo.http.*
-import dev.hotwire.core.turbo.nav.HotwireNavDestination
-import dev.hotwire.core.turbo.util.*
-import dev.hotwire.core.turbo.views.TurboWebView
+import dev.hotwire.core.turbo.http.HotwireHttpClient
+import dev.hotwire.core.turbo.offline.*
+import dev.hotwire.core.turbo.util.isHttpGetRequest
+import dev.hotwire.core.turbo.util.runOnUiThread
+import dev.hotwire.core.turbo.util.toJson
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
-import kotlinx.coroutines.*
-import java.util.*
+import java.util.Date
 
 /**
  * This class is primarily responsible for managing an instance of an Android WebView that will
- * be shared between fragments. An implementation of [SessionNavHostFragment] will create
- * a session for you and it can be retrieved via [SessionNavHostFragment.session].
+ * be shared between destinations.
  *
  * @property sessionName An arbitrary name to be used as an identifier for a given session.
  * @property activity The activity to which the session will be bound to.
- * @property webView An instance of a [TurboWebView] to be shared/managed.
+ * @property webView An instance of a [HotwireWebView] to be shared/managed.
  */
 @Suppress("unused")
-class Session internal constructor(
+class Session(
     internal val sessionName: String,
     private val activity: AppCompatActivity,
-    val webView: TurboWebView
+    val webView: HotwireWebView
 ) {
-    internal var currentVisit: Visit? = null
     internal var coldBootVisitIdentifier = ""
     internal var previousOverrideUrlTime = 0L
     internal var isColdBooting = false
     internal var visitPending = false
-    internal var isRenderProcessGone = false
     internal var restorationIdentifiers = SparseArray<String>()
     internal val context: Context = activity.applicationContext
-    internal val httpRepository = TurboHttpRepository(activity.lifecycleScope)
-    internal val requestInterceptor = TurboWebViewRequestInterceptor(this)
-    internal val fileChooserDelegate = TurboFileChooserDelegate(this)
+    internal val httpRepository = OfflineHttpRepository(activity.lifecycleScope)
+    internal val requestInterceptor = OfflineWebViewRequestInterceptor(this)
 
     // User accessible
 
     /**
-     * Experimental: API may change, not ready for production use.
+     * The current visit for the current destination.
      */
-    var offlineRequestHandler: TurboOfflineRequestHandler? = null
-
-    /**
-     * Returns whether transitional screenshots are enabled for this session. Default is `true`.
-     */
-    val screenshotsEnabled
-        get() = pathConfiguration.settings.screenshotsEnabled
-
-    /**
-     * Gets the nav destination that corresponds to the current WebView visit.
-     */
-    val currentVisitNavDestination: HotwireNavDestination?
-        get() = currentVisit?.callback?.visitNavDestination()
+    var currentVisit: Visit? = null
+        internal set
 
     /**
      * Provides the status of whether Turbo is initialized and ready for use.
@@ -82,27 +68,37 @@ class Session internal constructor(
     var isReady = false
         internal set
 
+    /**
+     * Specifies whether the render process is gone for the WebView instance. If the
+     * render process is gone, this Session and its WebView cannot be reused and must
+     * be recreated.
+     */
+    var isRenderProcessGone = false
+        internal set
+
+    val fileChooserDelegate = FileChooserDelegate(this)
+
     init {
         initializeWebView()
-        TurboHttpClient.enableCachingWith(context)
+        HotwireHttpClient.enableCachingWith(context)
         fileChooserDelegate.deleteCachedFiles()
     }
 
     // Public
 
     /**
-     * Fetches a given location and returns the response to the [TurboOfflineRequestHandler]
+     * Fetches a given location and returns the response to the [OfflineRequestHandler]
      * Allows an offline cache to contain specific items instead of solely relying on visited items.
      *
      * @param location Location to cache.
      */
     fun preCacheLocation(location: String) {
-        val requestHandler = checkNotNull(offlineRequestHandler) {
+        val requestHandler = checkNotNull(Hotwire.config.offlineRequestHandler) {
             "An offline request handler must be provided to pre-cache $location"
         }
 
         httpRepository.preCache(
-            requestHandler, TurboPreCacheRequest(
+            requestHandler, OfflinePreCacheRequest(
                 url = location, userAgent = webView.settings.userAgentString
             )
         )
@@ -122,9 +118,7 @@ class Session internal constructor(
         isColdBooting = false
     }
 
-    // Internal
-
-    internal fun visit(visit: Visit) {
+    fun visit(visit: Visit) {
         this.currentVisit = visit
         callback { it.visitLocationStarted(visit.location) }
 
@@ -141,10 +135,10 @@ class Session internal constructor(
 
     /**
      * Synthetically restore the WebView's current visit without using a cached snapshot or a
-     * visit request. This is used when restoring a Fragment destination from the backstack,
+     * visit request. This is used when restoring a destination from the backstack,
      * but the WebView's current location hasn't changed from the destination's location.
      */
-    internal fun restoreCurrentVisit(callback: SessionCallback): Boolean {
+    fun restoreCurrentVisit(callback: SessionCallback): Boolean {
         val visit = currentVisit ?: return false
         val restorationIdentifier = restorationIdentifiers[visit.destinationIdentifier]
 
@@ -165,7 +159,7 @@ class Session internal constructor(
         return true
     }
 
-    internal fun removeCallback(callback: SessionCallback) {
+    fun removeCallback(callback: SessionCallback) {
         currentVisit?.let { visit ->
             if (visit.callback == callback) {
                 visit.callback = null
@@ -622,7 +616,7 @@ class Session internal constructor(
     private fun callback(action: (SessionCallback) -> Unit) {
         context.runOnUiThread {
             currentVisit?.callback?.let { callback ->
-                if (callback.visitNavDestination().isActive) {
+                if (callback.visitDestination().isActive()) {
                     action(callback)
                 }
             }

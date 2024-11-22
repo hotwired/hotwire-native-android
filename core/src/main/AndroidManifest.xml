@@ -4,8 +4,8 @@
     <application>
 
         <provider
-            android:name=".turbo.util.TurboFileProvider"
-            android:authorities="${applicationId}.turbo.fileprovider"
+            android:name=".files.util.HotwireFileProvider"
+            android:authorities="${applicationId}.hotwire.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
