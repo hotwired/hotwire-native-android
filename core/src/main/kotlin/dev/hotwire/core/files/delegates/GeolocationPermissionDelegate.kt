@@ -1,6 +1,5 @@
 package dev.hotwire.core.files.delegates
 
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
 import android.content.pm.PackageManager
@@ -11,11 +10,9 @@ import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.turbo.session.Session
 
-class GeolocationPermissionDelegate(
-    private val session: Session
-) {
+class GeolocationPermissionDelegate(private val session: Session) {
     private val context: Context = session.context
-    private val permissionToRequest = preferredLocationPermission()
+    private val permissionToRequest = locationPermission()
 
     private var requestOrigin: String? = null
     private var requestCallback: GeolocationPermissions.Callback? = null
@@ -46,7 +43,9 @@ class GeolocationPermissionDelegate(
 
     private fun startPermissionRequest() {
         val destination = session.currentVisit?.callback?.visitDestination() ?: return
-        val resultLauncher = destination.activityPermissionResultLauncher(HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION)
+        val resultLauncher = destination.activityPermissionResultLauncher(
+            HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
+        )
 
         try {
             resultLauncher?.launch(permissionToRequest)
@@ -74,20 +73,11 @@ class GeolocationPermissionDelegate(
         requestCallback = null
     }
 
-    private fun preferredLocationPermission(): String? {
-        val declaredPermissions = manifestPermissions().filter {
-            it == ACCESS_COARSE_LOCATION ||
-            it == ACCESS_FINE_LOCATION
-        }
-
-        // Prefer fine location if provided in manifest, otherwise coarse location
-        return if (declaredPermissions.contains(ACCESS_FINE_LOCATION)) {
-            ACCESS_FINE_LOCATION
-        } else if (declaredPermissions.contains(ACCESS_COARSE_LOCATION)) {
-            ACCESS_COARSE_LOCATION
-        } else {
-            null
-        }
+    private fun locationPermission(): String? {
+        // Only request "fine" location if provided in the app manifest, since
+        // the WebView requires this permission for location access. Granting
+        // "coarse" location does not work. See: https://issues.chromium.org/issues/40205003
+        return manifestPermissions().firstOrNull { it == ACCESS_FINE_LOCATION }
     }
 
     private fun manifestPermissions(): Array<String> {
