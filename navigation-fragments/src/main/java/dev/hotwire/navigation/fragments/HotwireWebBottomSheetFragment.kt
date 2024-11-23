@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
+import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
 import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.navigation.R
@@ -59,6 +60,13 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
     override fun activityResultLauncher(requestCode: Int): ActivityResultLauncher<Intent>? {
         return when (requestCode) {
             HOTWIRE_REQUEST_CODE_FILES -> webDelegate.fileChooserResultLauncher
+            else -> null
+        }
+    }
+
+    override fun activityPermissionResultLauncher(requestCode: Int): ActivityResultLauncher<String>? {
+        return when (requestCode) {
+            HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION -> webDelegate.geoLocationPermissionResultLauncher
             else -> null
         }
     }
