@@ -1,8 +1,10 @@
 package dev.hotwire.core.files.delegates
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.webkit.GeolocationPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
@@ -12,7 +14,7 @@ import dev.hotwire.core.turbo.session.Session
 
 class GeolocationPermissionDelegate(private val session: Session) {
     private val context: Context = session.context
-    private val permissionToRequest = locationPermission()
+    private val permissionToRequest = preferredLocationPermission()
 
     private var requestOrigin: String? = null
     private var requestCallback: GeolocationPermissions.Callback? = null
@@ -73,7 +75,29 @@ class GeolocationPermissionDelegate(private val session: Session) {
         requestCallback = null
     }
 
-    private fun locationPermission(): String? {
+    private fun preferredLocationPermission(): String? {
+        val declaredPermissions = manifestPermissions().filter {
+            it == ACCESS_COARSE_LOCATION ||
+            it == ACCESS_FINE_LOCATION
+        }
+
+        // Prefer fine location if provided in manifest, otherwise coarse location
+        return if (declaredPermissions.contains(ACCESS_FINE_LOCATION)) {
+            ACCESS_FINE_LOCATION
+        } else if (declaredPermissions.contains(ACCESS_COARSE_LOCATION)) {
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S ||
+                Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
+                // Android 12 requires the "fine" permission for location
+                // access within the WebView. Granting "coarse" location does not
+                // work. See: https://issues.chromium.org/issues/40205003
+                null
+            } else {
+                ACCESS_COARSE_LOCATION
+            }
+        } else {
+            null
+        }
+
         // Only request "fine" location if provided in the app manifest, since
         // the WebView requires this permission for location access. Granting
         // "coarse" location does not work. See: https://issues.chromium.org/issues/40205003
