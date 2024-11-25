@@ -1,6 +1,7 @@
 package dev.hotwire.core.turbo.session
 
 import android.os.Build
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
@@ -54,6 +55,7 @@ class SessionTest {
         val visitDestination = object : VisitDestination {
             override fun isActive() = true
             override fun activityResultLauncher(requestCode: Int) = null
+            override fun activityPermissionResultLauncher(requestCode: Int) = null
         }
 
         whenever(callback.visitDestination()).thenReturn(visitDestination)
