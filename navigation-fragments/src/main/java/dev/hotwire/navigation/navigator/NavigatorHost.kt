@@ -27,6 +27,15 @@ open class NavigatorHost : NavHostFragment() {
         activity.delegate.unregisterNavigatorHost(this)
     }
 
+    /**
+     * Returns whether the navigation host is ready for navigation. It is not
+     * ready for navigation if the view is not attached or the start destination
+     * has not been created yet.
+     */
+    fun isReady(): Boolean {
+        return isAdded && !isDetached && childFragmentManager.primaryNavigationFragment != null
+    }
+
     internal fun initControllerGraph() {
         navController.apply {
             graph = NavigatorGraphBuilder(

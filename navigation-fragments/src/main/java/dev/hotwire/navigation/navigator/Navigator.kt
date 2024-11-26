@@ -64,6 +64,18 @@ class Navigator(
         }
     }
 
+    /**
+     * Returns whether the navigator and its host are ready for navigation. It is not
+     * ready for navigation if the host view is not attached or the start destination
+     * has not been created yet.
+     */
+    fun isReady(): Boolean {
+        return host.isReady()
+    }
+
+    /**
+     * Returns whether the current destination is the only backstack entry.
+     */
     fun isAtStartDestination(): Boolean {
         return navController.previousBackStackEntry == null
     }
