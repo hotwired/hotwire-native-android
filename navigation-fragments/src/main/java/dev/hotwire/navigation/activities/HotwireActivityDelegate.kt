@@ -44,15 +44,16 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
     /**
      * Get the Activity's currently active [Navigator].
+     *
+     * Returns null if the navigator is not ready for navigation.
      */
     val currentNavigator: Navigator?
-        get() {
-            return if (currentNavigatorHost.isAdded && !currentNavigatorHost.isDetached) {
-                currentNavigatorHost.navigator
-            } else {
-                null
-            }
+        get() = if (currentNavigatorHost.isReady()) {
+            currentNavigatorHost.navigator
+        } else {
+            null
         }
+
 
     /**
      * Sets the currently active navigator in your Activity. If you use multiple
@@ -107,7 +108,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     private fun updateOnBackPressedCallback(navController: NavController) {
-        if (navController == currentNavigatorHost.navController)  {
+        if (navController == currentNavigatorHost.navController) {
             onBackPressedCallback.isEnabled = navController.previousBackStackEntry != null
         }
     }

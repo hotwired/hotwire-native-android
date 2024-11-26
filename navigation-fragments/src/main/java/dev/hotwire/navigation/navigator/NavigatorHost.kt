@@ -27,6 +27,10 @@ open class NavigatorHost : NavHostFragment() {
         activity.delegate.unregisterNavigatorHost(this)
     }
 
+    fun isReady(): Boolean {
+        return isAdded && !isDetached && childFragmentManager.primaryNavigationFragment != null
+    }
+
     internal fun initControllerGraph() {
         navController.apply {
             graph = NavigatorGraphBuilder(
