@@ -22,6 +22,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 internal class NavigatorGraphBuilder(
+    private val navigatorName: String,
     private val startLocation: String,
     private val navController: NavController,
     private val pathConfiguration: PathConfiguration
@@ -69,8 +70,12 @@ internal class NavigatorGraphBuilder(
                 }
             }
 
-            argument("location") {
+            argument(ARG_LOCATION) {
                 defaultValue = startLocation
+            }
+
+            argument(ARG_NAVIGATOR_NAME) {
+                defaultValue = navigatorName
             }
 
             // Use a random value to represent a unique instance of the graph, so the

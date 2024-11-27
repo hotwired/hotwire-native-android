@@ -33,6 +33,7 @@ internal class NavigatorRule(
     navOptions: NavOptions,
     extras: FragmentNavigator.Extras?,
     pathConfiguration: PathConfiguration,
+    navigatorName: String,
     val controller: NavController
 ) {
     val defaultUri = HotwireDestinationDeepLink.from(HotwireNavigation.defaultFragmentDestination).uri.toUri()
@@ -45,6 +46,7 @@ internal class NavigatorRule(
     val isAtStartDestination = controller.previousBackStackEntry == null
 
     // New destination
+    val newNavigatorName = navigatorName
     val newLocation = location
     val newProperties = pathConfiguration.properties(newLocation)
     val newPresentationContext = newProperties.context
@@ -156,8 +158,9 @@ internal class NavigatorRule(
     private fun Bundle?.withNavArguments(): Bundle {
         val bundle = this ?: bundleOf()
         return bundle.apply {
-            putString("location", newLocation)
-            putSerializable("presentation-context", newPresentationContext)
+            putString(ARG_LOCATION, newLocation)
+            putString(ARG_NAVIGATOR_NAME, newNavigatorName)
+            putString(ARG_PRESENTATION_CONTEXT, newPresentationContext.name)
         }
     }
 

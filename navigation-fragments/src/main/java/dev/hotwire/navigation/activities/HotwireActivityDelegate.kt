@@ -2,7 +2,7 @@ package dev.hotwire.navigation.activities
 
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
-import androidx.navigation.NavController
+import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.navigator.Navigator
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.navigator.NavigatorHost
@@ -25,10 +25,6 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     private var currentNavigatorHostId = activity.navigatorConfigurations().first().navigatorHostId
-        set(value) {
-            field = value
-            updateOnBackPressedCallback(currentNavigatorHost.navController)
-        }
 
     /**
      * Initializes the Activity with a BackPressedDispatcher that properly
@@ -48,10 +44,14 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      * Returns null if the navigator is not ready for navigation.
      */
     val currentNavigator: Navigator?
-        get() = if (currentNavigatorHost.isReady()) {
-            currentNavigatorHost.navigator
-        } else {
-            null
+        get() {
+            val navigator = navigatorHosts[currentNavigatorHostId]
+
+            return if (navigator?.isReady() == true) {
+                navigator.navigator
+            } else {
+                null
+            }
         }
 
 
@@ -61,18 +61,36 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      *  you must update this whenever the current navigator changes.
      */
     fun setCurrentNavigator(configuration: NavigatorConfiguration) {
+        logEvent("navigatorSetAsCurrent", listOf("navigator" to configuration.name))
         currentNavigatorHostId = configuration.navigatorHostId
+
+        val navigatorHost = navigatorHosts[currentNavigatorHostId]
+        if (navigatorHost != null) {
+            updateOnBackPressedCallback(navigatorHost)
+        }
     }
 
     internal fun registerNavigatorHost(host: NavigatorHost) {
+        logEvent("navigatorRegistered", listOf("navigator" to host.navigator.configuration.name))
+
         if (navigatorHosts[host.id] == null) {
             navigatorHosts[host.id] = host
-            listenToDestinationChanges(host.navController)
+            listenToDestinationChanges(host)
+
+            if (currentNavigatorHostId == host.id) {
+                updateOnBackPressedCallback(host)
+            }
         }
     }
 
     internal fun unregisterNavigatorHost(host: NavigatorHost) {
+        logEvent("navigatorUnregistered", listOf("navigator" to host.navigator.configuration.name))
         navigatorHosts.remove(host.id)
+    }
+
+    internal fun onNavigatorHostReady(host: NavigatorHost) {
+        logEvent("navigatorReady", listOf("navigator" to host.navigator.configuration.name))
+        activity.onNavigatorReady(host.navigator)
     }
 
     /**
@@ -101,18 +119,15 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
         navigatorHosts.forEach { it.value.navigator.reset() }
     }
 
-    private fun listenToDestinationChanges(navController: NavController) {
-        navController.addOnDestinationChangedListener { controller, _, _ ->
-            updateOnBackPressedCallback(controller)
+    private fun listenToDestinationChanges(host: NavigatorHost) {
+        host.navController.addOnDestinationChangedListener { controller, _, _ ->
+            updateOnBackPressedCallback(host)
         }
     }
 
-    private fun updateOnBackPressedCallback(navController: NavController) {
-        if (navController == currentNavigatorHost.navController) {
-            onBackPressedCallback.isEnabled = navController.previousBackStackEntry != null
+    private fun updateOnBackPressedCallback(host: NavigatorHost) {
+        if (host.id == currentNavigatorHostId) {
+            onBackPressedCallback.isEnabled = host.navController.previousBackStackEntry != null
         }
     }
-
-    private val currentNavigatorHost: NavigatorHost
-        get() = navigatorHost(currentNavigatorHostId)
 }

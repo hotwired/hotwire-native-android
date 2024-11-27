@@ -21,12 +21,13 @@ import dev.hotwire.navigation.navigator.NavigatorHost
  */
 abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
     HotwireDestination, HotwireDialogDestination {
-    override lateinit var navigator: Navigator
     internal lateinit var delegate: HotwireFragmentDelegate
+
+    override val navigator: Navigator
+        get() = (parentFragment as NavigatorHost).navigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        navigator = (parentFragment as NavigatorHost).navigator
         delegate = HotwireFragmentDelegate(this)
     }
 
