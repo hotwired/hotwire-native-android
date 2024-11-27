@@ -9,6 +9,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavBackStackEntry
 import dev.hotwire.navigation.R
+import dev.hotwire.navigation.navigator.location
 
 fun Toolbar.displayBackButton() {
     navigationIcon = ContextCompat.getDrawable(context, R.drawable.ic_back)
@@ -19,7 +20,7 @@ fun Toolbar.displayBackButtonAsCloseIcon() {
 }
 
 internal val NavBackStackEntry?.location: String?
-    get() = this?.arguments?.getString("location")
+    get() = this?.arguments?.location
 
 internal fun Context.colorFromThemeAttr(
     @AttrRes attrColor: Int,

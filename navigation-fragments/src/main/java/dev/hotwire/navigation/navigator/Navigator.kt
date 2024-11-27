@@ -121,6 +121,7 @@ class Navigator(
             navOptions = navOptions(location, options.action),
             extras = extras,
             pathConfiguration = Hotwire.config.pathConfiguration,
+            navigatorName = configuration.name,
             controller = currentControllerForLocation(location)
         )
 
@@ -391,10 +392,7 @@ class Navigator(
     }
 
     private val NavBackStackEntry?.isModalContext: Boolean
-        get() {
-            val context = this?.arguments?.getSerializable("presentation-context")
-            return context as? PresentationContext == PresentationContext.MODAL
-        }
+        get() = this?.arguments?.presentationContext == PresentationContext.MODAL
 
     private fun logEvent(event: String, vararg params: Pair<String, Any>) {
         val attributes = params.toMutableList().apply {
