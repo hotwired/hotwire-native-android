@@ -52,6 +52,7 @@ class NavigatorRuleTest {
     private val webModalUri = Uri.parse("hotwire://fragment/web/modal")
     private val webHomeUri = Uri.parse("hotwire://fragment/web/home")
 
+    private val navigatorName = "test"
     private val extras = null
     private val navOptions = navOptions {
         anim {
@@ -387,12 +388,19 @@ class NavigatorRuleTest {
         bundle: Bundle? = null
     ): NavigatorRule {
         return NavigatorRule(
-            location, visitOptions, bundle, navOptions, extras, pathConfiguration, controller
+            location = location,
+            visitOptions = visitOptions,
+            bundle = bundle,
+            navOptions = navOptions,
+            extras = extras,
+            pathConfiguration = pathConfiguration,
+            navigatorName = navigatorName,
+            controller = controller
         )
     }
 
     private fun locationArgs(location: String): Bundle {
-        return bundleOf("location" to location)
+        return bundleOf(ARG_LOCATION to location)
     }
 
     private fun buildControllerWithGraph(): TestNavHostController {
@@ -421,7 +429,8 @@ class NavigatorRuleTest {
                         navigator = provider.getNavigator<NavGraphNavigator>("test"),
                         id = webHomeDestinationId
                     ).apply {
-                        argument("location") { defaultValue = homeUrl }
+                        argument(ARG_LOCATION) { defaultValue = homeUrl }
+                        argument(ARG_NAVIGATOR_NAME) { defaultValue = navigatorName }
                         deepLink(webHomeUri.toString())
                     }
                 )
