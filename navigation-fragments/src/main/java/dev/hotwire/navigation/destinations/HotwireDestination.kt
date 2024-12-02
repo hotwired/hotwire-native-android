@@ -11,6 +11,8 @@ import dev.hotwire.core.bridge.BridgeDestination
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
+import dev.hotwire.core.turbo.config.presentation
+import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.navigation.R
@@ -136,24 +138,38 @@ interface HotwireDestination : BridgeDestination {
         action: VisitAction
     ): NavOptions {
         val modal = newPathProperties.context == PresentationContext.MODAL
-        val replace = action == VisitAction.REPLACE
+        val clearAll = newPathProperties.presentation == Presentation.CLEAR_ALL
+        val animate = action != VisitAction.REPLACE &&
+                newPathProperties.presentation != Presentation.REPLACE &&
+                newPathProperties.presentation != Presentation.REPLACE_ROOT
 
         return if (modal) {
             navOptions {
                 anim {
-                    enter = if (replace) 0 else R.anim.enter_slide_in_bottom
+                    enter = if (animate) R.anim.enter_slide_in_bottom else 0
                     exit = R.anim.exit_slide_out_bottom
                     popEnter = R.anim.enter_slide_in_bottom
                     popExit = R.anim.exit_slide_out_bottom
                 }
             }
         } else {
-            navOptions {
-                anim {
-                    enter = if (replace) 0 else R.anim.enter_slide_in_right
-                    exit = R.anim.exit_slide_out_left
-                    popEnter = R.anim.enter_slide_in_left
-                    popExit = R.anim.exit_slide_out_right
+            if (clearAll) {
+                navOptions {
+                    anim {
+                        enter = R.anim.exit_slide_out_left
+                        exit = R.anim.exit_slide_out_right
+                        popEnter = R.anim.enter_slide_in_left
+                        popExit = R.anim.enter_slide_in_right
+                    }
+                }
+            } else {
+                navOptions {
+                    anim {
+                        enter = if (animate) R.anim.enter_slide_in_right else 0
+                        exit = R.anim.exit_slide_out_left
+                        popEnter = R.anim.enter_slide_in_left
+                        popExit = R.anim.exit_slide_out_right
+                    }
                 }
             }
         }
