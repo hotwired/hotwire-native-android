@@ -16,7 +16,7 @@
     <style name="Widget.MyTheme.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">?shapeAppearanceLargeComponent</item>
         <item name="behavior_draggable">true</item>
-        <item name="behavior_peekHeight">600dp</item>
+        <item name="behavior_peekHeight">400dp</item>
         <item name="backgroundTint">?colorSurface</item>
     </style>
 
