@@ -97,11 +97,6 @@ class GeolocationPermissionDelegate(private val session: Session) {
         } else {
             null
         }
-
-        // Only request "fine" location if provided in the app manifest, since
-        // the WebView requires this permission for location access. Granting
-        // "coarse" location does not work. See: https://issues.chromium.org/issues/40205003
-        return manifestPermissions().firstOrNull { it == ACCESS_FINE_LOCATION }
     }
 
     private fun manifestPermissions(): Array<String> {
