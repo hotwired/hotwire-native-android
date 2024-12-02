@@ -100,12 +100,17 @@ class GeolocationPermissionDelegate(private val session: Session) {
     }
 
     private fun manifestPermissions(): Array<String> {
-        val context = session.context
-        val packageInfo = context.packageManager.getPackageInfo(
-            context.packageName,
-            PackageManager.GET_PERMISSIONS
-        )
+        return try {
+            val context = session.context
+            val packageInfo = context.packageManager.getPackageInfo(
+                context.packageName,
+                PackageManager.GET_PERMISSIONS
+            )
 
-        return packageInfo.requestedPermissions
+            packageInfo.requestedPermissions
+        } catch (e: PackageManager.NameNotFoundException) {
+            logError("manifestPermissionsNotAvailable", e)
+            emptyArray()
+        }
     }
 }
