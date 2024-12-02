@@ -33,6 +33,7 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navigator.currentDialogDestination = this
         delegate.onViewCreated()
 
         if (shouldObserveTitleChanges()) {
@@ -41,6 +42,11 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
                 fragmentViewModel.setTitle(it)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        navigator.currentDialogDestination = null
+        super.onDestroyView()
     }
 
     /**
