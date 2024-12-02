@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.webkit.HttpAuthHandler
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -13,11 +14,11 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.session.SessionCallback
-import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.util.dispatcherProvider
@@ -60,6 +61,11 @@ internal class HotwireWebFragmentDelegate(
      * The activity result launcher that handles file chooser results.
      */
     val fileChooserResultLauncher = registerFileChooserLauncher()
+
+    /**
+     * The activity result launcher that handles geolocation permission results.
+     */
+    val geoLocationPermissionResultLauncher = registerGeolocationPermissionLauncher()
 
     fun prepareNavigation(onReady: () -> Unit) {
         session.removeCallback(this)
@@ -161,6 +167,10 @@ internal class HotwireWebFragmentDelegate(
 
     override fun activityResultLauncher(requestCode: Int): ActivityResultLauncher<Intent>? {
         return navDestination.activityResultLauncher(requestCode)
+    }
+
+    override fun activityPermissionResultLauncher(requestCode: Int): ActivityResultLauncher<String>? {
+        return navDestination.activityPermissionResultLauncher(requestCode)
     }
 
     // -----------------------------------------------------------------------
@@ -340,6 +350,12 @@ internal class HotwireWebFragmentDelegate(
     private fun registerFileChooserLauncher(): ActivityResultLauncher<Intent> {
         return navDestination.fragment.registerForActivityResult(StartActivityForResult()) { result ->
             session.fileChooserDelegate.onActivityResult(result)
+        }
+    }
+
+    private fun registerGeolocationPermissionLauncher(): ActivityResultLauncher<String> {
+        return navDestination.fragment.registerForActivityResult(RequestPermission()) { isGranted ->
+            session.geolocationPermissionDelegate.onActivityResult(isGranted)
         }
     }
 

@@ -16,6 +16,7 @@ import androidx.webkit.WebViewFeature.isFeatureSupported
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.files.delegates.FileChooserDelegate
+import dev.hotwire.core.files.delegates.GeolocationPermissionDelegate
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
@@ -76,7 +77,15 @@ class Session(
     var isRenderProcessGone = false
         internal set
 
+    /**
+     * The delegate that handles WebView-requested file chooser requests.
+     */
     val fileChooserDelegate = FileChooserDelegate(this)
+
+    /**
+     * The delegate the handles WebView-requested geolocation permission requests.
+     */
+    val geolocationPermissionDelegate = GeolocationPermissionDelegate(this)
 
     init {
         initializeWebView()

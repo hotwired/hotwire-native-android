@@ -160,16 +160,32 @@ interface HotwireDestination : BridgeDestination {
     }
 
     /**
-     * Gets a registered activity result launcher instance for the given `requestCode`.
+     * Gets a registered `ActivityResultContracts.StartActivityForResult` activity result launcher
+     * instance for the given `requestCode`.
      *
      * Override to provide your own [androidx.activity.result.ActivityResultLauncher]
      * instances. If your app doesn't have a matching `requestCode`, you must call
-     * `super.activityResultLauncher(requestCode)` to give the Turbo library an
-     * opportunity to provide a matching result launcher.
+     * `super.activityResultLauncher(requestCode)` to give the library an opportunity
+     * to provide a matching result launcher.
      *
      * @param requestCode The request code for the corresponding result launcher.
      */
     fun activityResultLauncher(requestCode: Int): ActivityResultLauncher<Intent>? {
+        return null
+    }
+
+    /**
+     * Gets a registered `ActivityResultContracts.RequestPermission` activity result launcher
+     * instance for the given `requestCode`.
+     *
+     * Override to provide your own [androidx.activity.result.ActivityResultLauncher]
+     * instances. If your app doesn't have a matching `requestCode`, you must call
+     * `super.activityPermissionResultLauncher(requestCode)` to give the library an
+     * opportunity to provide a matching result launcher.
+     *
+     * @param requestCode The request code for the corresponding result launcher.
+     */
+    fun activityPermissionResultLauncher(requestCode: Int): ActivityResultLauncher<String>? {
         return null
     }
 
