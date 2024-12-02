@@ -22,12 +22,13 @@ import dev.hotwire.navigation.session.SessionModalResult
  * For web fragments, refer to [HotwireWebFragment].
  */
 abstract class HotwireFragment : Fragment(), HotwireDestination {
-    override lateinit var navigator: Navigator
     internal lateinit var delegate: HotwireFragmentDelegate
+
+    override val navigator: Navigator
+        get() = (parentFragment as NavigatorHost).navigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        navigator = (parentFragment as NavigatorHost).navigator
         delegate = HotwireFragmentDelegate(this)
     }
 

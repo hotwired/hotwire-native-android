@@ -28,7 +28,14 @@ class Navigator(
     private val navController = host.navController
 
     /**
-     * Retrieves the currently active [HotwireDestination] on the backstack.
+     * The currently active dialog destination on the backstack if present, otherwise null.
+     * Dialog fragments are added to the Activity window and are not added directly to the
+     * [NavigatorHost] childFragmentManager.
+     */
+    internal var currentDialogDestination: HotwireDialogDestination? = null
+
+    /**
+     * Retrieves the currently active (fullscreen) [HotwireDestination] on the backstack.
      */
     val currentDestination: HotwireDestination
         get() = host.childFragmentManager.primaryNavigationFragment as HotwireDestination?
@@ -64,6 +71,18 @@ class Navigator(
         }
     }
 
+    /**
+     * Returns whether the navigator and its host are ready for navigation. It is not
+     * ready for navigation if the host view is not attached or the start destination
+     * has not been created yet.
+     */
+    fun isReady(): Boolean {
+        return host.isReady()
+    }
+
+    /**
+     * Returns whether the current destination is the only backstack entry.
+     */
     fun isAtStartDestination(): Boolean {
         return navController.previousBackStackEntry == null
     }
@@ -73,9 +92,9 @@ class Navigator(
      */
     fun pop() {
         navigateWhenReady {
-            val currentFragment = currentDestination.fragment
-            if (currentFragment is HotwireDialogDestination) {
-                currentFragment.closeDialog()
+            val currentDialogDestination = currentDialogDestination
+            if (currentDialogDestination != null) {
+                currentDialogDestination.closeDialog()
             } else {
                 navController.popBackStack()
             }
@@ -109,6 +128,7 @@ class Navigator(
             navOptions = navOptions(location, options.action),
             extras = extras,
             pathConfiguration = Hotwire.config.pathConfiguration,
+            navigatorName = configuration.name,
             controller = currentControllerForLocation(location)
         )
 
@@ -149,10 +169,8 @@ class Navigator(
         }
 
         navigateWhenReady {
-            val currentFragment = currentDestination.fragment
-            if (currentFragment is HotwireDialogDestination) {
-                currentFragment.closeDialog()
-            }
+            // If a dialog is on top of the backstack, close it first
+            currentDialogDestination?.closeDialog()
 
             navController.popBackStack(navController.graph.startDestinationId, false)
             onCleared()
@@ -251,7 +269,7 @@ class Navigator(
         )
 
         navigateWhenReady {
-            val isDialog = currentDestination.fragment is HotwireDialogDestination
+            val isDialog = currentDialogDestination != null
             if (isDialog) {
                 // Pop the backstack before sending the modal result, since the
                 // underlying fragment is still active and will receive the
@@ -379,10 +397,7 @@ class Navigator(
     }
 
     private val NavBackStackEntry?.isModalContext: Boolean
-        get() {
-            val context = this?.arguments?.getSerializable("presentation-context")
-            return context as? PresentationContext == PresentationContext.MODAL
-        }
+        get() = this?.arguments?.presentationContext == PresentationContext.MODAL
 
     private fun logEvent(event: String, vararg params: Pair<String, Any>) {
         val attributes = params.toMutableList().apply {

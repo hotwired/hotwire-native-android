@@ -2,6 +2,7 @@ package dev.hotwire.navigation.fragments
 
 import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.navigator.navigatorName
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.session.SessionViewModel
 import dev.hotwire.navigation.util.displayBackButton
@@ -15,10 +16,11 @@ import dev.hotwire.navigation.util.displayBackButtonAsCloseIcon
 class HotwireFragmentDelegate(private val navDestination: HotwireDestination) {
     private val fragment = navDestination.fragment
     private val location = navDestination.location
-    private val navigator = navDestination.navigator
+    private val navigatorName = requireNotNull(fragment.arguments?.navigatorName)
+    private val navigator get() = navDestination.navigator
 
     internal val sessionViewModel = SessionViewModel.get(
-        sessionName = navigator.configuration.name,
+        sessionName = navigatorName,
         activity = fragment.requireActivity()
     )
     internal val fragmentViewModel = HotwireFragmentViewModel.get(

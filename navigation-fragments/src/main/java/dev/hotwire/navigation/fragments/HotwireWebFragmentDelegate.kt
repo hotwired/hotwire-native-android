@@ -46,7 +46,7 @@ internal class HotwireWebFragmentDelegate(
     private var screenshotOrientation = 0
     private var screenshotZoomed = false
     private var currentlyZoomed = false
-    private val navigator = navDestination.navigator
+    private val navigator get() = navDestination.navigator
     private val session get() = navigator.session
     private val turboView get() = callback.hotwireView
     private val viewTreeLifecycleOwner get() = turboView?.findViewTreeLifecycleOwner()

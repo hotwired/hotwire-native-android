@@ -21,17 +21,19 @@ import dev.hotwire.navigation.navigator.NavigatorHost
  */
 abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
     HotwireDestination, HotwireDialogDestination {
-    override lateinit var navigator: Navigator
     internal lateinit var delegate: HotwireFragmentDelegate
+
+    override val navigator: Navigator
+        get() = (parentFragment as NavigatorHost).navigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        navigator = (parentFragment as NavigatorHost).navigator
         delegate = HotwireFragmentDelegate(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navigator.currentDialogDestination = this
         delegate.onViewCreated()
 
         if (shouldObserveTitleChanges()) {
@@ -40,6 +42,11 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
                 fragmentViewModel.setTitle(it)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        navigator.currentDialogDestination = null
+        super.onDestroyView()
     }
 
     /**

@@ -19,6 +19,7 @@ import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.fragments.HotwireFragmentDelegate
 import dev.hotwire.navigation.fragments.HotwireFragmentViewModel
 import dev.hotwire.navigation.navigator.Navigator
+import dev.hotwire.navigation.navigator.location
 import dev.hotwire.navigation.routing.Router
 
 /**
@@ -193,7 +194,4 @@ interface HotwireDestination : BridgeDestination {
     override fun bridgeWebViewIsReady(): Boolean {
         return navigator.session.isReady
     }
-
-    private val Bundle.location
-        get() = getString("location")
 }

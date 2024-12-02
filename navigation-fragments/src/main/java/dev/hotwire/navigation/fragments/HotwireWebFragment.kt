@@ -134,7 +134,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
 
     /**
      * Gets the HotwireView instance in the Fragment's view
-     * with resource ID R.id.turbo_view.
+     * with resource ID R.id.hotwire_view.
      */
     final override val hotwireView: HotwireView?
         get() = view?.findViewById(R.id.hotwire_view)
