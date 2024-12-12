@@ -65,22 +65,27 @@ class HotwireConfig internal constructor() {
     }
 
     /**
-     * Provides a standard substring to be included in your WebView's user agent
-     * to identify itself as a Hotwire Native app.
-     *
-     * Important: Ensure that you've registered your bridge components before
-     * calling this so the bridge component names are included in your user agent.
+     * Set a custom user agent application prefix for every WebView instance. The
+     * library will automatically append a substring to your prefix which includes:
+     * - "Hotwire Native Android; Turbo Native Android;"
+     * - "bridge-components: [your bridge components];"
+     * - The WebView's default Chromium user agent string
      */
-    fun userAgentSubstring(): String {
-        val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
-        return "Hotwire Native Android; Turbo Native Android; bridge-components: [$components];"
-    }
+    var applicationUserAgentPrefix: String? = null
 
     /**
-     * Set a custom user agent for every WebView instance.
-     *
-     * Important: Include `Hotwire.userAgentSubstring()` as part of your
-     * custom user agent for compatibility with your server.
+     * Gets the full user agent that is used for every WebView instance. This includes:
+     * - Your (optional) custom `applicationUserAgentPrefix`
+     * - "Hotwire Native Android; Turbo Native Android;"
+     * - "bridge-components: [your bridge components];"
+     * - The WebView's default Chromium user agent string
      */
-    var userAgent: String = userAgentSubstring()
+    fun userAgent(context: Context): String {
+        val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
+
+        return applicationUserAgentPrefix?.let { "$it " }.orEmpty() +
+                "Hotwire Native Android; Turbo Native Android; " +
+                "bridge-components: [$components]; " +
+                Hotwire.webViewInfo(context).defaultUserAgent
+    }
 }
