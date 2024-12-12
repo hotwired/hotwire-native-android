@@ -83,9 +83,11 @@ class HotwireConfig internal constructor() {
     fun userAgent(context: Context): String {
         val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
 
-        return applicationUserAgentPrefix?.let { "$it " }.orEmpty() +
-                "Hotwire Native Android; Turbo Native Android; " +
-                "bridge-components: [$components]; " +
-                Hotwire.webViewInfo(context).defaultUserAgent
+        return listOf(
+            applicationUserAgentPrefix,
+            "Hotwire Native Android; Turbo Native Android;",
+            "bridge-components: [$components];",
+            Hotwire.webViewInfo(context).defaultUserAgent
+        ).filterNotNull().joinToString(" ")
     }
 }
