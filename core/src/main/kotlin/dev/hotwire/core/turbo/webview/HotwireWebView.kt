@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.util.AttributeSet
-import android.view.View
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
@@ -36,10 +35,10 @@ open class HotwireWebView @JvmOverloads constructor(
         internal set
 
     init {
-        id = View.generateViewId()
+        id = generateViewId()
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
-        settings.userAgentString = "${Hotwire.config.userAgent} ${settings.userAgentString}"
+        settings.userAgentString = Hotwire.config.userAgent(context)
         settings.setSupportMultipleWindows(true)
         layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
         initDayNightTheming()

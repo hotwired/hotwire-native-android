@@ -69,6 +69,6 @@ class DemoApplication : Application() {
         Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
-        Hotwire.config.userAgent = "Hotwire Demo; ${Hotwire.config.userAgentSubstring()}"
+        Hotwire.config.applicationUserAgentPrefix = "Hotwire Demo;"
     }
 }

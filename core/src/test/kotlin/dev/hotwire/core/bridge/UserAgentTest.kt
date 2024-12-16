@@ -1,24 +1,58 @@
 package dev.hotwire.core.bridge
 
+import android.content.Context
+import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.turbo.BaseUnitTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-class UserAgentTest {
-    @Test
-    fun userAgentSubstring() {
-        Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.R])
+class UserAgentTest : BaseUnitTest() {
+    private lateinit var context: Context
 
-        val userAgentSubstring = Hotwire.config.userAgentSubstring()
-        assertEquals(userAgentSubstring, "Hotwire Native Android; Turbo Native Android; bridge-components: [one two];")
+    @Before
+    override fun setup() {
+        super.setup()
+        context = ApplicationProvider.getApplicationContext()
+        Hotwire.config.applicationUserAgentPrefix = null
     }
 
     @Test
-    fun userAgent() {
+    fun `user agent with no prefix`() {
         Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
-        Hotwire.config.userAgent = "Test; ${Hotwire.config.userAgentSubstring()}"
 
-        val userAgent = Hotwire.config.userAgent
-        assertEquals(userAgent, "Test; Hotwire Native Android; Turbo Native Android; bridge-components: [one two];")
+        val userAgent = Hotwire.config.userAgent(context)
+        val expectedUserAgent =
+                "Hotwire Native Android; Turbo Native Android; " +
+                "bridge-components: [one two]; " +
+                TEST_USER_AGENT
+
+        assertEquals(expectedUserAgent, userAgent)
+    }
+
+    @Test
+    fun `user agent with prefix`() {
+        Hotwire.config.applicationUserAgentPrefix = "My Application Prefix;"
+        Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
+
+        val userAgent = Hotwire.config.userAgent(context)
+        val expectedUserAgent =
+                "My Application Prefix; " +
+                "Hotwire Native Android; Turbo Native Android; " +
+                "bridge-components: [one two]; " +
+                TEST_USER_AGENT
+
+        assertEquals(expectedUserAgent, userAgent)
+    }
+
+    companion object {
+        private const val TEST_USER_AGENT = "user"
     }
 }
