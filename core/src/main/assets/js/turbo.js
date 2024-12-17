@@ -166,6 +166,10 @@
       TurboSession.pageInvalidated()
     }
 
+    linkPrefetchingIsEnabledForLocation(location) {
+      return false
+    }
+
     // Private
 
     afterNextRepaint(callback) {
