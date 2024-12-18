@@ -94,6 +94,19 @@
         "uri": "hotwire://fragment/web/modal",
         "presentation": "replace_root"
       }
+    },
+    {
+      "patterns": [
+        "/custom/tabs"
+      ],
+      "properties": {
+        "tabs": [
+          {
+            "label": "Tab 1",
+            "path": "/tab1"
+          }
+        ]
+      }
     }
   ]
 }

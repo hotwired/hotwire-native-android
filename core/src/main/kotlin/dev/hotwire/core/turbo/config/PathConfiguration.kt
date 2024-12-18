@@ -104,13 +104,13 @@ class PathConfiguration {
     }
 }
 
-typealias PathConfigurationProperties = HashMap<String, String>
+typealias PathConfigurationProperties = HashMap<String, Any>
 typealias PathConfigurationSettings = HashMap<String, String>
 
 val PathConfigurationProperties.presentation: Presentation
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("presentation") ?: "default"
-        Presentation.valueOf(value.uppercase())
+        Presentation.valueOf(value.toString().uppercase())
     } catch (e: IllegalArgumentException) {
         Presentation.DEFAULT
     }
@@ -118,7 +118,7 @@ val PathConfigurationProperties.presentation: Presentation
 val PathConfigurationProperties.queryStringPresentation: QueryStringPresentation
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("query_string_presentation") ?: "default"
-        QueryStringPresentation.valueOf(value.uppercase())
+        QueryStringPresentation.valueOf(value.toString().uppercase())
     } catch (e: IllegalArgumentException) {
         QueryStringPresentation.DEFAULT
     }
@@ -126,19 +126,19 @@ val PathConfigurationProperties.queryStringPresentation: QueryStringPresentation
 val PathConfigurationProperties.context: PresentationContext
     @SuppressLint("DefaultLocale") get() = try {
         val value = get("context") ?: "default"
-        PresentationContext.valueOf(value.uppercase())
+        PresentationContext.valueOf(value.toString().uppercase())
     } catch (e: IllegalArgumentException) {
         PresentationContext.DEFAULT
     }
 
-val PathConfigurationProperties.uri: Uri?
-    get() = get("uri")?.toUri()
+val PathConfigurationProperties.uri: Uri
+    get() = get("uri").let { it.toString().toUri() }
 
-val PathConfigurationProperties.fallbackUri: Uri?
-    get() = get("fallback_uri")?.toUri()
+val PathConfigurationProperties.fallbackUri: Uri
+    get() = get("fallback_uri").let { it.toString().toUri() }
 
 val PathConfigurationProperties.title: String?
-    get() = get("title")
+    get() = get("title") as String?
 
 val PathConfigurationProperties.pullToRefreshEnabled: Boolean
-    get() = get("pull_to_refresh_enabled")?.toBoolean() ?: false
+    get() = get("pull_to_refresh_enabled").let { it as Boolean }
