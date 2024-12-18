@@ -166,6 +166,12 @@
       TurboSession.pageInvalidated()
     }
 
+    linkPrefetchingIsEnabledForLocation(location) {
+      // Disable link prefetching since it can be activated by link taps. We
+      // don't want to prefetch links that may correspond to native screens.
+      return false
+    }
+
     // Private
 
     afterNextRepaint(callback) {
