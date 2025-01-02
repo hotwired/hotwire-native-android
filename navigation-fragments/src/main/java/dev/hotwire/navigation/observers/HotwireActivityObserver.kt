@@ -3,6 +3,9 @@ package dev.hotwire.navigation.observers
 import android.webkit.CookieManager
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import dev.hotwire.navigation.util.dispatcherProvider
+import kotlinx.coroutines.launch
 
 internal class HotwireActivityObserver : DefaultLifecycleObserver {
     /**
@@ -13,7 +16,9 @@ internal class HotwireActivityObserver : DefaultLifecycleObserver {
      */
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
-        persistWebViewCookies()
+        owner.lifecycleScope.launch(dispatcherProvider.io) {
+            persistWebViewCookies()
+        }
     }
 
     private fun persistWebViewCookies() {
