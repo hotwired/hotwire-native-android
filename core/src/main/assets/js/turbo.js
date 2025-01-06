@@ -134,15 +134,15 @@
       this.loadResponseForVisitWithIdentifier(visit.identifier)
     }
 
-    async visitRequestFailedWithStatusCode(visit, statusCode) {
-      // Turbo does not permit cross-origin fetch redirect attempts and
-      // they'll lead to a visit request failure. Attempt to see if the
-      // visit request failure was due to a cross-origin redirect.
-      const redirect = await this.fetchFailedRequestCrossOriginRedirect(visit, statusCode)
+    visitRequestFailedWithStatusCode(visit, statusCode) {
       const location = visit.location.toString()
 
-      if (redirect != null) {
-        TurboSession.visitProposedToCrossOriginRedirect(location, redirect.toString(), visit.identifier)
+      // Non-HTTP status codes are sent by Turbo for network failures, including
+      // cross-origin fetch redirect attempts. For non-HTTP status codes, pass to
+      // the native side to determine whether a cross-origin redirect visit should
+      // be proposed.
+      if (statusCode <= 0) {
+        TurboSession.visitRequestFailedWithNonHttpStatusCode(location, visit.identifier, visit.hasCachedSnapshot())
       } else {
         TurboSession.visitRequestFailedWithStatusCode(location, visit.identifier, visit.hasCachedSnapshot(), statusCode)
       }
@@ -183,21 +183,6 @@
     }
 
     // Private
-
-    async fetchFailedRequestCrossOriginRedirect(visit, statusCode) {
-      // Non-HTTP status codes are sent by Turbo for network
-      // failures, including cross-origin fetch redirect attempts.
-      if (statusCode <= 0) {
-        try {
-          const response = await fetch(visit.location, { redirect: "follow" })
-          if (response.url != null && response.url.origin != visit.location.origin) {
-            return response.url
-          }
-        } catch {}
-      }
-
-      return null
-    }
 
     afterNextRepaint(callback) {
       if (document.hidden) {
