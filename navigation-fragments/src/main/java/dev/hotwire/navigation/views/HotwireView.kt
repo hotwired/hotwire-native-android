@@ -12,6 +12,9 @@ import android.widget.ImageView
 import androidx.core.view.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import dev.hotwire.navigation.R
+import dev.hotwire.navigation.logging.logError
+import dev.hotwire.navigation.logging.logEvent
+import kotlin.time.measureTimedValue
 
 /**
  * Turbo view that hosts the shared WebView, a progress view, an error view, and allows
@@ -136,9 +139,19 @@ class HotwireView @JvmOverloads constructor(context: Context, attrs: AttributeSe
         if (width <= 0 || height <= 0) return null
 
         return try {
-            drawToBitmap()
+            val (bitmap, duration) = measureTimedValue {
+                drawToBitmap()
+            }
+
+            logEvent("viewScreenshotCreated", listOf(
+                "size" to "${bitmap.width}x${bitmap.height}",
+                "duration" to "${duration.inWholeMilliseconds}ms"
+            ))
+
+            bitmap
         } catch (e: Exception) {
             // Don't ever crash when trying to make a screenshot
+            logError("viewScreenshotFailed", e)
             null
         }
     }
