@@ -309,12 +309,14 @@ internal class HotwireWebFragmentDelegate(
      * new view hierarchy, it needs to already be detached from the previous screen.
      */
     private fun detachWebView(onReady: () -> Unit = {}) {
-        val webView = webView
-        screenshotView()
+        navDestination.fragment.lifecycleScope.launch {
+            val webView = webView
+            screenshotView()
 
-        turboView?.detachWebView(webView) {
-            callback.onWebViewDetached(webView)
-            onReady()
+            turboView?.detachWebView(webView) {
+                callback.onWebViewDetached(webView)
+                onReady()
+            }
         }
     }
 
@@ -400,9 +402,11 @@ internal class HotwireWebFragmentDelegate(
         }
     }
 
-    private fun screenshotView() {
+    private suspend fun screenshotView() {
         turboView?.let {
-            screenshot = it.createScreenshot()
+            val bitmap = it.createScreenshot(navDestination.fragment)
+
+            screenshot = bitmap
             screenshotOrientation = it.screenshotOrientation()
             screenshotZoomed = currentlyZoomed
             showScreenshotIfAvailable(it)
