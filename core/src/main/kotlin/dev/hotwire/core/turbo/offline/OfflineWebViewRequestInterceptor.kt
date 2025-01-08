@@ -9,7 +9,7 @@ import dev.hotwire.core.turbo.util.isHttpGetRequest
 
 internal class OfflineWebViewRequestInterceptor(val session: Session) {
     private val offlineRequestHandler get() = Hotwire.config.offlineRequestHandler
-    private val httpRepository get() = session.httpRepository
+    private val httpRepository get() = session.offlineHttpRepository
     private val currentVisit get() = session.currentVisit
 
     fun interceptRequest(request: WebResourceRequest): WebResourceResponse? {

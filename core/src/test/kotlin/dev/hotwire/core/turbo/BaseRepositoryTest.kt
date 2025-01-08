@@ -1,5 +1,6 @@
 package dev.hotwire.core.turbo
 
+import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,6 +27,7 @@ open class BaseRepositoryTest : BaseUnitTest() {
 
     override fun setup() {
         super.setup()
+        HotwireHttpClient.instance = client()
         Dispatchers.setMain(testDispatcher)
         dispatcherProvider.io = Dispatchers.Main
         server.start()
@@ -38,25 +40,30 @@ open class BaseRepositoryTest : BaseUnitTest() {
         server.shutdown()
     }
 
-    protected fun client(): OkHttpClient {
-        return OkHttpClient.Builder()
-                .dispatcher(Dispatcher(SynchronousExecutorService()))
-                .build()
-    }
-
     protected fun baseUrl(): String {
         return server.url("/").toString()
     }
 
-    protected fun enqueueResponse(fileName: String, headers: Map<String, String> = emptyMap()) {
+    protected fun enqueueResponse(
+        fileName: String,
+        responseCode: Int = 200,
+        headers: Map<String, String> = emptyMap()
+    ) {
         val inputStream = loadAsset(fileName)
         val source = inputStream.source().buffer()
         val mockResponse = MockResponse().apply {
+            setResponseCode(responseCode)
             headers.forEach { addHeader(it.key, it.value) }
             setBody(source.readString(StandardCharsets.UTF_8))
         }
 
         server.enqueue(mockResponse)
+    }
+
+    private fun client(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .dispatcher(Dispatcher(SynchronousExecutorService()))
+            .build()
     }
 
     private fun loadAsset(fileName: String): InputStream {
