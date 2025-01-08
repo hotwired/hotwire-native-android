@@ -11,13 +11,17 @@ import okhttp3.Response
 internal class HttpRepository {
     private val cookieManager = CookieManager.getInstance()
 
-    data class Result(
+    data class HttpRequestResult(
         val response: Response,
-        val redirectToLocation: String?,
-        val redirectIsCrossOrigin: Boolean
+        val redirect: HttpRedirect?
     )
 
-    suspend fun fetch(location: String): Result? {
+    data class HttpRedirect(
+        val location: String,
+        val isCrossOrigin: Boolean
+    )
+
+    suspend fun fetch(location: String): HttpRequestResult? {
         return withContext(dispatcherProvider.io) {
             val response = issueRequest(location)
 
@@ -25,12 +29,13 @@ internal class HttpRepository {
                 // Determine if there was a redirect, based on the final response's request url
                 val responseUrl = response.request.url
                 val isRedirect = location != responseUrl.toString()
-                val redirectIsCrossOrigin = isRedirect && location.toHttpUrl().host != responseUrl.host
 
-                Result(
+                HttpRequestResult(
                     response = response,
-                    redirectToLocation = if (isRedirect) responseUrl.toString() else null,
-                    redirectIsCrossOrigin = redirectIsCrossOrigin
+                    redirect = if (!isRedirect) null else HttpRedirect(
+                        location = responseUrl.toString(),
+                        isCrossOrigin = location.toHttpUrl().host != responseUrl.host
+                    )
                 )
             } else {
                 null

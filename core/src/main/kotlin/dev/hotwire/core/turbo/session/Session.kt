@@ -353,10 +353,10 @@ class Session(
             val result = httpRepository.fetch(location)
 
             if (result != null && result.response.isSuccessful &&
-                result.redirectToLocation != null && result.redirectIsCrossOrigin) {
+                result.redirect?.isCrossOrigin == true) {
                 visitProposedToCrossOriginRedirect(
                     location = location,
-                    redirectLocation = result.redirectToLocation,
+                    redirectLocation = result.redirect.location,
                     visitIdentifier = visitIdentifier
                 )
             } else {
