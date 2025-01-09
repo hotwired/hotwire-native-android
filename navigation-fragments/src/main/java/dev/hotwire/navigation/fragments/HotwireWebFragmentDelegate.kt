@@ -279,7 +279,8 @@ internal class HotwireWebFragmentDelegate(
         turboView?.apply {
             initializePullToRefresh(this)
             initializeErrorPullToRefresh(this)
-            showScreenshotIfAvailable(this)
+
+            screenshot.showScreenshotIfAvailable(this, currentlyZoomed)
             screenshot.reset()
         }
     }
@@ -408,7 +409,7 @@ internal class HotwireWebFragmentDelegate(
     private suspend fun screenshotView() {
         turboView?.let {
             screenshot.captureScreenshot(it, navDestination.fragment, currentlyZoomed)
-            showScreenshotIfAvailable(it)
+            screenshot.showScreenshotIfAvailable(it, currentlyZoomed)
         }
     }
 
@@ -435,10 +436,6 @@ internal class HotwireWebFragmentDelegate(
 
     private fun pullToRefreshEnabled(enabled: Boolean) {
         turboView?.webViewRefresh?.isEnabled = enabled
-    }
-
-    private fun showScreenshotIfAvailable(hotwireView: HotwireView) {
-        screenshot.showScreenshotIfAvailable(hotwireView, currentlyZoomed)
     }
 
     private fun removeTransitionalViews() {

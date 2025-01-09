@@ -15,7 +15,7 @@ internal class HotwireViewScreenshot {
     var bitmap: Bitmap? = null
     var screenshotOrientation = 0
     var screenshotZoomed = false
-    
+
     fun reset() {
         bitmap = null
         screenshotOrientation = 0
@@ -31,13 +31,13 @@ internal class HotwireViewScreenshot {
     }
 
     suspend fun captureScreenshot(hotwireView: HotwireView, fragment: Fragment, currentlyZoomed: Boolean) {
-        bitmap = createScreenshot(hotwireView, fragment)
+        bitmap = copyViewToBitmap(hotwireView, fragment)
         screenshotOrientation = hotwireView.currentOrientation()
         screenshotZoomed = currentlyZoomed
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun createScreenshot(hotwireView: HotwireView, fragment: Fragment): Bitmap? {
+    private suspend fun copyViewToBitmap(hotwireView: HotwireView, fragment: Fragment): Bitmap? {
         return suspendCancellableCoroutine { continuation ->
             if (!hotwireView.isLaidOut || !hasEnoughMemoryForScreenshot() || (hotwireView.width <= 0 || hotwireView.height <= 0)) {
                 if (continuation.isActive) {
@@ -62,7 +62,6 @@ internal class HotwireViewScreenshot {
                             "viewScreenshotCreated", listOf(
                                 "size" to "${bitmap.width}x${bitmap.height}",
                                 "duration" to "${System.currentTimeMillis() - start}ms",
-                                "API" to "PixelCopy"
                             )
                         )
                         if (continuation.isActive) {
