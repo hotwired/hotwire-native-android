@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.PixelCopy
 import android.view.View
+import dev.hotwire.navigation.logging.logError
 import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.views.HotwireView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -75,7 +76,7 @@ internal class HotwireViewScreenshotHolder {
                                 continuation.resume(bitmap, null)
                             }
                         } else {
-                            logEvent("viewScreenshotFailed", listOf("error" to result))
+                            logError("viewScreenshotFailed", Exception("PixelCopy failed with result $result"))
                             if (continuation.isActive) {
                                 continuation.resume(null, null)
                             }
@@ -84,7 +85,7 @@ internal class HotwireViewScreenshotHolder {
                     Handler(Looper.getMainLooper())
                 )
             } catch (exception: Exception) {
-                logEvent("viewScreenshotFailed", listOf("error" to exception))
+                logError("viewScreenshotFailed", exception)
                 if (continuation.isActive) {
                     continuation.resume(null, null)
                 }
