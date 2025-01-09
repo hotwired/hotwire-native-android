@@ -78,7 +78,7 @@ dependencies {
     implementation(project(":core"))
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
 
     // AndroidX
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
