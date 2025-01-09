@@ -11,7 +11,7 @@ import dev.hotwire.navigation.views.HotwireView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-internal class HotwireViewScreenshot {
+internal class HotwireViewScreenshotHolder {
     var bitmap: Bitmap? = null
     var screenshotOrientation = 0
     var screenshotZoomed = false

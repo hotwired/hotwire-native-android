@@ -20,7 +20,7 @@ import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.session.SessionModalResult
-import dev.hotwire.navigation.util.HotwireViewScreenshot
+import dev.hotwire.navigation.util.HotwireViewScreenshotHolder
 import dev.hotwire.navigation.util.dispatcherProvider
 import dev.hotwire.navigation.views.HotwireView
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ internal class HotwireWebFragmentDelegate(
     private val identifier = generateIdentifier()
     private var isInitialVisit = true
     private var isWebViewAttachedToNewDestination = false
-    private val screenshot = HotwireViewScreenshot()
+    private val screenshotHolder = HotwireViewScreenshotHolder()
     private var currentlyZoomed = false
     private val navigator get() = navDestination.navigator
     private val session get() = navigator.session
@@ -280,8 +280,8 @@ internal class HotwireWebFragmentDelegate(
             initializePullToRefresh(this)
             initializeErrorPullToRefresh(this)
 
-            screenshot.showScreenshotIfAvailable(this, currentlyZoomed)
-            screenshot.reset()
+            screenshotHolder.showScreenshotIfAvailable(this, currentlyZoomed)
+            screenshotHolder.reset()
         }
     }
 
@@ -408,8 +408,8 @@ internal class HotwireWebFragmentDelegate(
 
     private suspend fun screenshotView() {
         turboView?.let {
-            screenshot.captureScreenshot(it, navDestination.fragment, currentlyZoomed)
-            screenshot.showScreenshotIfAvailable(it, currentlyZoomed)
+            screenshotHolder.captureScreenshot(it, navDestination.fragment, currentlyZoomed)
+            screenshotHolder.showScreenshotIfAvailable(it, currentlyZoomed)
         }
     }
 
