@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentOnAttachListener
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire
@@ -48,6 +49,18 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
      */
     fun isReady(): Boolean {
         return isAdded && !isDetached && childFragmentManager.primaryNavigationFragment != null
+    }
+
+    /**
+     *
+     */
+    fun setMaxLifecycle(state: Lifecycle.State) {
+        val currentFragment = childFragmentManager.primaryNavigationFragment ?: return
+
+        childFragmentManager
+            .beginTransaction()
+            .setMaxLifecycle(currentFragment, state)
+            .commit()
     }
 
     internal fun initControllerGraph() {
