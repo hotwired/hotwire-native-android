@@ -1,20 +1,25 @@
 package dev.hotwire.navigation.util
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import android.view.PixelCopy
-import androidx.fragment.app.Fragment
+import android.view.View
 import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.views.HotwireView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.security.AccessController.getContext
 
 internal class HotwireViewScreenshotHolder {
-    var bitmap: Bitmap? = null
-    var screenshotOrientation = 0
-    var screenshotZoomed = false
+    private var bitmap: Bitmap? = null
+    private var screenshotOrientation = 0
+    private var screenshotZoomed = false
+    var currentlyZoomed = false
 
     fun reset() {
         bitmap = null
@@ -22,7 +27,7 @@ internal class HotwireViewScreenshotHolder {
         screenshotZoomed = false
     }
 
-    fun showScreenshotIfAvailable(hotwireView: HotwireView, currentlyZoomed: Boolean) {
+    fun showScreenshotIfAvailable(hotwireView: HotwireView) {
         if (screenshotOrientation == hotwireView.currentOrientation() &&
             screenshotZoomed == currentlyZoomed
         ) {
@@ -30,19 +35,30 @@ internal class HotwireViewScreenshotHolder {
         }
     }
 
-    suspend fun captureScreenshot(hotwireView: HotwireView, fragment: Fragment, currentlyZoomed: Boolean) {
-        bitmap = copyViewToBitmap(hotwireView, fragment)
+    suspend fun captureScreenshot(hotwireView: HotwireView) {
+        bitmap = copyViewToBitmap(hotwireView)
         screenshotOrientation = hotwireView.currentOrientation()
         screenshotZoomed = currentlyZoomed
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun copyViewToBitmap(hotwireView: HotwireView, fragment: Fragment): Bitmap? {
+    private suspend fun copyViewToBitmap(hotwireView: HotwireView): Bitmap? {
         return suspendCancellableCoroutine { continuation ->
             if (!hotwireView.isLaidOut || !hasEnoughMemoryForScreenshot() || (hotwireView.width <= 0 || hotwireView.height <= 0)) {
+                logEvent("viewScreenshotFailed", "View not laid out or not enough memory")
+                if (continuation.isActive) {
+                    continuation.resume(null, null)
+                    return@suspendCancellableCoroutine
+                }
+            }
+
+            val window = hotwireView.getActivity()?.window
+            if (window == null) {
+                logEvent("viewScreenshotFailed", "Failed to obtain window")
                 if (continuation.isActive) {
                     continuation.resume(null, null)
                 }
+                return@suspendCancellableCoroutine
             }
 
             val start = System.currentTimeMillis()
@@ -53,7 +69,7 @@ internal class HotwireViewScreenshotHolder {
             val bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888)
 
             PixelCopy.request(
-                fragment.requireActivity().window,
+                window,
                 rect,
                 bitmap,
                 { result ->
@@ -86,5 +102,17 @@ internal class HotwireViewScreenshotHolder {
         val remaining = 1f - (used / max)
 
         return remaining > .20
+    }
+
+    // Inspired by https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/MediaRouteButton.java#163
+    private fun View.getActivity(): Activity? {
+        var context: Context? = getContext()
+        while (context is ContextWrapper) {
+            if (context is Activity) {
+                return context
+            }
+            context = context.baseContext
+        }
+        return null
     }
 }

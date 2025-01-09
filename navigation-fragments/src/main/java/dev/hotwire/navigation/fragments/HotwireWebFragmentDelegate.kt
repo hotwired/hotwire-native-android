@@ -43,7 +43,6 @@ internal class HotwireWebFragmentDelegate(
     private var isInitialVisit = true
     private var isWebViewAttachedToNewDestination = false
     private val screenshotHolder = HotwireViewScreenshotHolder()
-    private var currentlyZoomed = false
     private val navigator get() = navDestination.navigator
     private val session get() = navigator.session
     private val turboView get() = callback.hotwireView
@@ -184,12 +183,12 @@ internal class HotwireWebFragmentDelegate(
     }
 
     override fun onZoomed(newScale: Float) {
-        currentlyZoomed = true
+        screenshotHolder.currentlyZoomed = true
         pullToRefreshEnabled(false)
     }
 
     override fun onZoomReset(newScale: Float) {
-        currentlyZoomed = false
+        screenshotHolder.currentlyZoomed = false
         pullToRefreshEnabled(navDestination.pathProperties.pullToRefreshEnabled)
     }
 
@@ -275,12 +274,12 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private fun initView() {
-        currentlyZoomed = false
+        screenshotHolder.currentlyZoomed = false
         turboView?.apply {
             initializePullToRefresh(this)
             initializeErrorPullToRefresh(this)
 
-            screenshotHolder.showScreenshotIfAvailable(this, currentlyZoomed)
+            screenshotHolder.showScreenshotIfAvailable(this)
             screenshotHolder.reset()
         }
     }
@@ -408,8 +407,8 @@ internal class HotwireWebFragmentDelegate(
 
     private suspend fun screenshotView() {
         turboView?.let {
-            screenshotHolder.captureScreenshot(it, navDestination.fragment, currentlyZoomed)
-            screenshotHolder.showScreenshotIfAvailable(it, currentlyZoomed)
+            screenshotHolder.captureScreenshot(it)
+            screenshotHolder.showScreenshotIfAvailable(it)
         }
     }
 
