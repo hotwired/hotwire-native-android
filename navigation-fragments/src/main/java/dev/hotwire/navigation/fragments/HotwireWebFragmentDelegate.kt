@@ -45,8 +45,8 @@ internal class HotwireWebFragmentDelegate(
     private val screenshotHolder = HotwireViewScreenshotHolder()
     private val navigator get() = navDestination.navigator
     private val session get() = navigator.session
-    private val turboView get() = callback.hotwireView
-    private val viewTreeLifecycleOwner get() = turboView?.findViewTreeLifecycleOwner()
+    private val hotwireView get() = callback.hotwireView
+    private val viewTreeLifecycleOwner get() = hotwireView?.findViewTreeLifecycleOwner()
 
     /**
      * Get the session's WebView instance
@@ -137,7 +137,7 @@ internal class HotwireWebFragmentDelegate(
     fun refresh(displayProgress: Boolean) {
         if (webView.url == null) return
 
-        turboView?.webViewRefresh?.apply {
+        hotwireView?.webViewRefresh?.apply {
             if (displayProgress && !isRefreshing) {
                 isRefreshing = true
             }
@@ -151,7 +151,7 @@ internal class HotwireWebFragmentDelegate(
      * Displays the error view that's implemented via [HotwireWebFragmentCallback.createErrorView].
      */
     fun showErrorView(error: VisitError) {
-        turboView?.addErrorView(callback.createErrorView(error))
+        hotwireView?.addErrorView(callback.createErrorView(error))
     }
 
     // -----------------------------------------------------------------------
@@ -275,7 +275,7 @@ internal class HotwireWebFragmentDelegate(
 
     private fun initView() {
         screenshotHolder.currentlyZoomed = false
-        turboView?.let {
+        hotwireView?.let {
             initializePullToRefresh(it)
             initializeErrorPullToRefresh(it)
 
@@ -289,7 +289,7 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private fun attachWebView(onReady: (Boolean) -> Unit = {}) {
-        val view = turboView
+        val view = hotwireView
 
         if (view == null) {
             onReady(false)
@@ -316,7 +316,7 @@ internal class HotwireWebFragmentDelegate(
             val webView = webView
             screenshotView()
 
-            turboView?.detachWebView(webView) {
+            hotwireView?.detachWebView(webView) {
                 callback.onWebViewDetached(webView)
                 onReady()
             }
@@ -345,7 +345,7 @@ internal class HotwireWebFragmentDelegate(
 
     private fun webViewIsAttached(): Boolean {
         val webView = webView
-        return turboView?.webViewIsAttached(webView) ?: false
+        return hotwireView?.webViewIsAttached(webView) ?: false
     }
 
     private fun title(): String {
@@ -406,14 +406,14 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private suspend fun screenshotView() {
-        turboView?.let {
+        hotwireView?.let {
             screenshotHolder.captureScreenshot(it)
             screenshotHolder.showScreenshotIfAvailable(it)
         }
     }
 
     private fun showProgressView(location: String) {
-        turboView?.addProgressView(callback.createProgressView(location))
+        hotwireView?.addProgressView(callback.createProgressView(location))
     }
 
     private fun initializePullToRefresh(hotwireView: HotwireView) {
@@ -434,15 +434,15 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private fun pullToRefreshEnabled(enabled: Boolean) {
-        turboView?.webViewRefresh?.isEnabled = enabled
+        hotwireView?.webViewRefresh?.isEnabled = enabled
     }
 
     private fun removeTransitionalViews() {
-        turboView?.webViewRefresh?.isRefreshing = false
-        turboView?.errorRefresh?.isRefreshing = false
-        turboView?.removeProgressView()
-        turboView?.removeScreenshot()
-        turboView?.removeErrorView()
+        hotwireView?.webViewRefresh?.isRefreshing = false
+        hotwireView?.errorRefresh?.isRefreshing = false
+        hotwireView?.removeProgressView()
+        hotwireView?.removeScreenshot()
+        hotwireView?.removeErrorView()
     }
 
     private fun generateIdentifier(): Int {
