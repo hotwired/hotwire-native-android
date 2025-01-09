@@ -27,7 +27,6 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
     override fun setup() {
         super.setup()
         context = ApplicationProvider.getApplicationContext()
-        HotwireHttpClient.instance = client()
     }
 
     @Test

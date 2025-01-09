@@ -241,6 +241,13 @@ internal class HotwireWebFragmentDelegate(
         navigator.route(location, options)
     }
 
+    override fun visitProposedToCrossOriginRedirect(location: String) {
+        // Pop the current destination from the backstack since it
+        // resulted in a visit failure due to a cross-origin redirect.
+        navigator.pop()
+        navigator.route(location)
+    }
+
     override fun visitDestination(): VisitDestination {
         return this
     }
