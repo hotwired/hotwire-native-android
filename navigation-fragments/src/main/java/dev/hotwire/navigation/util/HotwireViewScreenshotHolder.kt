@@ -59,30 +59,37 @@ internal class HotwireViewScreenshotHolder {
 
             val bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888)
 
-            PixelCopy.request(
-                window,
-                rect,
-                bitmap,
-                { result ->
-                    if (result == PixelCopy.SUCCESS) {
-                        logEvent(
-                            "viewScreenshotCreated", listOf(
-                                "size" to "${bitmap.width}x${bitmap.height}",
-                                "duration" to "${System.currentTimeMillis() - start}ms",
+            try {
+                PixelCopy.request(
+                    window,
+                    rect,
+                    bitmap,
+                    { result ->
+                        if (result == PixelCopy.SUCCESS) {
+                            logEvent(
+                                "viewScreenshotCreated", listOf(
+                                    "size" to "${bitmap.width}x${bitmap.height}",
+                                    "duration" to "${System.currentTimeMillis() - start}ms",
+                                )
                             )
-                        )
-                        if (continuation.isActive) {
-                            continuation.resume(bitmap, null)
+                            if (continuation.isActive) {
+                                continuation.resume(bitmap, null)
+                            }
+                        } else {
+                            logEvent("viewScreenshotFailed", listOf("error" to result))
+                            if (continuation.isActive) {
+                                continuation.resume(null, null)
+                            }
                         }
-                    } else {
-                        logEvent("viewScreenshotFailed", listOf("error" to result))
-                        if (continuation.isActive) {
-                            continuation.resume(null, null)
-                        }
-                    }
-                },
-                Handler(Looper.getMainLooper())
-            )
+                    },
+                    Handler(Looper.getMainLooper())
+                )
+            } catch (exception: Exception) {
+                logEvent("viewScreenshotFailed", listOf("error" to exception))
+                if (continuation.isActive) {
+                    continuation.resume(null, null)
+                }
+            }
         }
     }
 
