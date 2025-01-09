@@ -13,6 +13,7 @@ import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.views.HotwireView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.security.AccessController.getContext
 
 internal class HotwireViewScreenshotHolder {
     private var bitmap: Bitmap? = null
@@ -44,7 +45,6 @@ internal class HotwireViewScreenshotHolder {
     private suspend fun copyViewToBitmap(hotwireView: HotwireView): Bitmap? {
         return suspendCancellableCoroutine { continuation ->
             val start = System.currentTimeMillis()
-
             val window = hotwireView.getActivity()?.window
 
             if (window == null || !hotwireView.isLaidOut || !hasEnoughMemoryForScreenshot() || (hotwireView.width <= 0 || hotwireView.height <= 0)) {
