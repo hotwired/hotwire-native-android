@@ -130,29 +130,7 @@ class HotwireView @JvmOverloads constructor(context: Context, attrs: AttributeSe
         }
     }
 
-    internal fun createScreenshot(): Bitmap? {
-        if (!isLaidOut) return null
-        if (!hasEnoughMemoryForScreenshot()) return null
-        if (width <= 0 || height <= 0) return null
-
-        return try {
-            drawToBitmap()
-        } catch (e: Exception) {
-            // Don't ever crash when trying to make a screenshot
-            null
-        }
-    }
-
-    internal fun screenshotOrientation(): Int {
+    internal fun currentOrientation(): Int {
         return context.resources.configuration.orientation
-    }
-
-    private fun hasEnoughMemoryForScreenshot(): Boolean {
-        val runtime = Runtime.getRuntime()
-        val used = runtime.totalMemory().toFloat()
-        val max = runtime.maxMemory().toFloat()
-        val remaining = 1f - (used / max)
-
-        return remaining > .20
     }
 }
