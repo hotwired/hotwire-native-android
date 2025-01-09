@@ -1,7 +1,6 @@
 package dev.hotwire.navigation.fragments
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.webkit.HttpAuthHandler
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -21,6 +20,7 @@ import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.session.SessionModalResult
+import dev.hotwire.navigation.util.HotwireViewScreenshot
 import dev.hotwire.navigation.util.dispatcherProvider
 import dev.hotwire.navigation.views.HotwireView
 import kotlinx.coroutines.launch
@@ -42,9 +42,7 @@ internal class HotwireWebFragmentDelegate(
     private val identifier = generateIdentifier()
     private var isInitialVisit = true
     private var isWebViewAttachedToNewDestination = false
-    private var screenshot: Bitmap? = null
-    private var screenshotOrientation = 0
-    private var screenshotZoomed = false
+    private val screenshot = HotwireViewScreenshot()
     private var currentlyZoomed = false
     private val navigator get() = navDestination.navigator
     private val session get() = navigator.session
@@ -275,9 +273,7 @@ internal class HotwireWebFragmentDelegate(
             initializePullToRefresh(this)
             initializeErrorPullToRefresh(this)
             showScreenshotIfAvailable(this)
-            screenshot = null
-            screenshotOrientation = 0
-            screenshotZoomed = false
+            screenshot.reset()
         }
     }
 
@@ -309,7 +305,7 @@ internal class HotwireWebFragmentDelegate(
      * new view hierarchy, it needs to already be detached from the previous screen.
      */
     private fun detachWebView(onReady: () -> Unit = {}) {
-        navDestination.fragment.lifecycleScope.launch {
+        viewTreeLifecycleOwner?.lifecycleScope?.launch {
             val webView = webView
             screenshotView()
 
@@ -404,11 +400,7 @@ internal class HotwireWebFragmentDelegate(
 
     private suspend fun screenshotView() {
         turboView?.let {
-            val bitmap = it.createScreenshot(navDestination.fragment)
-
-            screenshot = bitmap
-            screenshotOrientation = it.screenshotOrientation()
-            screenshotZoomed = currentlyZoomed
+            screenshot.captureScreenshot(it, navDestination.fragment, currentlyZoomed)
             showScreenshotIfAvailable(it)
         }
     }
@@ -439,11 +431,7 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private fun showScreenshotIfAvailable(hotwireView: HotwireView) {
-        if (screenshotOrientation == hotwireView.screenshotOrientation() &&
-            screenshotZoomed == currentlyZoomed
-        ) {
-            screenshot?.let { hotwireView.addScreenshot(it) }
-        }
+        screenshot.showScreenshotIfAvailable(hotwireView, currentlyZoomed)
     }
 
     private fun removeTransitionalViews() {

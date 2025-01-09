@@ -2,27 +2,16 @@ package dev.hotwire.navigation.views
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
-import android.view.PixelCopy
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.view.*
-import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import dev.hotwire.navigation.R
-import dev.hotwire.navigation.logging.logError
-import dev.hotwire.navigation.logging.logEvent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resumeWithException
-import kotlin.time.measureTimedValue
 
 /**
  * Turbo view that hosts the shared WebView, a progress view, an error view, and allows
@@ -141,60 +130,7 @@ class HotwireView @JvmOverloads constructor(context: Context, attrs: AttributeSe
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    internal suspend fun createScreenshot(fragment: Fragment): Bitmap? {
-        return suspendCancellableCoroutine { continuation ->
-            if (!isLaidOut || !hasEnoughMemoryForScreenshot() || (width <= 0 || height <= 0)) {
-                if (continuation.isActive) {
-                    continuation.resume(null, null)
-                }
-            }
-
-            val start = System.currentTimeMillis()
-
-            val rect = Rect()
-            getGlobalVisibleRect(rect)
-
-            val bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888)
-
-            PixelCopy.request(
-                fragment.requireActivity().window,
-                rect,
-                bitmap,
-                { result ->
-                    if (result == PixelCopy.SUCCESS) {
-                        logEvent(
-                            "viewScreenshotCreated", listOf(
-                                "size" to "${bitmap.width}x${bitmap.height}",
-                                "duration" to "${System.currentTimeMillis() - start}ms",
-                                "API" to "PixelCopy"
-                            )
-                        )
-                        if (continuation.isActive) {
-                            continuation.resume(bitmap, null)
-                        }
-                    } else {
-                        logEvent("viewScreenshotFailed", listOf("error" to result))
-                        if (continuation.isActive) {
-                            continuation.resume(null, null)
-                        }
-                    }
-                },
-                Handler(Looper.getMainLooper())
-            )
-        }
-    }
-
-    internal fun screenshotOrientation(): Int {
+    internal fun currentOrientation(): Int {
         return context.resources.configuration.orientation
-    }
-
-    private fun hasEnoughMemoryForScreenshot(): Boolean {
-        val runtime = Runtime.getRuntime()
-        val used = runtime.totalMemory().toFloat()
-        val max = runtime.maxMemory().toFloat()
-        val remaining = 1f - (used / max)
-
-        return remaining > .20
     }
 }
