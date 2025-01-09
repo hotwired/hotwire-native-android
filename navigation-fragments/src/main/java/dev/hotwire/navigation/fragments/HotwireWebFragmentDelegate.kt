@@ -275,11 +275,11 @@ internal class HotwireWebFragmentDelegate(
 
     private fun initView() {
         screenshotHolder.currentlyZoomed = false
-        turboView?.apply {
-            initializePullToRefresh(this)
-            initializeErrorPullToRefresh(this)
+        turboView?.let {
+            initializePullToRefresh(it)
+            initializeErrorPullToRefresh(it)
 
-            screenshotHolder.showScreenshotIfAvailable(this)
+            screenshotHolder.showScreenshotIfAvailable(it)
             screenshotHolder.reset()
         }
     }
