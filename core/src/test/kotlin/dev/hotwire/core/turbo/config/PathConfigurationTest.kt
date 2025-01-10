@@ -3,11 +3,15 @@ package dev.hotwire.core.turbo.config
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
 import dev.hotwire.core.turbo.nav.PresentationContext
+import dev.hotwire.core.turbo.util.toJson
+import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -38,7 +42,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.rules.size).isEqualTo(10)
+        assertThat(pathConfiguration.rules.size).isEqualTo(11)
     }
 
     @Test
@@ -84,4 +88,20 @@ class PathConfigurationTest : BaseRepositoryTest() {
         assertThat(pathConfiguration.properties("$url/home").pullToRefreshEnabled).isTrue
         assertThat(pathConfiguration.properties("$url/new").pullToRefreshEnabled).isFalse
     }
+
+    @Test
+    fun customProperties() {
+        assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.size)).isEqualTo(1)
+        assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.first()?.label)).isEqualTo("Tab 1")
+    }
+
+    //    Extension function to show support for serialising custom properties
+    private fun PathConfigurationProperties.getTabs(): List<Tab>? {
+        return get("tabs")?.toJson()?.toObject(object : TypeToken<List<Tab>>() {})
+    }
+
+    internal data class Tab(
+        @SerializedName("label") val label: String,
+        @SerializedName("path") val path: String
+    )
 }
