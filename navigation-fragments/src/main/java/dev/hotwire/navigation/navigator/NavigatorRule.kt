@@ -138,7 +138,7 @@ internal class NavigatorRule(
             location = newLocation,
             options = newVisitOptions,
             bundle = newBundle,
-            shouldNavigate = newProperties.presentation != Presentation.NONE
+            shouldNavigate = newProperties.presentation != Presentation.NONE && newProperties.presentation != Presentation.POP
         )
     }
 
