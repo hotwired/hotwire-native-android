@@ -121,10 +121,10 @@ internal class NavigatorRule(
                 newPresentation != Presentation.REPLACE_ROOT
 
         return when {
+            presentationNone -> NavigatorMode.NONE
             dismissModalContext -> NavigatorMode.DISMISS_MODAL
             navigateToModalContext -> NavigatorMode.TO_MODAL
             presentationRefresh -> NavigatorMode.REFRESH
-            presentationNone -> NavigatorMode.NONE
             else -> NavigatorMode.IN_CONTEXT
         }
     }
