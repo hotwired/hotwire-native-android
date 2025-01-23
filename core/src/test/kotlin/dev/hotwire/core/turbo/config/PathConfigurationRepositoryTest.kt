@@ -54,6 +54,20 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
     }
 
     @Test
+    fun getMalformedRemoteConfiguration() {
+        enqueueResponse("malformed-body.json")
+        val loader = PathConfigurationLoader(context)
+
+        runBlocking {
+            launch(Dispatchers.Main) {
+                val json = repository.getRemoteConfiguration(baseUrl())
+                val pathConfiguration = json?.let { loader.load(it) }
+                assertThat(pathConfiguration).isNull()
+            }
+        }
+    }
+
+    @Test
     fun getCachedConfiguration() {
         val url = "https://turbo.hotwired.dev/demo/configurations/android-v1.json"
         val config = requireNotNull(load(json()))

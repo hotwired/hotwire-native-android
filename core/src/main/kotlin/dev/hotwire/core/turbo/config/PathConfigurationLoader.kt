@@ -63,10 +63,12 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         repository.cacheConfigurationForUrl(context, url, pathConfiguration)
     }
 
-    private fun load(json: String) = try {
-        json.toObject(object : TypeToken<PathConfiguration>() {})
-    } catch(e: Exception) {
-        logError("pathConfiguredFailedToParse", e)
-        null
+    fun load(json: String): PathConfiguration? {
+     return try {
+            json.toObject(object : TypeToken<PathConfiguration>() {})
+        } catch (e: Exception) {
+            logError("pathConfiguredFailedToParse", e)
+            null
+        }
     }
 }
