@@ -3,8 +3,7 @@ package dev.hotwire.core.turbo.config
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.*
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
 import dev.hotwire.core.turbo.nav.PresentationContext
@@ -64,6 +63,42 @@ class PathConfigurationTest : BaseRepositoryTest() {
             pathConfiguration.load(context, location)
             verify(mockRepository).getCachedConfigurationForUrl(context, remoteUrl)
             verify(mockRepository).getRemoteConfiguration(remoteUrl)
+        }
+    }
+
+    @Test
+    fun validConfigurationIsCached() {
+        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+            repository = mockRepository
+        }
+
+        runBlocking {
+            val remoteUrl = "$url/demo/configurations/android-v1.json"
+            val location = Location(remoteFileUrl = remoteUrl)
+            val json = """{ "settings": {}, "rules": [] }"""
+
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl)).thenReturn(json)
+
+            pathConfiguration.load(context, location)
+            verify(mockRepository).cacheConfigurationForUrl(eq(context), eq(remoteUrl), any())
+        }
+    }
+
+    @Test
+    fun malformedConfigurationIsNotCached() {
+        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+            repository = mockRepository
+        }
+
+        runBlocking {
+            val remoteUrl = "$url/demo/configurations/android-v1.json"
+            val location = Location(remoteFileUrl = remoteUrl)
+            val json = "malformed-json"
+
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl)).thenReturn(json)
+
+            pathConfiguration.load(context, location)
+            verify(mockRepository, never()).cacheConfigurationForUrl(any(), any(), any())
         }
     }
 
