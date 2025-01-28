@@ -111,7 +111,7 @@ class Session(
 
         offlineHttpRepository.preCache(
             requestHandler, OfflinePreCacheRequest(
-                url = location, userAgent = webView.settings.userAgentString
+                url = location, userAgent = Hotwire.config.userAgentWithWebViewDefault(context)
             )
         )
     }

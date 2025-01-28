@@ -74,20 +74,30 @@ class HotwireConfig internal constructor() {
     var applicationUserAgentPrefix: String? = null
 
     /**
+     * Gets the user agent that the library builds to identify the app
+     * and its registered bridge components. This includes:
+     * - Your (optional) custom `applicationUserAgentPrefix`
+     * - "Hotwire Native Android; Turbo Native Android;"
+     * - "bridge-components: [your bridge components];"
+     */
+    val userAgent: String get() {
+        val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
+
+        return listOf(
+            applicationUserAgentPrefix,
+            "Hotwire Native Android; Turbo Native Android;",
+            "bridge-components: [$components];"
+        ).filterNotNull().joinToString(" ")
+    }
+
+    /**
      * Gets the full user agent that is used for every WebView instance. This includes:
      * - Your (optional) custom `applicationUserAgentPrefix`
      * - "Hotwire Native Android; Turbo Native Android;"
      * - "bridge-components: [your bridge components];"
      * - The WebView's default Chromium user agent string
      */
-    fun userAgent(context: Context): String {
-        val components = registeredBridgeComponentFactories.joinToString(" ") { it.name }
-
-        return listOf(
-            applicationUserAgentPrefix,
-            "Hotwire Native Android; Turbo Native Android;",
-            "bridge-components: [$components];",
-            Hotwire.webViewInfo(context).defaultUserAgent
-        ).filterNotNull().joinToString(" ")
+    fun userAgentWithWebViewDefault(context: Context): String {
+        return "$userAgent ${Hotwire.webViewInfo(context).defaultUserAgent}"
     }
 }
