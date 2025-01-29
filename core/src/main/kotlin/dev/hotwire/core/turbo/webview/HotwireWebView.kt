@@ -38,7 +38,7 @@ open class HotwireWebView @JvmOverloads constructor(
         id = generateViewId()
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
-        settings.userAgentString = Hotwire.config.userAgent(context)
+        settings.userAgentString = Hotwire.config.userAgentWithWebViewDefault(context)
         settings.setSupportMultipleWindows(true)
         layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
         initDayNightTheming()
