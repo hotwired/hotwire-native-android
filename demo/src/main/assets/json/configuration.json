@@ -68,6 +68,7 @@
         ".+\\.(?:bmp|gif|heic|jpg|jpeg|png|svg|webp)"
       ],
       "properties": {
+        "context": "modal",
         "uri": "hotwire://fragment/image_viewer"
       }
     }

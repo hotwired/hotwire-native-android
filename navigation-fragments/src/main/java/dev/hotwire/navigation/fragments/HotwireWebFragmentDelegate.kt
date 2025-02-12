@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStateAtLeast
+import androidx.lifecycle.withStateAtLeast
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
 import dev.hotwire.core.turbo.errors.VisitError
@@ -378,7 +379,7 @@ internal class HotwireWebFragmentDelegate(
                 else -> null
             }
 
-            viewTreeLifecycleOwner?.lifecycle?.whenStateAtLeast(STARTED) {
+            viewTreeLifecycleOwner?.lifecycle?.withStateAtLeast(STARTED) {
                 session.visit(
                     Visit(
                         location = location,

@@ -4,7 +4,8 @@ import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import okhttp3.Dispatcher
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit
 @ExperimentalCoroutinesApi
 open class BaseRepositoryTest : BaseUnitTest() {
     private val server = MockWebServer()
-    private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher(TestCoroutineScheduler())
 
     override fun setup() {
         super.setup()
@@ -36,7 +37,6 @@ open class BaseRepositoryTest : BaseUnitTest() {
     override fun teardown() {
         super.teardown()
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
         server.shutdown()
     }
 
