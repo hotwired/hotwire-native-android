@@ -14,6 +14,7 @@ import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.views.HotwireView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 internal class HotwireViewScreenshotHolder {
     private var bitmap: Bitmap? = null
@@ -41,7 +42,6 @@ internal class HotwireViewScreenshotHolder {
         screenshotZoomed = currentlyZoomed
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun copyViewToBitmap(hotwireView: HotwireView): Bitmap? {
         return suspendCancellableCoroutine { continuation ->
             val start = System.currentTimeMillis()
@@ -51,7 +51,7 @@ internal class HotwireViewScreenshotHolder {
                 hotwireView.width <= 0 || hotwireView.height <= 0
             ) {
                 if (continuation.isActive) {
-                    continuation.resume(null, null)
+                    continuation.resume(null)
                 }
                 return@suspendCancellableCoroutine
             }
@@ -73,12 +73,12 @@ internal class HotwireViewScreenshotHolder {
                                 )
                             )
                             if (continuation.isActive) {
-                                continuation.resume(bitmap, null)
+                                continuation.resume(bitmap)
                             }
                         } else {
                             logError("viewScreenshotFailed", Exception("PixelCopy failed with result $result"))
                             if (continuation.isActive) {
-                                continuation.resume(null, null)
+                                continuation.resume(null)
                             }
                         }
                     },
@@ -87,7 +87,7 @@ internal class HotwireViewScreenshotHolder {
             } catch (exception: Exception) {
                 logError("viewScreenshotFailed", exception)
                 if (continuation.isActive) {
-                    continuation.resume(null, null)
+                    continuation.resume(null)
                 }
             }
         }
@@ -104,7 +104,7 @@ internal class HotwireViewScreenshotHolder {
 
     // Inspired by https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/MediaRouteButton.java#163
     private fun View.getActivity(): Activity? {
-        var context: Context? = getContext()
+        var context: Context? = context
         while (context is ContextWrapper) {
             if (context is Activity) {
                 return context
