@@ -1,6 +1,7 @@
 package dev.hotwire.demo.main
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
@@ -16,9 +17,11 @@ class MainActivity : HotwireActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root_view)) { v, insets ->
-            insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime())
-                .apply { v.setPadding(left, top, right, bottom) }
+        // handle window insets:
+        val rootView = findViewById<View>(R.id.root_view)
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, insets ->
+            val insetTypes = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+            insets.getInsets(insetTypes).apply { v.setPadding(left, top, right, bottom) }
             insets
         }
     }
