@@ -12,7 +12,6 @@ import dev.hotwire.navigation.R
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.navigator.Navigator
 import dev.hotwire.navigation.navigator.NavigatorHost
-import dev.hotwire.navigation.observers.HotwireWindowThemeObserver
 import dev.hotwire.navigation.session.SessionModalResult
 
 /**
@@ -38,7 +37,6 @@ abstract class HotwireFragment : Fragment(), HotwireDestination {
 
         observeModalResult()
         observeDialogResult()
-        observeTheme()
 
         if (shouldObserveTitleChanges()) {
             observeTitleChanges()
@@ -150,19 +148,6 @@ abstract class HotwireFragment : Fragment(), HotwireDestination {
     private fun observeTitleChanges() {
         fragmentViewModel.title.observe(viewLifecycleOwner) {
             toolbarForNavigation()?.title = it
-        }
-    }
-
-    /*
-     * If a theme is applied directly on the root view, allow the
-     * system status and navigation bars to inherit the view's theme
-     * and override the Activity's theme window attributes.
-     */
-    private fun observeTheme() {
-        val view = view ?: return
-
-        if (requireActivity().theme != view.context.theme) {
-            viewLifecycleOwner.lifecycle.addObserver(HotwireWindowThemeObserver(this))
         }
     }
 
