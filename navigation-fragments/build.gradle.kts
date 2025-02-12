@@ -25,11 +25,11 @@ val isSonatypeRelease by extra(project.hasProperty("sonatype"))
 
 android {
     namespace = "dev.hotwire.navigation"
-    compileSdk = 34
+    compileSdk = 35
 
     testOptions.unitTests.isIncludeAndroidResources = true
     testOptions.unitTests.isReturnDefaultValues = true
-    testOptions.targetSdk = 34
+    testOptions.targetSdk = 35
 
     defaultConfig {
         minSdk = 28
@@ -78,11 +78,11 @@ dependencies {
     implementation(project(":core"))
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
 
     // AndroidX
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-common:2.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common:2.8.7")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // Material
@@ -92,17 +92,17 @@ dependencies {
     implementation("androidx.browser:browser:1.8.0")
 
     // Exported AndroidX dependencies
-    api("androidx.activity:activity-ktx:1.9.0")
-    api("androidx.fragment:fragment-ktx:1.7.1")
-    api("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    api("androidx.navigation:navigation-ui-ktx:2.7.7")
+    api("androidx.activity:activity-ktx:1.10.0")
+    api("androidx.fragment:fragment-ktx:1.8.5")
+    api("androidx.navigation:navigation-fragment-ktx:2.8.6")
+    api("androidx.navigation:navigation-ui-ktx:2.8.6")
 
     // Tests
-    testImplementation("androidx.test:core:1.5.0") // Robolectric
-    testImplementation("org.assertj:assertj-core:3.25.3")
-    testImplementation("androidx.navigation:navigation-testing:2.7.7")
-    testImplementation("org.robolectric:robolectric:4.12.1")
-    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("androidx.test:core:1.6.1") // Robolectric
+    testImplementation("org.assertj:assertj-core:3.26.3")
+    testImplementation("androidx.navigation:navigation-testing:2.8.6")
+    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("org.mockito:mockito-core:5.14.2")
     testImplementation("com.nhaarman:mockito-kotlin:1.6.0")
     testImplementation("junit:junit:4.13.2")
 }
