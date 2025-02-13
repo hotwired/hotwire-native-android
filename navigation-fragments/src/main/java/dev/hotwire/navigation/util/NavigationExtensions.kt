@@ -4,9 +4,12 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.TypedValue
+import android.view.View
 import androidx.annotation.AttrRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavBackStackEntry
 import dev.hotwire.navigation.R
 import dev.hotwire.navigation.navigator.location
@@ -43,4 +46,11 @@ internal fun Int.animateColorTo(toColor: Int, duration: Long = 150, onUpdate: (I
             color?.let { onUpdate(color) }
         }
     }.start()
+}
+fun View.applyDefaultWindowInsets() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        val insetTypes = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+        insets.getInsets(insetTypes).apply { v.setPadding(left, top, right, bottom) }
+        insets
+    }
 }
