@@ -1,12 +1,13 @@
 package dev.hotwire.navigation.util
 
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.util.TypedValue
+import android.view.View
 import androidx.annotation.AttrRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavBackStackEntry
 import dev.hotwire.navigation.R
 import dev.hotwire.navigation.navigator.location
@@ -35,12 +36,10 @@ internal fun Context.colorFromThemeAttr(
     return attrValue
 }
 
-internal fun Int.animateColorTo(toColor: Int, duration: Long = 150, onUpdate: (Int) -> Unit) {
-    ValueAnimator.ofObject(ArgbEvaluator(), this, toColor).apply {
-        this.duration = duration
-        this.addUpdateListener {
-            val color = it.animatedValue as Int?
-            color?.let { onUpdate(color) }
-        }
-    }.start()
+fun View.applyDefaultWindowInsets() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        val insetTypes = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+        insets.getInsets(insetTypes).apply { v.setPadding(left, top, right, bottom) }
+        insets
+    }
 }

@@ -26,11 +26,11 @@ val isSonatypeRelease by extra(project.hasProperty("sonatype"))
 
 android {
     namespace = "dev.hotwire.core"
-    compileSdk = 34
+    compileSdk = 35
 
     testOptions.unitTests.isIncludeAndroidResources = true
     testOptions.unitTests.isReturnDefaultValues = true
-    testOptions.targetSdk = 34
+    testOptions.targetSdk = 35
 
     defaultConfig {
         minSdk = 28
@@ -75,41 +75,41 @@ android {
 
 dependencies {
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
 
     // Material
     implementation("com.google.android.material:material:1.12.0")
 
     // AndroidX
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-common:2.8.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common:2.8.7")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // JSON
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("com.google.code.gson:gson:2.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     // Networking/API
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
     // Exported AndroidX dependencies
     api("androidx.appcompat:appcompat:1.7.0")
-    api("androidx.core:core-ktx:1.13.1")
-    api("androidx.webkit:webkit:1.11.0")
+    api("androidx.core:core-ktx:1.15.0")
+    api("androidx.webkit:webkit:1.12.1")
 
     // Tests
-    testImplementation("androidx.test:core:1.5.0") // Robolectric
-    testImplementation("androidx.navigation:navigation-testing:2.7.7")
+    testImplementation("androidx.test:core:1.6.1") // Robolectric
+    testImplementation("androidx.navigation:navigation-testing:2.8.6")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("org.assertj:assertj-core:3.25.3")
-    testImplementation("org.robolectric:robolectric:4.12.1")
-    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation("org.assertj:assertj-core:3.26.3")
+    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("org.mockito:mockito-core:5.14.2")
     testImplementation("com.nhaarman:mockito-kotlin:1.6.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("junit:junit:4.13.2")
