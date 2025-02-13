@@ -1,7 +1,5 @@
 package dev.hotwire.navigation.util
 
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.util.TypedValue
 import android.view.View
@@ -38,15 +36,6 @@ internal fun Context.colorFromThemeAttr(
     return attrValue
 }
 
-internal fun Int.animateColorTo(toColor: Int, duration: Long = 150, onUpdate: (Int) -> Unit) {
-    ValueAnimator.ofObject(ArgbEvaluator(), this, toColor).apply {
-        this.duration = duration
-        this.addUpdateListener {
-            val color = it.animatedValue as Int?
-            color?.let { onUpdate(color) }
-        }
-    }.start()
-}
 fun View.applyDefaultWindowInsets() {
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
         val insetTypes = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
