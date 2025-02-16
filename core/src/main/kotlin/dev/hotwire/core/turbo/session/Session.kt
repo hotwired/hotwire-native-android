@@ -568,8 +568,8 @@ class Session(
      * You should never call this directly as it could lead to unintended behavior.
      */
     @JavascriptInterface
-    fun elementTouchStarted(scrollable: Boolean) {
-        webView.elementTouchIsScrollable = scrollable
+    fun elementTouchStarted(preventsPullsToRefresh: Boolean) {
+        webView.elementTouchPreventsPullsToRefresh = preventsPullsToRefresh
     }
 
     /**
@@ -580,7 +580,7 @@ class Session(
      */
     @JavascriptInterface
     fun elementTouchEnded() {
-        webView.elementTouchIsScrollable = false
+        webView.elementTouchPreventsPullsToRefresh = false
     }
 
     // Private
