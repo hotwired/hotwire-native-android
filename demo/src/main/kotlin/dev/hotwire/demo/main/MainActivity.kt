@@ -14,7 +14,7 @@ class MainActivity : HotwireActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        findViewById<View>(R.id.root_view).applyDefaultImeWindowInsets()
+        findViewById<View>(R.id.main_navigator_host).applyDefaultImeWindowInsets()
     }
 
     override fun navigatorConfigurations() = listOf(
