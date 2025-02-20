@@ -20,6 +20,15 @@ fun Toolbar.displayBackButtonAsCloseIcon() {
     navigationIcon = ContextCompat.getDrawable(context, R.drawable.ic_close)
 }
 
+fun View.applyDefaultImeWindowInsets() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        insets.getInsets(WindowInsetsCompat.Type.ime()).apply {
+            v.setPadding(left, top, right, bottom)
+        }
+        insets
+    }
+}
+
 internal val NavBackStackEntry?.location: String?
     get() = this?.arguments?.location
 
@@ -34,12 +43,4 @@ internal fun Context.colorFromThemeAttr(
     attr.recycle()
 
     return attrValue
-}
-
-fun View.applyDefaultWindowInsets() {
-    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
-        val insetTypes = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
-        insets.getInsets(insetTypes).apply { v.setPadding(left, top, right, bottom) }
-        insets
-    }
 }
