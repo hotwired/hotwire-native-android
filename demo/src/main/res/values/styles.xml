@@ -9,8 +9,6 @@
         <item name="android:windowAnimationStyle">@style/Animation.MyTheme.BottomSheet.Modal</item>
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="bottomSheetStyle">@style/Widget.MyTheme.BottomSheet.Modal</item>
-        <item name="android:navigationBarColor">?colorSurface</item>
-        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">@color/transparent</item>
     </style>
 
     <style name="Widget.MyTheme.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
@@ -35,6 +33,10 @@
         <item name="titleTextColor">?colorOnSurface</item>
         <item name="subtitleTextColor">?colorSecondary</item>
         <item name="elevation">@dimen/toolbar_elevation</item>
+    </style>
+
+    <style name="Widget.MyTheme.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Surface">
+        <item name="android:background">?colorSurface</item>
     </style>
 
     <style name="Widget.MyTheme.Toolbar.Navigation.Tinted" parent="Widget.AppCompat.Toolbar.Button.Navigation">

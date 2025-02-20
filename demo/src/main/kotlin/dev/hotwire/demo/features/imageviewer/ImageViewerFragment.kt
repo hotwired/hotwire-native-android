@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import coil.load
+import dev.hotwire.core.turbo.util.isNightModeEnabled
 import dev.hotwire.demo.R
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireFragment
@@ -39,19 +39,17 @@ class ImageViewerFragment : HotwireFragment() {
 
     override fun onStart() {
         super.onStart()
-        val windowInsetsController = WindowCompat.getInsetsController(
-            requireActivity().window,
-            requireActivity().window.decorView
-        )
-        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+
+        val window = requireActivity().window
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightStatusBars = false
     }
 
     override fun onStop() {
         super.onStop()
-        val windowInsetsController = WindowCompat.getInsetsController(
-            requireActivity().window,
-            requireActivity().window.decorView
-        )
-        windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+
+        val window = requireActivity().window
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightStatusBars = !requireContext().isNightModeEnabled
     }
 }

@@ -1,6 +1,7 @@
 package dev.hotwire.core.turbo.util
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Handler
 import android.webkit.WebResourceRequest
 import com.google.gson.Gson
@@ -9,6 +10,11 @@ import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitActionAdapter
 import java.io.File
+
+val Context.isNightModeEnabled: Boolean get() {
+    val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    return currentNightMode == Configuration.UI_MODE_NIGHT_YES
+}
 
 internal fun WebResourceRequest.isHttpGetRequest(): Boolean {
     return method.equals("GET", ignoreCase = true) &&
