@@ -56,6 +56,7 @@
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MyTheme.AlertDialog</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.MyTheme.BottomSheetDialog</item>
         <item name="toolbarStyle">@style/Widget.MyTheme.Toolbar</item>
+        <item name="appBarLayoutStyle">@style/Widget.MyTheme.AppBarLayout</item>
         <item name="materialButtonStyle">@style/Widget.MyTheme.Button</item>
         <item name="buttonOutlineStyle">@style/Widget.MyTheme.OutlinedButton</item>
         <item name="buttonTextStyle">@style/Widget.MyTheme.TextButton</item>
@@ -67,9 +68,9 @@
         <item name="alphaEmphasisMedium">@dimen/alpha_emphasis_medium</item>
         <item name="alphaEmphasisDisabled">@dimen/alpha_emphasis_disabled</item>
 
-        <item name="android:statusBarColor">?colorSurface</item>
+        <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">?colorSurface</item>
+        <item name="android:navigationBarColor">@color/transparent</item>
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:navigationBarDividerColor">@color/transparent</item>
 

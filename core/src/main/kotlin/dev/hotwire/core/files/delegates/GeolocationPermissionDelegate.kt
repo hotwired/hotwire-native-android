@@ -107,7 +107,7 @@ class GeolocationPermissionDelegate(private val session: Session) {
                 PackageManager.GET_PERMISSIONS
             )
 
-            packageInfo.requestedPermissions
+            packageInfo.requestedPermissions ?: emptyArray()
         } catch (e: PackageManager.NameNotFoundException) {
             logError("manifestPermissionsNotAvailable", e)
             emptyArray()

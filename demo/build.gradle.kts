@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "dev.hotwire.demo"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "dev.hotwire.demo"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -58,13 +58,13 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
 
     // AndroidX
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
 
     // JSON
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     // Images
-    implementation("io.coil-kt:coil:2.6.0")
+    implementation("io.coil-kt:coil:2.7.0")
 
 }

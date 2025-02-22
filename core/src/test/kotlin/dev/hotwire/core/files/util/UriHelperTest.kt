@@ -8,7 +8,8 @@ import dev.hotwire.core.turbo.BaseUnitTest
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -26,7 +27,7 @@ import java.io.File
 @Config(sdk = [Build.VERSION_CODES.R])
 class UriHelperTest : BaseUnitTest() {
 
-    private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher(TestCoroutineScheduler())
 
     private lateinit var context: Context
     private lateinit var uriHelper: UriHelper
@@ -44,7 +45,6 @@ class UriHelperTest : BaseUnitTest() {
     override fun teardown() {
         super.teardown()
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 
     @Test
