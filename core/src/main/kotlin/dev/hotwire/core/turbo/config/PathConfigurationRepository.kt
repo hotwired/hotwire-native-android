@@ -14,7 +14,13 @@ internal class PathConfigurationRepository {
     private val cacheFile = "turbo"
 
     suspend fun getRemoteConfiguration(url: String): String? {
-        val request = Request.Builder().url(url).build()
+        val requestBuilder = Request.Builder().url(url)
+
+        PathConfigurationClient.getHeaders()?.forEach { (key, value) ->
+            requestBuilder.header(key, value)
+        }
+
+        val request = requestBuilder.build()
 
         return withContext(dispatcherProvider.io) {
             issueRequest(request)
