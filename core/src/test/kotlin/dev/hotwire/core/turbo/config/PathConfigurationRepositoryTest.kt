@@ -66,6 +66,42 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
         assertThat(cachedConfig?.rules?.size).isEqualTo(1)
     }
 
+    @Test
+    fun `getRemoteConfiguration should not include custom headers by default`() {
+        enqueueResponse("test-configuration.json")
+
+        runBlocking {
+            launch(Dispatchers.Main) {
+                repository.getRemoteConfiguration(baseUrl())
+
+                val request = server.takeRequest()
+                print(request.headers)
+                assertThat(request.headers["Custom-Header"]).isNull()
+            }
+        }
+    }
+
+    @Test
+    fun `getRemoteConfiguration should include custom headers when set`() {
+        enqueueResponse("test-configuration.json")
+
+        val customHeaders = mapOf(
+            "Custom-Header" to "test-value",
+            "Accept" to "application/json"
+        )
+        PathConfigurationClient.setPathConfigurationHeaders(customHeaders)
+
+        runBlocking {
+            launch(Dispatchers.Main) {
+                repository.getRemoteConfiguration(baseUrl())
+
+                val request = server.takeRequest()
+                assertThat(request.headers["Custom-Header"]).isEqualTo("test-value")
+                assertThat(request.headers["Accept"]).isEqualTo("application/json")
+            }
+        }
+    }
+
     private fun load(json: String?): PathConfiguration? {
         return json?.toObject(object : TypeToken<PathConfiguration>() {})
     }
