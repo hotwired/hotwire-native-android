@@ -17,7 +17,7 @@ internal class HotwireSwipeRefreshLayout @JvmOverloads constructor(context: Cont
         val webView = children.firstOrNull() as? HotwireWebView
 
         return if (webView != null) {
-            webView.scrollY > 0 || webView.elementTouchIsScrollable
+            webView.scrollY > 0 || webView.elementTouchPreventsPullsToRefresh
         } else {
             false
         }
