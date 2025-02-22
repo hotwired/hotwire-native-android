@@ -206,8 +206,10 @@
     while (element) {
       const canScroll = element.scrollHeight > element.clientHeight
       const overflowY = window.getComputedStyle(element).overflowY
+      const isScrollable = canScroll && (overflowY === "scroll" || overflowY === "auto")
+      const preventPullToRefresh = !!element.closest("[data-native-prevent-pull-to-refresh]")
 
-      if (canScroll && (overflowY === "scroll" || overflowY === "auto")) {
+      if (isScrollable || preventPullToRefresh) {
         TurboSession.elementTouchStarted(true)
         break
       }

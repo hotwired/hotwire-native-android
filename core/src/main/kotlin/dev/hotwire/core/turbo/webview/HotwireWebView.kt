@@ -31,7 +31,7 @@ open class HotwireWebView @JvmOverloads constructor(
 ) : WebView(context, attrs) {
     private val gson = GsonBuilder().disableHtmlEscaping().create()
 
-    var elementTouchIsScrollable = false
+    var elementTouchPreventsPullsToRefresh = false
         internal set
 
     init {
