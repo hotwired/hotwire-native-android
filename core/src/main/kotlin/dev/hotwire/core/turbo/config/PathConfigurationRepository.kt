@@ -13,10 +13,13 @@ import okhttp3.Request
 internal class PathConfigurationRepository {
     private val cacheFile = "turbo"
 
-    suspend fun getRemoteConfiguration(url: String): String? {
+    suspend fun getRemoteConfiguration(
+        url: String,
+        clientConfig: PathConfiguration.ClientConfig
+    ): String? {
         val requestBuilder = Request.Builder().url(url)
 
-        PathConfigurationClientConfig.getHeaders()?.forEach { (key, value) ->
+        clientConfig.headers.forEach { (key, value) ->
             requestBuilder.header(key, value)
         }
 
@@ -27,15 +30,25 @@ internal class PathConfigurationRepository {
         }
     }
 
-    fun getBundledConfiguration(context: Context, filePath: String): String {
+    fun getBundledConfiguration(
+        context: Context,
+        filePath: String
+    ): String {
         return contentFromAsset(context, filePath)
     }
 
-    fun getCachedConfigurationForUrl(context: Context, url: String): String? {
+    fun getCachedConfigurationForUrl(
+        context: Context,
+        url: String
+    ): String? {
         return prefs(context).getString(url, null)
     }
 
-    fun cacheConfigurationForUrl(context: Context, url: String, pathConfiguration: PathConfiguration) {
+    fun cacheConfigurationForUrl(
+        context: Context,
+        url: String,
+        pathConfiguration: PathConfiguration
+    ) {
         prefs(context).edit {
             putString(url, pathConfiguration.toJson())
         }

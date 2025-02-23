@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.turbo.BaseRepositoryTest
+import dev.hotwire.core.turbo.config.PathConfiguration.*
 import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,19 +30,13 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
         context = ApplicationProvider.getApplicationContext()
     }
 
-    @After
-    fun tearDown() {
-        PathConfigurationClientConfig.setRequestHeaders(emptyMap())
-    }
-
-
     @Test
     fun getRemoteConfiguration() {
         enqueueResponse("test-configuration.json")
 
         runBlocking {
             launch(Dispatchers.Main) {
-                val json = repository.getRemoteConfiguration(baseUrl())
+                val json = repository.getRemoteConfiguration(baseUrl(), ClientConfig())
                 assertThat(json).isNotNull()
 
                 val config = load(json)
@@ -73,33 +68,19 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `getRemoteConfiguration should not include custom headers by default`() {
+    fun `getRemoteConfiguration should include custom headers`() {
         enqueueResponse("test-configuration.json")
 
-        runBlocking {
-            launch(Dispatchers.Main) {
-                repository.getRemoteConfiguration(baseUrl())
-
-                val request = server.takeRequest()
-                print(request.headers)
-                assertThat(request.headers["Custom-Header"]).isNull()
-            }
-        }
-    }
-
-    @Test
-    fun `getRemoteConfiguration should include custom headers when set`() {
-        enqueueResponse("test-configuration.json")
-
-        val customHeaders = mapOf(
-            "Custom-Header" to "test-value",
-            "Accept" to "application/json"
+        val clientConfig = ClientConfig(
+            headers = mapOf(
+                "Accept" to "application/json",
+                "Custom-Header" to "test-value"
+            )
         )
-        PathConfigurationClientConfig.setRequestHeaders(customHeaders)
 
         runBlocking {
             launch(Dispatchers.Main) {
-                repository.getRemoteConfiguration(baseUrl())
+                repository.getRemoteConfiguration(baseUrl(), clientConfig)
 
                 val request = server.takeRequest()
                 assertThat(request.headers["Custom-Header"]).isEqualTo("test-value")
