@@ -1,6 +1,6 @@
 package dev.hotwire.core.turbo.config
 
-object PathConfigurationClientConfig {
+internal object PathConfigurationClientConfig {
     private var customHeaders: Map<String, String>? = null
 
     /**

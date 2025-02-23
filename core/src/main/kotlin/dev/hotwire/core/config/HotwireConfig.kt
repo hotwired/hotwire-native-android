@@ -6,6 +6,7 @@ import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.turbo.config.PathConfigurationClientConfig
 import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -99,5 +100,13 @@ class HotwireConfig internal constructor() {
      */
     fun userAgentWithWebViewDefault(context: Context): String {
         return "$userAgent ${Hotwire.webViewInfo(context).defaultUserAgent}"
+    }
+
+    /**
+     * Sets custom headers for PathConfiguration requests.
+     * @param headers A map of header names to header values.
+     */
+    fun pathConfigurationClientHeaders(headers: Map<String, String>) {
+        PathConfigurationClientConfig.setRequestHeaders(headers)
     }
 }
