@@ -59,10 +59,11 @@ class PathConfigurationTest : BaseRepositoryTest() {
         runBlocking {
             val remoteUrl = "$url/demo/configurations/android-v1.json"
             val location = Location(remoteFileUrl = remoteUrl)
+            val clientConfig = PathConfiguration.ClientConfig()
 
-            pathConfiguration.load(context, location)
+            pathConfiguration.load(context, location,clientConfig)
             verify(mockRepository).getCachedConfigurationForUrl(context, remoteUrl)
-            verify(mockRepository).getRemoteConfiguration(remoteUrl)
+            verify(mockRepository).getRemoteConfiguration(remoteUrl, clientConfig)
         }
     }
 
@@ -75,11 +76,12 @@ class PathConfigurationTest : BaseRepositoryTest() {
         runBlocking {
             val remoteUrl = "$url/demo/configurations/android-v1.json"
             val location = Location(remoteFileUrl = remoteUrl)
+            val clientConfig = PathConfiguration.ClientConfig()
             val json = """{ "settings": {}, "rules": [] }"""
 
-            whenever(mockRepository.getRemoteConfiguration(remoteUrl)).thenReturn(json)
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl,clientConfig)).thenReturn(json)
 
-            pathConfiguration.load(context, location)
+            pathConfiguration.load(context, location, clientConfig)
             verify(mockRepository).cacheConfigurationForUrl(eq(context), eq(remoteUrl), any())
         }
     }
@@ -93,9 +95,10 @@ class PathConfigurationTest : BaseRepositoryTest() {
         runBlocking {
             val remoteUrl = "$url/demo/configurations/android-v1.json"
             val location = Location(remoteFileUrl = remoteUrl)
+            val clientConfig = PathConfiguration.ClientConfig()
             val json = "malformed-json"
 
-            whenever(mockRepository.getRemoteConfiguration(remoteUrl)).thenReturn(json)
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl,clientConfig)).thenReturn(json)
 
             pathConfiguration.load(context, location)
             verify(mockRepository, never()).cacheConfigurationForUrl(any(), any(), any())

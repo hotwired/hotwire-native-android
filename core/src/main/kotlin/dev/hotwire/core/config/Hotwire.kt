@@ -19,7 +19,11 @@ object Hotwire {
      * Loads the [PathConfiguration] JSON file(s) from the provided location to
      * configure navigation rules.
      */
-    fun loadPathConfiguration(context: Context, location: PathConfiguration.Location) {
-        config.pathConfiguration.load(context.applicationContext, location)
+    fun loadPathConfiguration(
+        context: Context,
+        location: PathConfiguration.Location,
+        clientConfig: PathConfiguration.ClientConfig = PathConfiguration.ClientConfig()
+    ) {
+        config.pathConfiguration.load(context.applicationContext, location, clientConfig)
     }
 }

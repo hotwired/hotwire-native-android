@@ -17,22 +17,22 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = dispatcherProvider.io + Job()
 
-    fun load(location: PathConfiguration.Location, onCompletion: (PathConfiguration) -> Unit) {
+    fun load(location: PathConfiguration.Location, clientConfig: PathConfiguration.ClientConfig?, onCompletion: (PathConfiguration) -> Unit) {
         location.assetFilePath?.let {
             loadBundledAssetConfiguration(it, onCompletion)
         }
 
         location.remoteFileUrl?.let {
-            downloadRemoteConfiguration(it, onCompletion)
+            downloadRemoteConfiguration(it, clientConfig, onCompletion)
         }
     }
 
-    private fun downloadRemoteConfiguration(url: String, onCompletion: (PathConfiguration) -> Unit) {
+    private fun downloadRemoteConfiguration(url: String, clientConfig: PathConfiguration.ClientConfig?, onCompletion: (PathConfiguration) -> Unit) {
         // Always load the previously cached version first, if available
         loadCachedConfigurationForUrl(url, onCompletion)
 
         launch {
-            repository.getRemoteConfiguration(url)?.let { json ->
+            repository.getRemoteConfiguration(url, clientConfig)?.let { json ->
                 load(json)?.let {
                     logEvent("remotePathConfigurationLoaded", url)
                     onCompletion(it)

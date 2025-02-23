@@ -11,7 +11,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -29,19 +28,13 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
         context = ApplicationProvider.getApplicationContext()
     }
 
-    @After
-    fun tearDown() {
-        PathConfigurationClientConfig.setRequestHeaders(emptyMap())
-    }
-
-
     @Test
     fun getRemoteConfiguration() {
         enqueueResponse("test-configuration.json")
 
         runBlocking {
             launch(Dispatchers.Main) {
-                val json = repository.getRemoteConfiguration(baseUrl())
+                val json = repository.getRemoteConfiguration(baseUrl(), PathConfiguration.ClientConfig())
                 assertThat(json).isNotNull()
 
                 val config = load(json)
@@ -78,7 +71,22 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
 
         runBlocking {
             launch(Dispatchers.Main) {
-                repository.getRemoteConfiguration(baseUrl())
+                repository.getRemoteConfiguration(baseUrl(), PathConfiguration.ClientConfig())
+
+                val request = server.takeRequest()
+                print(request.headers)
+                assertThat(request.headers["Custom-Header"]).isNull()
+            }
+        }
+    }
+
+    @Test
+    fun `getRemoteConfiguration should not include custom headers by default when clientConfig is null`() {
+        enqueueResponse("test-configuration.json")
+
+        runBlocking {
+            launch(Dispatchers.Main) {
+                repository.getRemoteConfiguration(baseUrl(), null)
 
                 val request = server.takeRequest()
                 print(request.headers)
@@ -95,11 +103,11 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
             "Custom-Header" to "test-value",
             "Accept" to "application/json"
         )
-        PathConfigurationClientConfig.setRequestHeaders(customHeaders)
+        val clientConfiguration = PathConfiguration.ClientConfig(customHeaders)
 
         runBlocking {
             launch(Dispatchers.Main) {
-                repository.getRemoteConfiguration(baseUrl())
+                repository.getRemoteConfiguration(baseUrl(), clientConfiguration)
 
                 val request = server.takeRequest()
                 assertThat(request.headers["Custom-Header"]).isEqualTo("test-value")

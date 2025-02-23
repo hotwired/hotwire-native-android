@@ -55,15 +55,22 @@ class PathConfiguration {
     )
 
     /**
+     * Configuration options for the PathConfiguration http client.
+     */
+    data class ClientConfig(
+        val headers: Map<String, String>? = null
+    )
+
+    /**
      * Loads and parses the specified configuration file(s) from their local
      * and/or remote locations.
      */
-    fun load(context: Context, location: Location) {
+    fun load(context: Context, location: Location, clientConfig: ClientConfig? = null) {
         if (loader == null) {
             loader = PathConfigurationLoader(context.applicationContext)
         }
 
-        loader?.load(location) {
+        loader?.load(location, clientConfig) {
             cachedProperties.clear()
             rules = it.rules
             settings = it.settings

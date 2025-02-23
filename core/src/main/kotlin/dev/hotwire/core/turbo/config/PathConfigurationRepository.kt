@@ -13,10 +13,10 @@ import okhttp3.Request
 internal class PathConfigurationRepository {
     private val cacheFile = "turbo"
 
-    suspend fun getRemoteConfiguration(url: String): String? {
+    suspend fun getRemoteConfiguration(url: String, clientConfig: PathConfiguration.ClientConfig?): String? {
         val requestBuilder = Request.Builder().url(url)
 
-        PathConfigurationClientConfig.getHeaders()?.forEach { (key, value) ->
+        clientConfig?.headers?.forEach { (key, value) ->
             requestBuilder.header(key, value)
         }
 
