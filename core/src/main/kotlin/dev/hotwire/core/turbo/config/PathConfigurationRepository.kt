@@ -16,7 +16,7 @@ internal class PathConfigurationRepository {
     suspend fun getRemoteConfiguration(url: String): String? {
         val requestBuilder = Request.Builder().url(url)
 
-        PathConfigurationClient.getHeaders()?.forEach { (key, value) ->
+        PathConfigurationClientConfig.getHeaders()?.forEach { (key, value) ->
             requestBuilder.header(key, value)
         }
 

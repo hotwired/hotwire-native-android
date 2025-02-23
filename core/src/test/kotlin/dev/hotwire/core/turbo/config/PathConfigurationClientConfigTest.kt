@@ -5,16 +5,16 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class PathConfigurationClientTest {
+class PathConfigurationClientConfigTest {
 
     @After
     fun tearDown() {
-        PathConfigurationClient.setPathConfigurationHeaders(emptyMap())
+        PathConfigurationClientConfig.setRequestHeaders(emptyMap())
     }
 
     @Test
     fun `headers should be null by default`() {
-        assertNull(PathConfigurationClient.getHeaders())
+        assertNull(PathConfigurationClientConfig.getHeaders())
     }
 
     @Test
@@ -24,16 +24,16 @@ class PathConfigurationClientTest {
             "Custom-Header" to "test-value"
         )
 
-        PathConfigurationClient.setPathConfigurationHeaders(customHeaders)
+        PathConfigurationClientConfig.setRequestHeaders(customHeaders)
 
-        assertEquals(customHeaders, PathConfigurationClient.getHeaders())
+        assertEquals(customHeaders, PathConfigurationClientConfig.getHeaders())
     }
 
     @Test
     fun `should allow empty headers map`() {
-        PathConfigurationClient.setPathConfigurationHeaders(emptyMap())
+        PathConfigurationClientConfig.setRequestHeaders(emptyMap())
 
-        assertNull(PathConfigurationClient.getHeaders())
+        assertNull(PathConfigurationClientConfig.getHeaders())
     }
 
     @Test
@@ -41,9 +41,9 @@ class PathConfigurationClientTest {
         val initialHeaders = mapOf("Initial-Header" to "initial-value")
         val newHeaders = mapOf("New-Header" to "new-value")
 
-        PathConfigurationClient.setPathConfigurationHeaders(initialHeaders)
-        PathConfigurationClient.setPathConfigurationHeaders(newHeaders)
+        PathConfigurationClientConfig.setRequestHeaders(initialHeaders)
+        PathConfigurationClientConfig.setRequestHeaders(newHeaders)
 
-        assertEquals(newHeaders, PathConfigurationClient.getHeaders())
+        assertEquals(newHeaders, PathConfigurationClientConfig.getHeaders())
     }
 }

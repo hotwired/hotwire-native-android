@@ -5,13 +5,13 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.turbo.BaseRepositoryTest
-import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -28,6 +28,12 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
         super.setup()
         context = ApplicationProvider.getApplicationContext()
     }
+
+    @After
+    fun tearDown() {
+        PathConfigurationClientConfig.setRequestHeaders(emptyMap())
+    }
+
 
     @Test
     fun getRemoteConfiguration() {
@@ -89,7 +95,7 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
             "Custom-Header" to "test-value",
             "Accept" to "application/json"
         )
-        PathConfigurationClient.setPathConfigurationHeaders(customHeaders)
+        PathConfigurationClientConfig.setRequestHeaders(customHeaders)
 
         runBlocking {
             launch(Dispatchers.Main) {

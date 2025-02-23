@@ -1,6 +1,6 @@
 package dev.hotwire.core.turbo.config
 
-object PathConfigurationClient {
+object PathConfigurationClientConfig {
     private var customHeaders: Map<String, String>? = null
 
     /**
@@ -10,7 +10,7 @@ object PathConfigurationClient {
      *
      *
      */
-    fun setPathConfigurationHeaders(headers: Map<String, String>) {
+    fun setRequestHeaders(headers: Map<String, String>) {
             customHeaders = headers.ifEmpty { null }
     }
 
