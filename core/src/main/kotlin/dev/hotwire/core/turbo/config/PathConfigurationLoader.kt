@@ -17,7 +17,11 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = dispatcherProvider.io + Job()
 
-    fun load(location: PathConfiguration.Location, clientConfig: PathConfiguration.ClientConfig?, onCompletion: (PathConfiguration) -> Unit) {
+    fun load(
+        location: PathConfiguration.Location,
+        clientConfig: PathConfiguration.ClientConfig,
+        onCompletion: (PathConfiguration) -> Unit
+    ) {
         location.assetFilePath?.let {
             loadBundledAssetConfiguration(it, onCompletion)
         }
@@ -27,7 +31,11 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         }
     }
 
-    private fun downloadRemoteConfiguration(url: String, clientConfig: PathConfiguration.ClientConfig?, onCompletion: (PathConfiguration) -> Unit) {
+    private fun downloadRemoteConfiguration(
+        url: String,
+        clientConfig: PathConfiguration.ClientConfig,
+        onCompletion: (PathConfiguration) -> Unit
+    ) {
         // Always load the previously cached version first, if available
         loadCachedConfigurationForUrl(url, onCompletion)
 
@@ -42,7 +50,10 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         }
     }
 
-    private fun loadBundledAssetConfiguration(filePath: String, onCompletion: (PathConfiguration) -> Unit) {
+    private fun loadBundledAssetConfiguration(
+        filePath: String,
+        onCompletion: (PathConfiguration) -> Unit
+    ) {
         val json = repository.getBundledConfiguration(context, filePath)
         load(json)?.let {
             logEvent("bundledPathConfigurationLoaded", filePath)
@@ -50,7 +61,10 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         }
     }
 
-    private fun loadCachedConfigurationForUrl(url: String, onCompletion: (PathConfiguration) -> Unit) {
+    private fun loadCachedConfigurationForUrl(
+        url: String,
+        onCompletion: (PathConfiguration) -> Unit
+    ) {
         repository.getCachedConfigurationForUrl(context, url)?.let { json ->
             load(json)?.let {
                 logEvent("cachedPathConfigurationLoaded", url)
@@ -59,7 +73,10 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         }
     }
 
-    private fun cacheConfigurationForUrl(url: String, pathConfiguration: PathConfiguration) {
+    private fun cacheConfigurationForUrl(
+        url: String,
+        pathConfiguration: PathConfiguration
+    ) {
         repository.cacheConfigurationForUrl(context, url, pathConfiguration)
     }
 

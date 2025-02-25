@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockito_kotlin.*
 import dev.hotwire.core.turbo.BaseRepositoryTest
+import dev.hotwire.core.turbo.config.PathConfiguration.ClientConfig
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
 import dev.hotwire.core.turbo.nav.PresentationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,6 +25,12 @@ class PathConfigurationTest : BaseRepositoryTest() {
     private lateinit var pathConfiguration: PathConfiguration
     private val mockRepository = mock<PathConfigurationRepository>()
     private val url = "https://turbo.hotwired.dev"
+    private val clientConfig = ClientConfig(
+        headers = mapOf(
+            "Accept" to "application/json",
+            "Custom-Header" to "test-value"
+        )
+    )
 
     @Before
     override fun setup() {
@@ -31,7 +38,11 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
         context = ApplicationProvider.getApplicationContext()
         pathConfiguration = PathConfiguration().apply {
-            load(context, Location(assetFilePath = "json/test-configuration.json"))
+            load(
+                context = context,
+                location = Location(assetFilePath = "json/test-configuration.json"),
+                clientConfig = clientConfig
+            )
         }
     }
 
@@ -61,7 +72,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
             val location = Location(remoteFileUrl = remoteUrl)
             val clientConfig = PathConfiguration.ClientConfig()
 
-            pathConfiguration.load(context, location,clientConfig)
+            pathConfiguration.load(context, location, clientConfig)
             verify(mockRepository).getCachedConfigurationForUrl(context, remoteUrl)
             verify(mockRepository).getRemoteConfiguration(remoteUrl, clientConfig)
         }
@@ -79,7 +90,8 @@ class PathConfigurationTest : BaseRepositoryTest() {
             val clientConfig = PathConfiguration.ClientConfig()
             val json = """{ "settings": {}, "rules": [] }"""
 
-            whenever(mockRepository.getRemoteConfiguration(remoteUrl,clientConfig)).thenReturn(json)
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl, clientConfig))
+                .thenReturn(json)
 
             pathConfiguration.load(context, location, clientConfig)
             verify(mockRepository).cacheConfigurationForUrl(eq(context), eq(remoteUrl), any())
@@ -98,9 +110,10 @@ class PathConfigurationTest : BaseRepositoryTest() {
             val clientConfig = PathConfiguration.ClientConfig()
             val json = "malformed-json"
 
-            whenever(mockRepository.getRemoteConfiguration(remoteUrl,clientConfig)).thenReturn(json)
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl, clientConfig))
+                .thenReturn(json)
 
-            pathConfiguration.load(context, location)
+            pathConfiguration.load(context, location, clientConfig)
             verify(mockRepository, never()).cacheConfigurationForUrl(any(), any(), any())
         }
     }

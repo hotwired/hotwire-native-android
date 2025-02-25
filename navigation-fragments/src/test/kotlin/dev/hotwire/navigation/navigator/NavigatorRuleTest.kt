@@ -13,6 +13,7 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.turbo.config.PathConfiguration.Location
 import dev.hotwire.core.turbo.nav.*
 import dev.hotwire.core.turbo.visit.VisitOptions
 import org.assertj.core.api.Assertions.assertThat
@@ -68,7 +69,11 @@ class NavigatorRuleTest {
         context = ApplicationProvider.getApplicationContext()
         controller = buildControllerWithGraph()
         pathConfiguration = PathConfiguration().apply {
-            load(context, PathConfiguration.Location(assetFilePath = "json/test-configuration.json"))
+            load(
+                context = context,
+                location = Location(assetFilePath = "json/test-configuration.json"),
+                clientConfig = PathConfiguration.ClientConfig()
+            )
         }
     }
 
