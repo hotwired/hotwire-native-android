@@ -18,8 +18,16 @@ object Hotwire {
     /**
      * Loads the [PathConfiguration] JSON file(s) from the provided location to
      * configure navigation rules.
+     * @param context The application or activity context.
+     * @param location Specifies local and/or remote location to retrieve path configuration files.
+     * @param clientConfig Optional HTTP client configuration options to use when fetching remote
+     *  path configuration files from your server.
      */
-    fun loadPathConfiguration(context: Context, location: PathConfiguration.Location) {
-        config.pathConfiguration.load(context.applicationContext, location)
+    fun loadPathConfiguration(
+        context: Context,
+        location: PathConfiguration.Location,
+        clientConfig: PathConfiguration.ClientConfig = PathConfiguration.ClientConfig()
+    ) {
+        config.pathConfiguration.load(context.applicationContext, location, clientConfig)
     }
 }
