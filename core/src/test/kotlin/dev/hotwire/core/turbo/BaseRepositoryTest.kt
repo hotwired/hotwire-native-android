@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 open class BaseRepositoryTest : BaseUnitTest() {
-    private val server = MockWebServer()
+    internal val server = MockWebServer()
     private val testDispatcher = UnconfinedTestDispatcher(TestCoroutineScheduler())
 
     override fun setup() {
