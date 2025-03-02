@@ -25,7 +25,7 @@ Before submitting a pull request, please:
 3. If you’re fixing a bug or adding code that should be tested, add tests!
 4. Ensure the test suite passes.
 
-## Feature parity with Android
+## Feature parity with iOS
 
 New features will not be merged until also added to [Hotwire Native iOS](https://github.com/hotwired/hotwire-native-ios).
 
