@@ -10,6 +10,7 @@ import androidx.navigation.navOptions
 import dev.hotwire.core.bridge.BridgeDestination
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
+import dev.hotwire.core.turbo.config.animated
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.config.presentation
 import dev.hotwire.core.turbo.nav.Presentation
@@ -139,7 +140,7 @@ interface HotwireDestination : BridgeDestination {
     ): NavOptions {
         val modal = newPathProperties.context == PresentationContext.MODAL
         val clearAll = newPathProperties.presentation == Presentation.CLEAR_ALL
-        val animate = action != VisitAction.REPLACE &&
+        val animate = newPathProperties.animated && action != VisitAction.REPLACE &&
                 newPathProperties.presentation != Presentation.REPLACE &&
                 newPathProperties.presentation != Presentation.REPLACE_ROOT
 

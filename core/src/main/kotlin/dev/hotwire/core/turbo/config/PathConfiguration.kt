@@ -157,3 +157,6 @@ val PathConfigurationProperties.title: String?
 
 val PathConfigurationProperties.pullToRefreshEnabled: Boolean
     get() = get("pull_to_refresh_enabled")?.toBoolean() ?: false
+
+val PathConfigurationProperties.animated: Boolean
+    get() = get("animated")?.toBoolean() ?: true
