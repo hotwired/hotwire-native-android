@@ -82,12 +82,12 @@ internal class NavigatorRule(
         val locationIsCurrent = locationsAreSame(newLocation, currentLocation)
         val locationIsPrevious = locationsAreSame(newLocation, previousLocation)
         val replace = newVisitOptions.action == VisitAction.REPLACE
-        val dismissToDefaultContext = currentPresentationContext == PresentationContext.MODAL &&
+        val dismissModalContext = currentPresentationContext == PresentationContext.MODAL &&
                 newPresentationContext == PresentationContext.DEFAULT
 
         return when {
             locationIsCurrent && isAtStartDestination -> Presentation.REPLACE_ROOT
-            locationIsPrevious || dismissToDefaultContext -> Presentation.POP
+            locationIsPrevious || dismissModalContext -> Presentation.POP
             locationIsCurrent || replace -> Presentation.REPLACE
             else -> Presentation.PUSH
         }
