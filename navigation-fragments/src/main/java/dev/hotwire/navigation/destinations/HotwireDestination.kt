@@ -137,21 +137,26 @@ interface HotwireDestination : BridgeDestination {
         newPathProperties: PathConfigurationProperties,
         action: VisitAction
     ): NavOptions {
-        val navigatingToModal = newPathProperties.context == PresentationContext.MODAL
+        val navigatingToModalContext = pathProperties.context == PresentationContext.DEFAULT &&
+                newPathProperties.context == PresentationContext.MODAL
 
-        val dismissingModal = pathProperties.context == PresentationContext.MODAL &&
+        val navigatingWithinModalContext = pathProperties.context == PresentationContext.MODAL &&
+                newPathProperties.context == PresentationContext.MODAL
+
+        val dismissingModalContext = pathProperties.context == PresentationContext.MODAL &&
                 newPathProperties.context == PresentationContext.DEFAULT
 
-        val animate = action != VisitAction.REPLACE &&
+        val animate = (navigatingToModalContext || dismissingModalContext) ||
+                (action != VisitAction.REPLACE &&
                 newPathProperties.presentation != Presentation.REPLACE &&
-                newPathProperties.presentation != Presentation.REPLACE_ROOT
+                newPathProperties.presentation != Presentation.REPLACE_ROOT)
 
         val clearAll = newPathProperties.presentation == Presentation.CLEAR_ALL
 
-        return if (navigatingToModal || dismissingModal) {
+        return if (navigatingToModalContext || navigatingWithinModalContext || dismissingModalContext) {
             navOptions {
                 anim {
-                    enter = R.anim.enter_slide_in_bottom
+                    enter = if (animate) R.anim.enter_slide_in_bottom else 0
                     exit = R.anim.exit_slide_out_bottom
                     popEnter = R.anim.enter_slide_in_bottom
                     popExit = R.anim.exit_slide_out_bottom
