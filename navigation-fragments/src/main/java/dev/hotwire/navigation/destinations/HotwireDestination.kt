@@ -137,8 +137,7 @@ interface HotwireDestination : BridgeDestination {
         newPathProperties: PathConfigurationProperties,
         action: VisitAction
     ): NavOptions {
-        val navigatingToModal = pathProperties.context == PresentationContext.DEFAULT &&
-                newPathProperties.context == PresentationContext.MODAL
+        val navigatingToModal = newPathProperties.context == PresentationContext.MODAL
 
         val dismissingModal = pathProperties.context == PresentationContext.MODAL &&
                 newPathProperties.context == PresentationContext.DEFAULT
