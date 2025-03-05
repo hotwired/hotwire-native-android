@@ -136,10 +136,10 @@ internal class NavigatorRule(
             return null
         }
 
-        // When dismissing a modal, override the visit action. A visit proposal with an
-        // original "replace" action is respected by first dismissing the modal. But we
-        // don't want to also "replace" the underlying default context screen (unless
-        // the urls are the same).
+        // When dismissing a modal to navigate in the "default" context, override the visit
+        // action. A visit proposal with an original "replace" action is respected by first
+        // dismissing the modal. But we don't want to also "replace" the underlying "default"
+        // context screen (unless the urls are the same).
         val locationIsPrevious = locationsAreSame(newLocation, previousLocation)
         val action = if (locationIsPrevious) VisitAction.REPLACE else VisitAction.ADVANCE
 
