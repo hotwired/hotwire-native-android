@@ -3,6 +3,7 @@ package dev.hotwire.navigation.destinations
 import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
+import dev.hotwire.core.turbo.config.animated
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.config.presentation
 import dev.hotwire.core.turbo.nav.Presentation
@@ -73,6 +74,10 @@ class HotwireDestinationAnimations {
             newPathProperties: PathConfigurationProperties,
             action: VisitAction
         ): Boolean {
+            if (!newPathProperties.animated) {
+                return false
+            }
+
             if (navigatingToModalContext || dismissingModalContext) {
                 return true
             }

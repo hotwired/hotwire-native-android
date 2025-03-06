@@ -94,6 +94,14 @@
         "uri": "hotwire://fragment/web/modal",
         "presentation": "replace_root"
       }
+    },
+    {
+      "patterns": [
+        "/not-animated"
+      ],
+      "properties": {
+        "animated": false
+      }
     }
   ]
 }
