@@ -48,7 +48,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.rules.size).isEqualTo(10)
+        assertThat(pathConfiguration.rules.size).isEqualTo(11)
     }
 
     @Test
@@ -128,6 +128,13 @@ class PathConfigurationTest : BaseRepositoryTest() {
     @Test
     fun title() {
         assertThat(pathConfiguration.properties("$url/image.jpg").title).isEqualTo("Image Viewer")
+    }
+
+    @Test
+    fun animated() {
+        assertThat(pathConfiguration.properties("$url/home").animated).isTrue()
+        assertThat(pathConfiguration.properties("$url/new").animated).isTrue()
+        assertThat(pathConfiguration.properties("$url/not-animated").animated).isFalse()
     }
 
     @Test
