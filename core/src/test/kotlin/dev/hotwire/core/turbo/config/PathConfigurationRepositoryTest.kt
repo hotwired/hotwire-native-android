@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.turbo.BaseRepositoryTest
-import dev.hotwire.core.turbo.config.PathConfiguration.*
+import dev.hotwire.core.turbo.config.PathConfiguration.LoaderOptions
 import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,7 +35,7 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
 
         runBlocking {
             launch(Dispatchers.Main) {
-                val json = repository.getRemoteConfiguration(baseUrl(), ClientConfig())
+                val json = repository.getRemoteConfiguration(baseUrl(), LoaderOptions())
                 assertThat(json).isNotNull()
 
                 val config = load(json)
@@ -70,8 +70,8 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
     fun `getRemoteConfiguration should include custom headers`() {
         enqueueResponse("test-configuration.json")
 
-        val clientConfig = ClientConfig(
-            headers = mapOf(
+        val options = LoaderOptions(
+            httpHeaders = mapOf(
                 "Accept" to "application/json",
                 "Custom-Header" to "test-value"
             )
@@ -79,7 +79,7 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
 
         runBlocking {
             launch(Dispatchers.Main) {
-                repository.getRemoteConfiguration(baseUrl(), clientConfig)
+                repository.getRemoteConfiguration(baseUrl(), options)
 
                 val request = server.takeRequest()
                 assertThat(request.headers["Custom-Header"]).isEqualTo("test-value")

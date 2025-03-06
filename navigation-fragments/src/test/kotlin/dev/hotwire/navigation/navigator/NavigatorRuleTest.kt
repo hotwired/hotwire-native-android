@@ -14,7 +14,9 @@ import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
-import dev.hotwire.core.turbo.nav.*
+import dev.hotwire.core.turbo.nav.Presentation
+import dev.hotwire.core.turbo.nav.PresentationContext
+import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.visit.VisitOptions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -72,7 +74,7 @@ class NavigatorRuleTest {
             load(
                 context = context,
                 location = Location(assetFilePath = "json/test-configuration.json"),
-                clientConfig = PathConfiguration.ClientConfig()
+                options = PathConfiguration.LoaderOptions()
             )
         }
     }

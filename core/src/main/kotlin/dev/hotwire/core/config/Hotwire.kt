@@ -20,14 +20,14 @@ object Hotwire {
      * configure navigation rules.
      * @param context The application or activity context.
      * @param location Specifies local and/or remote location to retrieve path configuration files.
-     * @param clientConfig Optional HTTP client configuration options to use when fetching remote
-     *  path configuration files from your server.
+     * @param options Optional loader options to use when fetching remote path configuration files
+     *  from your server.
      */
     fun loadPathConfiguration(
         context: Context,
         location: PathConfiguration.Location,
-        clientConfig: PathConfiguration.ClientConfig = PathConfiguration.ClientConfig()
+        options: PathConfiguration.LoaderOptions = PathConfiguration.LoaderOptions()
     ) {
-        config.pathConfiguration.load(context.applicationContext, location, clientConfig)
+        config.pathConfiguration.load(context.applicationContext, location, options)
     }
 }
