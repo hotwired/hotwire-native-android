@@ -137,52 +137,11 @@ interface HotwireDestination : BridgeDestination {
         newPathProperties: PathConfigurationProperties,
         action: VisitAction
     ): NavOptions {
-        val navigatingToModalContext = pathProperties.context == PresentationContext.DEFAULT &&
-                newPathProperties.context == PresentationContext.MODAL
-
-        val navigatingWithinModalContext = pathProperties.context == PresentationContext.MODAL &&
-                newPathProperties.context == PresentationContext.MODAL
-
-        val dismissingModalContext = pathProperties.context == PresentationContext.MODAL &&
-                newPathProperties.context == PresentationContext.DEFAULT
-
-        val animate = (navigatingToModalContext || dismissingModalContext) ||
-                (action != VisitAction.REPLACE &&
-                newPathProperties.presentation != Presentation.REPLACE &&
-                newPathProperties.presentation != Presentation.REPLACE_ROOT)
-
-        val clearAll = newPathProperties.presentation == Presentation.CLEAR_ALL
-
-        return if (navigatingToModalContext || navigatingWithinModalContext || dismissingModalContext) {
-            navOptions {
-                anim {
-                    enter = if (animate) R.anim.enter_slide_in_bottom else 0
-                    exit = R.anim.exit_slide_out_bottom
-                    popEnter = R.anim.enter_slide_in_bottom
-                    popExit = R.anim.exit_slide_out_bottom
-                }
-            }
-        } else {
-            if (clearAll) {
-                navOptions {
-                    anim {
-                        enter = R.anim.exit_slide_out_left
-                        exit = R.anim.exit_slide_out_right
-                        popEnter = R.anim.enter_slide_in_left
-                        popExit = R.anim.enter_slide_in_right
-                    }
-                }
-            } else {
-                navOptions {
-                    anim {
-                        enter = if (animate) R.anim.enter_slide_in_right else 0
-                        exit = R.anim.exit_slide_out_left
-                        popEnter = R.anim.enter_slide_in_left
-                        popExit = R.anim.exit_slide_out_right
-                    }
-                }
-            }
-        }
+        return HotwireDestinationAnimations.defaultNavOptions(
+            currentPathProperties = pathProperties,
+            newPathProperties = newPathProperties,
+            action = action
+        )
     }
 
     /**
