@@ -137,13 +137,23 @@ interface HotwireDestination : BridgeDestination {
         newPathProperties: PathConfigurationProperties,
         action: VisitAction
     ): NavOptions {
-        val modal = newPathProperties.context == PresentationContext.MODAL
-        val clearAll = newPathProperties.presentation == Presentation.CLEAR_ALL
-        val animate = action != VisitAction.REPLACE &&
-                newPathProperties.presentation != Presentation.REPLACE &&
-                newPathProperties.presentation != Presentation.REPLACE_ROOT
+        val navigatingToModalContext = pathProperties.context == PresentationContext.DEFAULT &&
+                newPathProperties.context == PresentationContext.MODAL
 
-        return if (modal) {
+        val navigatingWithinModalContext = pathProperties.context == PresentationContext.MODAL &&
+                newPathProperties.context == PresentationContext.MODAL
+
+        val dismissingModalContext = pathProperties.context == PresentationContext.MODAL &&
+                newPathProperties.context == PresentationContext.DEFAULT
+
+        val animate = (navigatingToModalContext || dismissingModalContext) ||
+                (action != VisitAction.REPLACE &&
+                newPathProperties.presentation != Presentation.REPLACE &&
+                newPathProperties.presentation != Presentation.REPLACE_ROOT)
+
+        val clearAll = newPathProperties.presentation == Presentation.CLEAR_ALL
+
+        return if (navigatingToModalContext || navigatingWithinModalContext || dismissingModalContext) {
             navOptions {
                 anim {
                     enter = if (animate) R.anim.enter_slide_in_bottom else 0
