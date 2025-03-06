@@ -19,7 +19,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
 
     fun load(
         location: PathConfiguration.Location,
-        clientConfig: PathConfiguration.ClientConfig,
+        options: PathConfiguration.LoaderOptions,
         onCompletion: (PathConfiguration) -> Unit
     ) {
         location.assetFilePath?.let {
@@ -27,20 +27,20 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         }
 
         location.remoteFileUrl?.let {
-            downloadRemoteConfiguration(it, clientConfig, onCompletion)
+            downloadRemoteConfiguration(it, options, onCompletion)
         }
     }
 
     private fun downloadRemoteConfiguration(
         url: String,
-        clientConfig: PathConfiguration.ClientConfig,
+        options: PathConfiguration.LoaderOptions,
         onCompletion: (PathConfiguration) -> Unit
     ) {
         // Always load the previously cached version first, if available
         loadCachedConfigurationForUrl(url, onCompletion)
 
         launch {
-            repository.getRemoteConfiguration(url, clientConfig)?.let { json ->
+            repository.getRemoteConfiguration(url, options)?.let { json ->
                 load(json)?.let {
                     logEvent("remotePathConfigurationLoaded", url)
                     onCompletion(it)

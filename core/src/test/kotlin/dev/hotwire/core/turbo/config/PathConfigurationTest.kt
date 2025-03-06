@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockito_kotlin.*
 import dev.hotwire.core.turbo.BaseRepositoryTest
-import dev.hotwire.core.turbo.config.PathConfiguration.ClientConfig
+import dev.hotwire.core.turbo.config.PathConfiguration.LoaderOptions
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
 import dev.hotwire.core.turbo.nav.PresentationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,8 +25,8 @@ class PathConfigurationTest : BaseRepositoryTest() {
     private lateinit var pathConfiguration: PathConfiguration
     private val mockRepository = mock<PathConfigurationRepository>()
     private val url = "https://turbo.hotwired.dev"
-    private val clientConfig = ClientConfig(
-        headers = mapOf(
+    private val options = LoaderOptions(
+        httpHeaders = mapOf(
             "Accept" to "application/json",
             "Custom-Header" to "test-value"
         )
@@ -41,7 +41,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
             load(
                 context = context,
                 location = Location(assetFilePath = "json/test-configuration.json"),
-                clientConfig = clientConfig
+                options = options
             )
         }
     }
@@ -70,11 +70,11 @@ class PathConfigurationTest : BaseRepositoryTest() {
         runBlocking {
             val remoteUrl = "$url/demo/configurations/android-v1.json"
             val location = Location(remoteFileUrl = remoteUrl)
-            val clientConfig = PathConfiguration.ClientConfig()
+            val options = LoaderOptions()
 
-            pathConfiguration.load(context, location, clientConfig)
+            pathConfiguration.load(context, location, options)
             verify(mockRepository).getCachedConfigurationForUrl(context, remoteUrl)
-            verify(mockRepository).getRemoteConfiguration(remoteUrl, clientConfig)
+            verify(mockRepository).getRemoteConfiguration(remoteUrl, options)
         }
     }
 
@@ -87,13 +87,13 @@ class PathConfigurationTest : BaseRepositoryTest() {
         runBlocking {
             val remoteUrl = "$url/demo/configurations/android-v1.json"
             val location = Location(remoteFileUrl = remoteUrl)
-            val clientConfig = PathConfiguration.ClientConfig()
+            val options = LoaderOptions()
             val json = """{ "settings": {}, "rules": [] }"""
 
-            whenever(mockRepository.getRemoteConfiguration(remoteUrl, clientConfig))
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl, options))
                 .thenReturn(json)
 
-            pathConfiguration.load(context, location, clientConfig)
+            pathConfiguration.load(context, location, options)
             verify(mockRepository).cacheConfigurationForUrl(eq(context), eq(remoteUrl), any())
         }
     }
@@ -107,13 +107,13 @@ class PathConfigurationTest : BaseRepositoryTest() {
         runBlocking {
             val remoteUrl = "$url/demo/configurations/android-v1.json"
             val location = Location(remoteFileUrl = remoteUrl)
-            val clientConfig = PathConfiguration.ClientConfig()
+            val options = LoaderOptions()
             val json = "malformed-json"
 
-            whenever(mockRepository.getRemoteConfiguration(remoteUrl, clientConfig))
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl, options))
                 .thenReturn(json)
 
-            pathConfiguration.load(context, location, clientConfig)
+            pathConfiguration.load(context, location, options)
             verify(mockRepository, never()).cacheConfigurationForUrl(any(), any(), any())
         }
     }

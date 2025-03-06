@@ -55,14 +55,13 @@ class PathConfiguration {
     )
 
     /**
-     * HTTP client configuration options when fetching remote path configuration
-     * files from your server.
+     * Loader options when fetching remote path configuration files from your server.
      */
-    data class ClientConfig(
+    data class LoaderOptions(
         /**
-         * Custom headers to send with each remote path configuration file request.
+         * Custom HTTP headers to send with each remote path configuration file request.
          */
-        val headers: Map<String, String> = emptyMap()
+        val httpHeaders: Map<String, String> = emptyMap()
     )
 
     /**
@@ -72,13 +71,13 @@ class PathConfiguration {
     fun load(
         context: Context,
         location: Location,
-        clientConfig: ClientConfig
+        options: LoaderOptions
     ) {
         if (loader == null) {
             loader = PathConfigurationLoader(context.applicationContext)
         }
 
-        loader?.load(location, clientConfig) {
+        loader?.load(location, options) {
             cachedProperties.clear()
             rules = it.rules
             settings = it.settings

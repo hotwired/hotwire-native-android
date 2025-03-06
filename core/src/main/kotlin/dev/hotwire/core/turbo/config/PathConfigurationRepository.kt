@@ -15,11 +15,11 @@ internal class PathConfigurationRepository {
 
     suspend fun getRemoteConfiguration(
         url: String,
-        clientConfig: PathConfiguration.ClientConfig
+        options: PathConfiguration.LoaderOptions
     ): String? {
         val requestBuilder = Request.Builder().url(url)
 
-        clientConfig.headers.forEach { (key, value) ->
+        options.httpHeaders.forEach { (key, value) ->
             requestBuilder.header(key, value)
         }
 
