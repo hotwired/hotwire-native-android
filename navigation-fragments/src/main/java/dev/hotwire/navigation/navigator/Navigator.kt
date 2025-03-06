@@ -35,10 +35,11 @@ class Navigator(
     internal var currentDialogDestination: HotwireDialogDestination? = null
 
     /**
-     * Retrieves the currently active (fullscreen) [HotwireDestination] on the backstack.
+     * Retrieves the currently active [HotwireDestination] on the backstack.
      */
     val currentDestination: HotwireDestination
-        get() = host.childFragmentManager.primaryNavigationFragment as HotwireDestination?
+        get() = currentDialogDestination as? HotwireDestination
+            ?: host.childFragmentManager.primaryNavigationFragment as? HotwireDestination
             ?: throw IllegalStateException("No current destination found in NavigatorHost")
 
     /**
@@ -92,9 +93,9 @@ class Navigator(
      */
     fun pop() {
         navigateWhenReady {
-            val currentDialogDestination = currentDialogDestination
-            if (currentDialogDestination != null) {
-                currentDialogDestination.closeDialog()
+            val dialogDestination = currentDialogDestination
+            if (dialogDestination != null) {
+                dialogDestination.closeDialog()
             } else {
                 navController.popBackStack()
             }
@@ -229,6 +230,11 @@ class Navigator(
                 navigateToLocation(rule)
             }
             Presentation.PUSH -> navigateWhenReady {
+                // Only permit one dialog instance on top of the stack
+                if (currentDialogDestination != null) {
+                    popBackStack(rule)
+                }
+
                 navigateToLocation(rule)
             }
             Presentation.REPLACE_ROOT -> navigateWhenReady {
@@ -297,6 +303,8 @@ class Navigator(
             "popFromBackStack",
             "location" to rule.controller.currentBackStackEntry.location.orEmpty()
         )
+
+        currentDialogDestination = null
         rule.controller.popBackStack()
     }
 

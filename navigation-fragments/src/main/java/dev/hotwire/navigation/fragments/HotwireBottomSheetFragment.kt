@@ -98,6 +98,7 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
 
     override fun closeDialog() {
         requireDialog().cancel()
+        navigator.currentDialogDestination = null
     }
 
     override fun onBeforeNavigation() {}
