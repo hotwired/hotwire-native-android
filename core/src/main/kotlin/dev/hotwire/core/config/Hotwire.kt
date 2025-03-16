@@ -26,8 +26,9 @@ object Hotwire {
     fun loadPathConfiguration(
         context: Context,
         location: PathConfiguration.Location,
-        options: PathConfiguration.LoaderOptions = PathConfiguration.LoaderOptions()
+        options: PathConfiguration.LoaderOptions = PathConfiguration.LoaderOptions(),
+        onCompletion: (PathConfiguration) -> Unit = {}
     ) {
-        config.pathConfiguration.load(context.applicationContext, location, options)
+        config.pathConfiguration.load(context.applicationContext, location, options, onCompletion)
     }
 }

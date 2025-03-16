@@ -1,6 +1,7 @@
 package dev.hotwire.demo
 
 import android.app.Application
+import android.util.Log
 import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
@@ -35,7 +36,10 @@ class DemoApplication : Application() {
             context = this,
             location = PathConfiguration.Location(
                 assetFilePath = "json/configuration.json"
-            )
+            ),
+            onCompletion = {
+                Log.i("DemoApplication", "Path configuration loaded: $it")
+            }
         )
 
         // Set the default fragment destination
