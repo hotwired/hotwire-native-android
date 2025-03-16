@@ -38,7 +38,7 @@ class DemoApplication : Application() {
                 assetFilePath = "json/configuration.json"
             ),
             onCompletion = {
-                Log.i("DemoApplication", "Path configuration loaded: $it")
+                Log.i("DemoApplication", "Path configuration loaded")
             }
         )
 
