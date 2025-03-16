@@ -126,6 +126,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
         runBlocking {
             pathConfiguration.load(context, location, options, onCompletionCallback)
+            verify(mockRepository).getBundledConfiguration(context, assetFilePath)
             verify(mockRepository).getCachedConfigurationForUrl(context, remoteUrl)
             verify(mockRepository).getRemoteConfiguration(remoteUrl, options)
 
