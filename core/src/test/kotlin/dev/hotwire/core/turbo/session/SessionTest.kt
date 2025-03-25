@@ -1,18 +1,21 @@
 package dev.hotwire.core.turbo.session
 
 import android.os.Build
-import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.turbo.BaseRepositoryTest
+import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.HttpError.ServerError
 import dev.hotwire.core.turbo.errors.LoadError
+import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.util.toJson
-import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.core.turbo.webview.HotwireWebView
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -24,26 +27,31 @@ import org.robolectric.Robolectric.buildActivity
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
-class SessionTest {
+class SessionTest : BaseRepositoryTest() {
     @Mock
     private lateinit var callback: SessionCallback
+
     @Mock
     private lateinit var webView: HotwireWebView
+
     @Mock
     private lateinit var activity: AppCompatActivity
     private lateinit var session: Session
     private lateinit var visit: Visit
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
+
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
         session = Session("test", activity, webView)
         visit = Visit(
-            location = "https://turbo.hotwired.dev",
+            location = baseUrl(),
             destinationIdentifier = 1,
             restoreWithCachedSnapshot = false,
             reload = false,
@@ -62,7 +70,7 @@ class SessionTest {
     }
 
     @Test
-    fun getNewIsAlwaysNewInstance() {
+    fun `session is always new instance`() {
         val session = Session("test", activity, webView)
         val newSession = Session("test", activity, webView)
 
@@ -70,7 +78,7 @@ class SessionTest {
     }
 
     @Test
-    fun visitProposedToLocationFiresCallback() {
+    fun `visit proposed to location fires callback`() {
         val options = VisitOptions()
         val newLocation = "${visit.location}/page"
 
@@ -81,7 +89,7 @@ class SessionTest {
     }
 
     @Test
-    fun visitStartedSavesCurrentVisitIdentifier() {
+    fun `visit started saves current visit identifier`() {
         val visitIdentifier = "12345"
 
         session.currentVisit = visit.copy(identifier = visitIdentifier)
@@ -89,14 +97,14 @@ class SessionTest {
             visitIdentifier = visitIdentifier,
             visitHasCachedSnapshot = true,
             visitIsPageRefresh = false,
-            location = "https://turbo.hotwired.dev"
+            location = visit.location
         )
 
         assertThat(session.currentVisit?.identifier).isEqualTo(visitIdentifier)
     }
 
     @Test
-    fun visitFailedToLoadCallsAdapter() {
+    fun `visit failed to load calls adapter`() {
         val visitIdentifier = "12345"
 
         session.currentVisit = visit.copy(identifier = visitIdentifier)
@@ -106,20 +114,78 @@ class SessionTest {
     }
 
     @Test
-    fun visitRequestFailedWithStatusCodeCallsAdapter() {
+    fun `visit request failed with status code calls adapter`() {
         val visitIdentifier = "12345"
 
         session.currentVisit = visit.copy(identifier = visitIdentifier)
-        session.visitRequestFailedWithStatusCode(visitIdentifier, true, 500)
+        session.visitRequestFailedWithStatusCode(visit.location, visitIdentifier, true, 500)
 
         verify(callback).requestFailedWithError(
-            visitHasCachedSnapshot =  true,
+            visitHasCachedSnapshot = true,
             error = ServerError.InternalServerError
         )
     }
 
     @Test
-    fun visitCompletedCallsAdapter() {
+    fun `visit request failed with non http status code calls adapter for cross origin redirect`() {
+        val redirectLocation = "https://example.com/"
+        val visitIdentifier = "12345"
+
+        enqueueResponse(
+            fileName = "empty-body.json",
+            responseCode = 301,
+            headers = mapOf("Location" to redirectLocation)
+        )
+
+        enqueueResponse(
+            fileName = "empty-body.json",
+            responseCode = 200
+        )
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.visitRequestFailedWithNonHttpStatusCode(visit.location, visitIdentifier, true)
+
+        verify(callback).visitProposedToCrossOriginRedirect(redirectLocation)
+    }
+
+    @Test
+    fun `visit request failed with non http status code calls adapter without redirect`() {
+        enqueueResponse(
+            fileName = "empty-body.json",
+            responseCode = 404
+        )
+
+        val visitIdentifier = "12345"
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.visitRequestFailedWithNonHttpStatusCode(visit.location, visitIdentifier, true)
+
+        verify(callback).requestFailedWithError(
+            visitHasCachedSnapshot = true,
+            error = HttpError.from(WebError.Unknown.errorCode)
+        )
+    }
+
+    @Test
+    fun `visit request failed with non http status code calls adapter without redirect fails visit`() {
+        enqueueResponse(
+            fileName = "empty-body.json",
+            responseCode = 200
+        )
+
+        val visitIdentifier = "12345"
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.visitRequestFailedWithNonHttpStatusCode(visit.location, visitIdentifier, true)
+
+        verify(callback).requestFailedWithError(
+            visitHasCachedSnapshot = true,
+            error = HttpError.from(WebError.Unknown.errorCode)
+        )
+    }
+
+    @Test
+    fun `visit completed calls adapter`() {
         val visitIdentifier = "12345"
         val restorationIdentifier = "67890"
 
@@ -130,7 +196,7 @@ class SessionTest {
     }
 
     @Test
-    fun visitCompletedSavesRestorationIdentifier() {
+    fun `visit completed saves restoration identifier`() {
         val visitIdentifier = "12345"
         val restorationIdentifier = "67890"
         assertThat(session.restorationIdentifiers.size()).isEqualTo(0)
@@ -142,7 +208,7 @@ class SessionTest {
     }
 
     @Test
-    fun visitFormSubmissionStartedFiresCallback() {
+    fun `visit form submission started fires callback`() {
         session.currentVisit = visit
         session.formSubmissionStarted(visit.location)
 
@@ -150,7 +216,7 @@ class SessionTest {
     }
 
     @Test
-    fun visitFormSubmissionFinishedFiresCallback() {
+    fun `visit form submission finished fires callback`() {
         session.currentVisit = visit
         session.formSubmissionFinished(visit.location)
 
@@ -158,7 +224,7 @@ class SessionTest {
     }
 
     @Test
-    fun pageLoadedSavesRestorationIdentifier() {
+    fun `page loaded saves restoration identifier`() {
         val restorationIdentifier = "67890"
         assertThat(session.restorationIdentifiers.size()).isEqualTo(0)
 
@@ -169,7 +235,7 @@ class SessionTest {
     }
 
     @Test
-    fun pendingVisitIsVisitedWhenReady() {
+    fun `pending visit is visited when ready`() {
         session.currentVisit = visit
         session.visitPending = true
 
@@ -178,7 +244,7 @@ class SessionTest {
     }
 
     @Test
-    fun resetToColdBoot() {
+    fun `reset to cold boot`() {
         session.currentVisit = visit
         session.isReady = true
         session.isColdBooting = false
@@ -189,7 +255,7 @@ class SessionTest {
     }
 
     @Test
-    fun resetToColdBootClearsIdentifiers() {
+    fun `reset to cold boot clears identifiers`() {
         val visitIdentifier = "12345"
         session.currentVisit = visit.copy(identifier = visitIdentifier)
         session.coldBootVisitIdentifier = "0"
@@ -200,7 +266,7 @@ class SessionTest {
     }
 
     @Test
-    fun restoreCurrentVisit() {
+    fun `restore current visit`() {
         val visitIdentifier = "12345"
         val restorationIdentifier = "67890"
 
@@ -213,7 +279,7 @@ class SessionTest {
     }
 
     @Test
-    fun restoreCurrentVisitFailsWithNoRestorationIdentifier() {
+    fun `restore current visit fails with no restoration identifier`() {
         val visitIdentifier = "12345"
 
         session.currentVisit = visit.copy(identifier = visitIdentifier)
@@ -224,7 +290,7 @@ class SessionTest {
     }
 
     @Test
-    fun restoreCurrentVisitFailsWithSessionNotReady() {
+    fun `restore current visit fails with session not ready`() {
         val visitIdentifier = "12345"
         val restorationIdentifier = "67890"
 
@@ -238,7 +304,7 @@ class SessionTest {
     }
 
     @Test
-    fun webViewIsNotNull() {
+    fun `webView is not null`() {
         assertThat(session.webView).isNotNull
     }
 }

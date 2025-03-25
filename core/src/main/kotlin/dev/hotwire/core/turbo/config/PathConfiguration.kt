@@ -55,15 +55,29 @@ class PathConfiguration {
     )
 
     /**
+     * Loader options when fetching remote path configuration files from your server.
+     */
+    data class LoaderOptions(
+        /**
+         * Custom HTTP headers to send with each remote path configuration file request.
+         */
+        val httpHeaders: Map<String, String> = emptyMap()
+    )
+
+    /**
      * Loads and parses the specified configuration file(s) from their local
      * and/or remote locations.
      */
-    fun load(context: Context, location: Location) {
+    fun load(
+        context: Context,
+        location: Location,
+        options: LoaderOptions
+    ) {
         if (loader == null) {
             loader = PathConfigurationLoader(context.applicationContext)
         }
 
-        loader?.load(location) {
+        loader?.load(location, options) {
             cachedProperties.clear()
             rules = it.rules
             settings = it.settings
@@ -142,3 +156,6 @@ val PathConfigurationProperties.title: String?
 
 val PathConfigurationProperties.pullToRefreshEnabled: Boolean
     get() = get("pull_to_refresh_enabled").let { it as Boolean }
+
+val PathConfigurationProperties.animated: Boolean
+    get() = get("animated")?.let { it as Boolean } ?: true

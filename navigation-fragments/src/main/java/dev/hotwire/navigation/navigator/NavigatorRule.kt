@@ -82,10 +82,12 @@ internal class NavigatorRule(
         val locationIsCurrent = locationsAreSame(newLocation, currentLocation)
         val locationIsPrevious = locationsAreSame(newLocation, previousLocation)
         val replace = newVisitOptions.action == VisitAction.REPLACE
+        val dismissModalContext = currentPresentationContext == PresentationContext.MODAL &&
+                newPresentationContext == PresentationContext.DEFAULT
 
         return when {
             locationIsCurrent && isAtStartDestination -> Presentation.REPLACE_ROOT
-            locationIsPrevious -> Presentation.POP
+            locationIsPrevious || dismissModalContext -> Presentation.POP
             locationIsCurrent || replace -> Presentation.REPLACE
             else -> Presentation.PUSH
         }
@@ -134,9 +136,16 @@ internal class NavigatorRule(
             return null
         }
 
+        // When dismissing a modal to navigate in the "default" context, override the visit
+        // action. A visit proposal with an original "replace" action is respected by first
+        // dismissing the modal. But we don't want to also "replace" the underlying "default"
+        // context screen (unless the urls are the same).
+        val locationIsPrevious = locationsAreSame(newLocation, previousLocation)
+        val action = if (locationIsPrevious) VisitAction.REPLACE else VisitAction.ADVANCE
+
         return SessionModalResult(
             location = newLocation,
-            options = newVisitOptions,
+            options = newVisitOptions.copy(action = action),
             bundle = newBundle,
             shouldNavigate = newProperties.presentation != Presentation.NONE
         )

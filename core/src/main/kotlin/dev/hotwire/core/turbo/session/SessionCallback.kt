@@ -19,6 +19,7 @@ interface SessionCallback {
     fun visitCompleted(completedOffline: Boolean)
     fun visitLocationStarted(location: String)
     fun visitProposedToLocation(location: String, options: VisitOptions)
+    fun visitProposedToCrossOriginRedirect(location: String)
     fun visitDestination(): VisitDestination
     fun formSubmissionStarted(location: String)
     fun formSubmissionFinished(location: String)

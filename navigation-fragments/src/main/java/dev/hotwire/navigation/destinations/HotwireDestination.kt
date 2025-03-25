@@ -137,42 +137,11 @@ interface HotwireDestination : BridgeDestination {
         newPathProperties: PathConfigurationProperties,
         action: VisitAction
     ): NavOptions {
-        val modal = newPathProperties.context == PresentationContext.MODAL
-        val clearAll = newPathProperties.presentation == Presentation.CLEAR_ALL
-        val animate = action != VisitAction.REPLACE &&
-                newPathProperties.presentation != Presentation.REPLACE &&
-                newPathProperties.presentation != Presentation.REPLACE_ROOT
-
-        return if (modal) {
-            navOptions {
-                anim {
-                    enter = if (animate) R.anim.enter_slide_in_bottom else 0
-                    exit = R.anim.exit_slide_out_bottom
-                    popEnter = R.anim.enter_slide_in_bottom
-                    popExit = R.anim.exit_slide_out_bottom
-                }
-            }
-        } else {
-            if (clearAll) {
-                navOptions {
-                    anim {
-                        enter = R.anim.exit_slide_out_left
-                        exit = R.anim.exit_slide_out_right
-                        popEnter = R.anim.enter_slide_in_left
-                        popExit = R.anim.enter_slide_in_right
-                    }
-                }
-            } else {
-                navOptions {
-                    anim {
-                        enter = if (animate) R.anim.enter_slide_in_right else 0
-                        exit = R.anim.exit_slide_out_left
-                        popEnter = R.anim.enter_slide_in_left
-                        popExit = R.anim.exit_slide_out_right
-                    }
-                }
-            }
-        }
+        return HotwireDestinationAnimations.defaultNavOptions(
+            currentPathProperties = pathProperties,
+            newPathProperties = newPathProperties,
+            action = action
+        )
     }
 
     /**

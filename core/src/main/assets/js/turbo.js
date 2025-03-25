@@ -98,18 +98,18 @@
     // Adapter interface
 
     visitProposedToLocation(location, options) {
-        if (window.Turbo && Turbo.navigator.locationWithActionIsSamePage(location, options.action)) {
-          // Scroll to the anchor on the page
-          TurboSession.visitProposalScrollingToAnchor(location.toString(), JSON.stringify(options))
-          Turbo.navigator.view.scrollToAnchorFromLocation(location)
-        } else if (window.Turbo && Turbo.navigator.location?.href === location.href) {
-          // Refresh the page without native proposal
-          TurboSession.visitProposalRefreshingPage(location.toString(), JSON.stringify(options))
-          this.visitLocationWithOptionsAndRestorationIdentifier(location, JSON.stringify(options), Turbo.navigator.restorationIdentifier)
-        } else {
-          // Propose the visit
-          TurboSession.visitProposedToLocation(location.toString(), JSON.stringify(options))
-        }
+      if (window.Turbo && Turbo.navigator.locationWithActionIsSamePage(location, options.action)) {
+        // Scroll to the anchor on the page
+        TurboSession.visitProposalScrollingToAnchor(location.toString(), JSON.stringify(options))
+        Turbo.navigator.view.scrollToAnchorFromLocation(location)
+      } else if (window.Turbo && Turbo.navigator.location?.href === location.href) {
+        // Refresh the page without native proposal
+        TurboSession.visitProposalRefreshingPage(location.toString(), JSON.stringify(options))
+        this.visitLocationWithOptionsAndRestorationIdentifier(location, JSON.stringify(options), Turbo.navigator.restorationIdentifier)
+      } else {
+        // Propose the visit
+        TurboSession.visitProposedToLocation(location.toString(), JSON.stringify(options))
+      }
     }
 
     // Turbolinks 5
@@ -135,7 +135,17 @@
     }
 
     visitRequestFailedWithStatusCode(visit, statusCode) {
-      TurboSession.visitRequestFailedWithStatusCode(visit.identifier, visit.hasCachedSnapshot(), statusCode)
+      const location = visit.location.toString()
+
+      // Non-HTTP status codes are sent by Turbo for network failures, including
+      // cross-origin fetch redirect attempts. For non-HTTP status codes, pass to
+      // the native side to determine whether a cross-origin redirect visit should
+      // be proposed.
+      if (statusCode <= 0) {
+        TurboSession.visitRequestFailedWithNonHttpStatusCode(location, visit.identifier, visit.hasCachedSnapshot())
+      } else {
+        TurboSession.visitRequestFailedWithStatusCode(location, visit.identifier, visit.hasCachedSnapshot(), statusCode)
+      }
     }
 
     visitRequestFinished(visit) {
@@ -196,8 +206,10 @@
     while (element) {
       const canScroll = element.scrollHeight > element.clientHeight
       const overflowY = window.getComputedStyle(element).overflowY
+      const isScrollable = canScroll && (overflowY === "scroll" || overflowY === "auto")
+      const preventPullToRefresh = !!element.closest("[data-native-prevent-pull-to-refresh]")
 
-      if (canScroll && (overflowY === "scroll" || overflowY === "auto")) {
+      if (isScrollable || preventPullToRefresh) {
         TurboSession.elementTouchStarted(true)
         break
       }

@@ -14,22 +14,24 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.VISUAL_STATE_CALLBACK
 import androidx.webkit.WebViewFeature.isFeatureSupported
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.files.delegates.GeolocationPermissionDelegate
+import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.errors.WebSslError
 import dev.hotwire.core.turbo.http.HotwireHttpClient
+import dev.hotwire.core.turbo.http.HttpRepository
 import dev.hotwire.core.turbo.offline.*
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 import dev.hotwire.core.turbo.util.runOnUiThread
 import dev.hotwire.core.turbo.util.toJson
-import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.core.turbo.webview.HotwireWebView
+import kotlinx.coroutines.launch
 import java.util.Date
 
 /**
@@ -52,8 +54,9 @@ class Session(
     internal var visitPending = false
     internal var restorationIdentifiers = SparseArray<String>()
     internal val context: Context = activity.applicationContext
-    internal val httpRepository = OfflineHttpRepository(activity.lifecycleScope)
-    internal val requestInterceptor = OfflineWebViewRequestInterceptor(this)
+    internal val httpRepository = HttpRepository()
+    internal val offlineHttpRepository = OfflineHttpRepository(activity.lifecycleScope)
+    internal val offlineRequestInterceptor = OfflineWebViewRequestInterceptor(this)
 
     // User accessible
 
@@ -106,9 +109,9 @@ class Session(
             "An offline request handler must be provided to pre-cache $location"
         }
 
-        httpRepository.preCache(
+        offlineHttpRepository.preCache(
             requestHandler, OfflinePreCacheRequest(
-                url = location, userAgent = webView.settings.userAgentString
+                url = location, userAgent = Hotwire.config.userAgentWithWebViewDefault(context)
             )
         )
     }
@@ -195,6 +198,22 @@ class Session(
         callback { it.visitProposedToLocation(location, options) }
     }
 
+    private fun visitProposedToCrossOriginRedirect(
+        location: String,
+        redirectLocation: String,
+        visitIdentifier: String
+    ) {
+        logEvent("visitProposedToCrossOriginRedirect",
+            "location" to location,
+            "redirectLocation" to redirectLocation,
+            "visitIdentifier" to visitIdentifier
+        )
+
+        if (visitIdentifier == currentVisit?.identifier) {
+            callback { it.visitProposedToCrossOriginRedirect(redirectLocation) }
+        }
+    }
+
     /**
      * Called by Turbo bridge when a new visit proposal will refresh the
      * current page.
@@ -277,24 +296,76 @@ class Session(
      * Warning: This method is public so it can be used as a Javascript Interface.
      * You should never call this directly as it could lead to unintended behavior.
      *
+     * @param location The location of the failed visit.
      * @param visitIdentifier A unique identifier for the visit.
      * @param visitHasCachedSnapshot Whether the visit has a cached snapshot available.
      * @param statusCode The HTTP status code that caused the failure.
      */
     @JavascriptInterface
-    fun visitRequestFailedWithStatusCode(visitIdentifier: String, visitHasCachedSnapshot: Boolean, statusCode: Int) {
+    fun visitRequestFailedWithStatusCode(
+        location: String,
+        visitIdentifier: String,
+        visitHasCachedSnapshot: Boolean,
+        statusCode: Int
+    ) {
         val visitError = HttpError.from(statusCode)
 
         logEvent(
             "visitRequestFailedWithStatusCode",
+            "location" to location,
             "visitIdentifier" to visitIdentifier,
             "visitHasCachedSnapshot" to visitHasCachedSnapshot,
             "error" to visitError
         )
 
-        currentVisit?.let { visit ->
-            if (visitIdentifier == visit.identifier) {
-                callback { it.requestFailedWithError(visitHasCachedSnapshot, visitError) }
+        if (visitIdentifier == currentVisit?.identifier) {
+            callback { it.requestFailedWithError(visitHasCachedSnapshot, visitError) }
+        }
+    }
+
+    /**
+     * Called by Turbo bridge when a visit request fails with a non-HTTP status code, suggesting
+     * it may be the result of a cross-origin redirect visit. Determining a cross-origin redirect
+     * is not possible in javascript with the Fetch API due to CORS restrictions, so verify on
+     * the native side. Propose a cross-origin redirect visit if a redirect is found, otherwise
+     * fail the visit.
+     *
+     * Warning: This method is public so it can be used as a Javascript Interface.
+     * You should never call this directly as it could lead to unintended behavior.
+     *
+     * @param location The original visit location requested.
+     * @param visitIdentifier A unique identifier for the visit.
+     * @param visitHasCachedSnapshot Whether the visit has a cached snapshot available.
+     */
+    @JavascriptInterface
+    fun visitRequestFailedWithNonHttpStatusCode(
+        location: String,
+        visitIdentifier: String,
+        visitHasCachedSnapshot: Boolean
+    ) {
+        logEvent("visitRequestFailedWithNonHttpStatusCode",
+            "location" to location,
+            "visitIdentifier" to visitIdentifier,
+            "visitHasCachedSnapshot" to visitHasCachedSnapshot
+        )
+
+        activity.lifecycleScope.launch {
+            val result = httpRepository.fetch(location)
+
+            if (result != null && result.response.isSuccessful &&
+                result.redirect?.isCrossOrigin == true) {
+                visitProposedToCrossOriginRedirect(
+                    location = location,
+                    redirectLocation = result.redirect.location,
+                    visitIdentifier = visitIdentifier
+                )
+            } else {
+                visitRequestFailedWithStatusCode(
+                    location = location,
+                    visitIdentifier = visitIdentifier,
+                    visitHasCachedSnapshot = visitHasCachedSnapshot,
+                    statusCode = WebError.Unknown.errorCode
+                )
             }
         }
     }
@@ -497,8 +568,8 @@ class Session(
      * You should never call this directly as it could lead to unintended behavior.
      */
     @JavascriptInterface
-    fun elementTouchStarted(scrollable: Boolean) {
-        webView.elementTouchIsScrollable = scrollable
+    fun elementTouchStarted(preventsPullsToRefresh: Boolean) {
+        webView.elementTouchPreventsPullsToRefresh = preventsPullsToRefresh
     }
 
     /**
@@ -509,7 +580,7 @@ class Session(
      */
     @JavascriptInterface
     fun elementTouchEnded() {
-        webView.elementTouchIsScrollable = false
+        webView.elementTouchPreventsPullsToRefresh = false
     }
 
     // Private
@@ -749,7 +820,7 @@ class Session(
         }
 
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-            return requestInterceptor.interceptRequest(request)
+            return offlineRequestInterceptor.interceptRequest(request)
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {

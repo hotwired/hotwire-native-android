@@ -28,11 +28,10 @@ class UserAgentTest : BaseUnitTest() {
     fun `user agent with no prefix`() {
         Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
 
-        val userAgent = Hotwire.config.userAgent(context)
+        val userAgent = Hotwire.config.userAgent
         val expectedUserAgent =
                 "Hotwire Native Android; Turbo Native Android; " +
-                "bridge-components: [one two]; " +
-                TEST_USER_AGENT
+                "bridge-components: [one two];"
 
         assertEquals(expectedUserAgent, userAgent)
     }
@@ -42,12 +41,26 @@ class UserAgentTest : BaseUnitTest() {
         Hotwire.config.applicationUserAgentPrefix = "My Application Prefix;"
         Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
 
-        val userAgent = Hotwire.config.userAgent(context)
+        val userAgent = Hotwire.config.userAgent
         val expectedUserAgent =
                 "My Application Prefix; " +
                 "Hotwire Native Android; Turbo Native Android; " +
-                "bridge-components: [one two]; " +
-                TEST_USER_AGENT
+                "bridge-components: [one two];"
+
+        assertEquals(expectedUserAgent, userAgent)
+    }
+
+    @Test
+    fun `user agent with prefix and webview default`() {
+        Hotwire.config.applicationUserAgentPrefix = "My Application Prefix;"
+        Hotwire.config.registeredBridgeComponentFactories = TestData.componentFactories
+
+        val userAgent = Hotwire.config.userAgentWithWebViewDefault(context)
+        val expectedUserAgent =
+            "My Application Prefix; " +
+                    "Hotwire Native Android; Turbo Native Android; " +
+                    "bridge-components: [one two]; " +
+                    TEST_USER_AGENT
 
         assertEquals(expectedUserAgent, userAgent)
     }

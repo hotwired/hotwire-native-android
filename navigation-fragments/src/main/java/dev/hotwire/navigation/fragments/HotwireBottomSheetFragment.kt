@@ -56,7 +56,7 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
      * Use [onViewCreated] for code touching
      * the Fragment's view and [onCreate] for other initialization.
      */
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION", "OverrideDeprecatedMigration")
     final override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
     }
@@ -71,7 +71,7 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
      * Turbo provides the [HotwireDestination.activityResultLauncher] interface
      * to obtain registered result launchers from any destination.
      */
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION", "OverrideDeprecatedMigration")
     final override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
     }
@@ -98,6 +98,7 @@ abstract class HotwireBottomSheetFragment : BottomSheetDialogFragment(),
 
     override fun closeDialog() {
         requireDialog().cancel()
+        navigator.currentDialogDestination = null
     }
 
     override fun onBeforeNavigation() {}

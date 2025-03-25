@@ -13,7 +13,11 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.turbo.config.PathConfiguration
-import dev.hotwire.core.turbo.nav.*
+import dev.hotwire.core.turbo.config.PathConfiguration.Location
+import dev.hotwire.core.turbo.nav.Presentation
+import dev.hotwire.core.turbo.nav.PresentationContext
+import dev.hotwire.core.turbo.nav.QueryStringPresentation
+import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -34,6 +38,7 @@ class NavigatorRuleTest {
     private val homeUrl = "https://hotwired.dev/home"
     private val newHomeUrl = "https://hotwired.dev/new-home"
     private val featureUrl = "https://hotwired.dev/feature"
+    private val featureTwoUrl = "https://hotwired.dev/feature-two"
     private val newUrl = "https://hotwired.dev/feature/new"
     private val editUrl = "https://hotwired.dev/feature/edit"
     private val recedeUrl = "https://hotwired.dev/custom/recede"
@@ -68,7 +73,11 @@ class NavigatorRuleTest {
         context = ApplicationProvider.getApplicationContext()
         controller = buildControllerWithGraph()
         pathConfiguration = PathConfiguration().apply {
-            load(context, PathConfiguration.Location(assetFilePath = "json/test-configuration.json"))
+            load(
+                context = context,
+                location = Location(assetFilePath = "json/test-configuration.json"),
+                options = PathConfiguration.LoaderOptions()
+            )
         }
     }
 
@@ -191,6 +200,56 @@ class NavigatorRuleTest {
         assertThat(rule.newQueryStringPresentation).isEqualTo(QueryStringPresentation.REPLACE)
         assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.DISMISS_MODAL)
         assertThat(rule.newModalResult?.location).isEqualTo(featureUrl)
+        assertThat(rule.newDestinationUri).isEqualTo(webUri)
+        assertThat(rule.newDestination).isNotNull()
+        assertThat(rule.newNavOptions).isEqualTo(navOptions)
+    }
+
+    @Test
+    fun `navigating back to feature from modal context with replace action maintains replace`() {
+        controller.navigate(webDestinationId, locationArgs(featureUrl))
+        controller.navigate(webModalDestinationId, locationArgs(newUrl))
+        val rule = getNavigatorRule(featureUrl, VisitOptions(action = VisitAction.REPLACE))
+
+        // Current destination
+        assertThat(rule.previousLocation).isEqualTo(featureUrl)
+        assertThat(rule.currentLocation).isEqualTo(newUrl)
+        assertThat(rule.currentPresentationContext).isEqualTo(PresentationContext.MODAL)
+        assertThat(rule.isAtStartDestination).isFalse()
+
+        // New destination
+        assertThat(rule.newLocation).isEqualTo(featureUrl)
+        assertThat(rule.newPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.newPresentation).isEqualTo(Presentation.POP)
+        assertThat(rule.newQueryStringPresentation).isEqualTo(QueryStringPresentation.REPLACE)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.DISMISS_MODAL)
+        assertThat(rule.newModalResult?.location).isEqualTo(featureUrl)
+        assertThat(rule.newModalResult?.options?.action).isEqualTo(VisitAction.REPLACE)
+        assertThat(rule.newDestinationUri).isEqualTo(webUri)
+        assertThat(rule.newDestination).isNotNull()
+        assertThat(rule.newNavOptions).isEqualTo(navOptions)
+    }
+
+    @Test
+    fun `navigating to new feature from modal context with replace action changes to advance`() {
+        controller.navigate(webDestinationId, locationArgs(featureUrl))
+        controller.navigate(webModalDestinationId, locationArgs(newUrl))
+        val rule = getNavigatorRule(featureTwoUrl, VisitOptions(action = VisitAction.REPLACE))
+
+        // Current destination
+        assertThat(rule.previousLocation).isEqualTo(featureUrl)
+        assertThat(rule.currentLocation).isEqualTo(newUrl)
+        assertThat(rule.currentPresentationContext).isEqualTo(PresentationContext.MODAL)
+        assertThat(rule.isAtStartDestination).isFalse()
+
+        // New destination
+        assertThat(rule.newLocation).isEqualTo(featureTwoUrl)
+        assertThat(rule.newPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.newPresentation).isEqualTo(Presentation.POP)
+        assertThat(rule.newQueryStringPresentation).isEqualTo(QueryStringPresentation.REPLACE)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.DISMISS_MODAL)
+        assertThat(rule.newModalResult?.location).isEqualTo(featureTwoUrl)
+        assertThat(rule.newModalResult?.options?.action).isEqualTo(VisitAction.ADVANCE)
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
         assertThat(rule.newNavOptions).isEqualTo(navOptions)

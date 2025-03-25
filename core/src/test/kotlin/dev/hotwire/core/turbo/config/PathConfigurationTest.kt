@@ -5,9 +5,14 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.turbo.BaseRepositoryTest
+import dev.hotwire.core.turbo.config.PathConfiguration.LoaderOptions
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.util.toJson
@@ -29,6 +34,12 @@ class PathConfigurationTest : BaseRepositoryTest() {
     private lateinit var pathConfiguration: PathConfiguration
     private val mockRepository = mock<PathConfigurationRepository>()
     private val url = "https://turbo.hotwired.dev"
+    private val options = LoaderOptions(
+        httpHeaders = mapOf(
+            "Accept" to "application/json",
+            "Custom-Header" to "test-value"
+        )
+    )
 
     @Before
     override fun setup() {
@@ -36,13 +47,17 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
         context = ApplicationProvider.getApplicationContext()
         pathConfiguration = PathConfiguration().apply {
-            load(context, Location(assetFilePath = "json/test-configuration.json"))
+            load(
+                context = context,
+                location = Location(assetFilePath = "json/test-configuration.json"),
+                options = options
+            )
         }
     }
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.rules.size).isEqualTo(11)
+        assertThat(pathConfiguration.rules.size).isEqualTo(12)
     }
 
     @Test
@@ -64,10 +79,51 @@ class PathConfigurationTest : BaseRepositoryTest() {
         runBlocking {
             val remoteUrl = "$url/demo/configurations/android-v1.json"
             val location = Location(remoteFileUrl = remoteUrl)
+            val options = LoaderOptions()
 
-            pathConfiguration.load(context, location)
+            pathConfiguration.load(context, location, options)
             verify(mockRepository).getCachedConfigurationForUrl(context, remoteUrl)
-            verify(mockRepository).getRemoteConfiguration(remoteUrl)
+            verify(mockRepository).getRemoteConfiguration(remoteUrl, options)
+        }
+    }
+
+    @Test
+    fun validConfigurationIsCached() {
+        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+            repository = mockRepository
+        }
+
+        runBlocking {
+            val remoteUrl = "$url/demo/configurations/android-v1.json"
+            val location = Location(remoteFileUrl = remoteUrl)
+            val options = LoaderOptions()
+            val json = """{ "settings": {}, "rules": [] }"""
+
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl, options))
+                .thenReturn(json)
+
+            pathConfiguration.load(context, location, options)
+            verify(mockRepository).cacheConfigurationForUrl(eq(context), eq(remoteUrl), any())
+        }
+    }
+
+    @Test
+    fun malformedConfigurationIsNotCached() {
+        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+            repository = mockRepository
+        }
+
+        runBlocking {
+            val remoteUrl = "$url/demo/configurations/android-v1.json"
+            val location = Location(remoteFileUrl = remoteUrl)
+            val options = LoaderOptions()
+            val json = "malformed-json"
+
+            whenever(mockRepository.getRemoteConfiguration(remoteUrl, options))
+                .thenReturn(json)
+
+            pathConfiguration.load(context, location, options)
+            verify(mockRepository, never()).cacheConfigurationForUrl(any(), any(), any())
         }
     }
 
@@ -81,6 +137,13 @@ class PathConfigurationTest : BaseRepositoryTest() {
     @Test
     fun title() {
         assertThat(pathConfiguration.properties("$url/image.jpg").title).isEqualTo("Image Viewer")
+    }
+
+    @Test
+    fun animated() {
+        assertThat(pathConfiguration.properties("$url/home").animated).isTrue()
+        assertThat(pathConfiguration.properties("$url/new").animated).isTrue()
+        assertThat(pathConfiguration.properties("$url/not-animated").animated).isFalse()
     }
 
     @Test

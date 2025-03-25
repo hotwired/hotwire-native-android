@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.turbo.BaseRepositoryTest
-import dev.hotwire.core.turbo.http.HotwireHttpClient
+import dev.hotwire.core.turbo.config.PathConfiguration.LoaderOptions
 import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +27,6 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
     override fun setup() {
         super.setup()
         context = ApplicationProvider.getApplicationContext()
-        HotwireHttpClient.instance = client()
     }
 
     @Test
@@ -36,7 +35,7 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
 
         runBlocking {
             launch(Dispatchers.Main) {
-                val json = repository.getRemoteConfiguration(baseUrl())
+                val json = repository.getRemoteConfiguration(baseUrl(), LoaderOptions())
                 assertThat(json).isNotNull()
 
                 val config = load(json)
@@ -51,7 +50,7 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
         assertThat(json).isNotNull()
 
         val config = load(json)
-        assertThat(config?.rules?.size).isEqualTo(11)
+        assertThat(config?.rules?.size).isEqualTo(12)
     }
 
     @Test
@@ -65,6 +64,28 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
 
         val cachedConfig = load(json)
         assertThat(cachedConfig?.rules?.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `getRemoteConfiguration should include custom headers`() {
+        enqueueResponse("test-configuration.json")
+
+        val options = LoaderOptions(
+            httpHeaders = mapOf(
+                "Accept" to "application/json",
+                "Custom-Header" to "test-value"
+            )
+        )
+
+        runBlocking {
+            launch(Dispatchers.Main) {
+                repository.getRemoteConfiguration(baseUrl(), options)
+
+                val request = server.takeRequest()
+                assertThat(request.headers["Custom-Header"]).isEqualTo("test-value")
+                assertThat(request.headers["Accept"]).isEqualTo("application/json")
+            }
+        }
     }
 
     private fun load(json: String?): PathConfiguration? {

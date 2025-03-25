@@ -97,6 +97,14 @@
     },
     {
       "patterns": [
+        "/not-animated"
+      ],
+      "properties": {
+        "animated": false
+      }
+    },
+    {
+      "patterns": [
         "/custom/tabs"
       ],
       "properties": {

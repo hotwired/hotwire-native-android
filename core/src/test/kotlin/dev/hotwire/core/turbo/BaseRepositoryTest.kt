@@ -1,9 +1,11 @@
 package dev.hotwire.core.turbo
 
+import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import okhttp3.Dispatcher
@@ -21,11 +23,12 @@ import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 open class BaseRepositoryTest : BaseUnitTest() {
-    private val server = MockWebServer()
-    private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+    internal val server = MockWebServer()
+    private val testDispatcher = UnconfinedTestDispatcher(TestCoroutineScheduler())
 
     override fun setup() {
         super.setup()
+        HotwireHttpClient.instance = client()
         Dispatchers.setMain(testDispatcher)
         dispatcherProvider.io = Dispatchers.Main
         server.start()
@@ -34,29 +37,33 @@ open class BaseRepositoryTest : BaseUnitTest() {
     override fun teardown() {
         super.teardown()
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
         server.shutdown()
-    }
-
-    protected fun client(): OkHttpClient {
-        return OkHttpClient.Builder()
-                .dispatcher(Dispatcher(SynchronousExecutorService()))
-                .build()
     }
 
     protected fun baseUrl(): String {
         return server.url("/").toString()
     }
 
-    protected fun enqueueResponse(fileName: String, headers: Map<String, String> = emptyMap()) {
+    protected fun enqueueResponse(
+        fileName: String,
+        responseCode: Int = 200,
+        headers: Map<String, String> = emptyMap()
+    ) {
         val inputStream = loadAsset(fileName)
         val source = inputStream.source().buffer()
         val mockResponse = MockResponse().apply {
+            setResponseCode(responseCode)
             headers.forEach { addHeader(it.key, it.value) }
             setBody(source.readString(StandardCharsets.UTF_8))
         }
 
         server.enqueue(mockResponse)
+    }
+
+    private fun client(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .dispatcher(Dispatcher(SynchronousExecutorService()))
+            .build()
     }
 
     private fun loadAsset(fileName: String): InputStream {
