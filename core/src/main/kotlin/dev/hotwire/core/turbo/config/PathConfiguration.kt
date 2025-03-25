@@ -145,17 +145,17 @@ val PathConfigurationProperties.context: PresentationContext
         PresentationContext.DEFAULT
     }
 
-val PathConfigurationProperties.uri: Uri
-    get() = get("uri").let { it.toString().toUri() }
+val PathConfigurationProperties.uri: Uri?
+    get() = get("uri")?.toString()?.toUri()
 
-val PathConfigurationProperties.fallbackUri: Uri
-    get() = get("fallback_uri").let { it.toString().toUri() }
+val PathConfigurationProperties.fallbackUri: Uri?
+    get() = get("fallback_uri")?.toString()?.toUri()
 
 val PathConfigurationProperties.title: String?
-    get() = get("title") as String?
+    get() = get("title")?.toString()
 
 val PathConfigurationProperties.pullToRefreshEnabled: Boolean
-    get() = get("pull_to_refresh_enabled").let { it as Boolean }
+    get() = get("pull_to_refresh_enabled")?.let { it as Boolean } ?: false
 
 val PathConfigurationProperties.animated: Boolean
     get() = get("animated")?.let { it as Boolean } ?: true
