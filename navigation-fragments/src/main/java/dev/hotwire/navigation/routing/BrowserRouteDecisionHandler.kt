@@ -10,8 +10,6 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
 class BrowserRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "browser"
 
-    override val decision = Router.Decision.CANCEL
-
     override fun matches(
         location: String,
         configuration: NavigatorConfiguration
@@ -23,7 +21,7 @@ class BrowserRouteDecisionHandler : Router.RouteDecisionHandler {
         location: String,
         configuration: NavigatorConfiguration,
         activity: HotwireActivity
-    ) {
+    ): Router.Decision {
         val intent = Intent(Intent.ACTION_VIEW, location.toUri())
 
         try {
@@ -31,5 +29,7 @@ class BrowserRouteDecisionHandler : Router.RouteDecisionHandler {
         } catch (e: ActivityNotFoundException) {
             logError("BrowserRouteDecisionHandler", e)
         }
+
+        return Router.Decision.CANCEL
     }
 }

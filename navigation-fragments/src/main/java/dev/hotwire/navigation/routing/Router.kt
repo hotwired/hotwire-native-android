@@ -22,13 +22,6 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
         val name: String
 
         /**
-         * To permit in-app navigation when the location matches this decision
-         * handler, return [Decision.NAVIGATE]. To prevent in-app navigation
-         * return [Decision.CANCEL].
-         */
-        val decision: Decision
-
-        /**
          * Determines whether the location matches this decision handler. Use
          * your own custom rules based on the location's domain, protocol,
          * path, or any other factors.
@@ -39,14 +32,15 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
         ): Boolean
 
         /**
-         * Handle custom routing behavior when a match is found. For example,
-         * open an external browser or app for external domain urls.
+         * Handle custom routing behavior when a match is found. To continue with in-app
+         * navigation, return [Decision.NAVIGATE]. To prevent in-app navigation return
+         * [Decision.CANCEL].
          */
         fun handle(
             location: String,
             configuration: NavigatorConfiguration,
             activity: HotwireActivity
-        )
+        ): Decision
     }
 
     enum class Decision {
@@ -73,8 +67,7 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
                     "location" to location
                 ))
 
-                handler.handle(location, configuration, activity)
-                return handler.decision
+                return handler.handle(location, configuration, activity)
             }
         }
 
