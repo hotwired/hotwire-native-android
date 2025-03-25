@@ -129,9 +129,15 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun globalSetting() {
-        assertThat(pathConfiguration.settings.size).isEqualTo(1)
-        assertThat(pathConfiguration.settings["custom_app_feature_enabled"]).isEqualTo("true")
+        assertThat(pathConfiguration.settings.size).isEqualTo(2)
         assertThat(pathConfiguration.settings["no_such_key"]).isNull()
+        assertThat(pathConfiguration.settings["custom_app_feature_enabled"]).isEqualTo(true)
+        assertThat(pathConfiguration.settings.getCustomAppData()).isEqualTo(
+            CustomAppData(
+                marketingSite = "https://native.hotwired.dev",
+                demoSite = "https://hotwire-native-demo.dev"
+            )
+        )
     }
 
     @Test
@@ -158,13 +164,23 @@ class PathConfigurationTest : BaseRepositoryTest() {
         assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.first()?.label)).isEqualTo("Tab 1")
     }
 
-    //    Extension function to show support for serialising custom properties
+    // Extension functions to show support for deserializing custom properties/settings
+
     private fun PathConfigurationProperties.getTabs(): List<Tab>? {
         return get("tabs")?.toJson()?.toObject(object : TypeToken<List<Tab>>() {})
     }
 
-    internal data class Tab(
+    private fun PathConfigurationSettings.getCustomAppData(): CustomAppData? {
+        return get("custom_app_data")?.toJson()?.toObject(object : TypeToken<CustomAppData>() {})
+    }
+
+    private data class Tab(
         @SerializedName("label") val label: String,
         @SerializedName("path") val path: String
+    )
+
+    private data class CustomAppData(
+        @SerializedName("marketing_site") val marketingSite: String,
+        @SerializedName("demo_site") val demoSite: String
     )
 }

@@ -119,7 +119,7 @@ class PathConfiguration {
 }
 
 typealias PathConfigurationProperties = HashMap<String, Any>
-typealias PathConfigurationSettings = HashMap<String, String>
+typealias PathConfigurationSettings = HashMap<String, Any>
 
 val PathConfigurationProperties.presentation: Presentation
     @SuppressLint("DefaultLocale") get() = try {
