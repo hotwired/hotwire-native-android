@@ -7,8 +7,6 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
 class AppNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "app-navigation"
 
-    override val decision = Router.Decision.NAVIGATE
-
     override fun matches(
         location: String,
         configuration: NavigatorConfiguration
@@ -20,7 +18,7 @@ class AppNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
         location: String,
         configuration: NavigatorConfiguration,
         activity: HotwireActivity
-    ) {
-        // No-op
+    ): Router.Decision {
+        return Router.Decision.NAVIGATE
     }
 }

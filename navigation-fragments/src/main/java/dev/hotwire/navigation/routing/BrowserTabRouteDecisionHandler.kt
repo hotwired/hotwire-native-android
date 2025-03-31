@@ -11,8 +11,6 @@ import dev.hotwire.navigation.util.colorFromThemeAttr
 class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "browser-tab"
 
-    override val decision = Router.Decision.CANCEL
-
     override fun matches(
         location: String,
         configuration: NavigatorConfiguration
@@ -24,7 +22,7 @@ class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
         location: String,
         configuration: NavigatorConfiguration,
         activity: HotwireActivity
-    ) {
+    ): Router.Decision {
         val color = activity.colorFromThemeAttr(R.attr.colorSurface)
         val colorParams = CustomTabColorSchemeParams.Builder()
             .setToolbarColor(color)
@@ -38,5 +36,7 @@ class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
             .setDefaultColorSchemeParams(colorParams)
             .build()
             .launchUrl(activity, location.toUri())
+
+        return Router.Decision.CANCEL
     }
 }
