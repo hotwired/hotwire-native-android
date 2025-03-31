@@ -33,5 +33,5 @@ class NumberBottomSheetFragment : HotwireBottomSheetFragment() {
     }
 
     private val PathConfigurationProperties.description: String?
-        get() = get("description")
+        get() = get("description")?.toString()
 }

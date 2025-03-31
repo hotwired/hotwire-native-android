@@ -3,11 +3,20 @@ package dev.hotwire.core.turbo.config
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.nhaarman.mockito_kotlin.*
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.config.PathConfiguration.LoaderOptions
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
 import dev.hotwire.core.turbo.nav.PresentationContext
+import dev.hotwire.core.turbo.util.toJson
+import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -48,7 +57,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.rules.size).isEqualTo(11)
+        assertThat(pathConfiguration.rules.size).isEqualTo(12)
     }
 
     @Test
@@ -120,9 +129,15 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun globalSetting() {
-        assertThat(pathConfiguration.settings.size).isEqualTo(1)
-        assertThat(pathConfiguration.settings["custom_app_feature_enabled"]).isEqualTo("true")
+        assertThat(pathConfiguration.settings.size).isEqualTo(2)
         assertThat(pathConfiguration.settings["no_such_key"]).isNull()
+        assertThat(pathConfiguration.settings["custom_app_feature_enabled"]).isEqualTo(true)
+        assertThat(pathConfiguration.settings.getCustomAppData()).isEqualTo(
+            CustomAppData(
+                marketingSite = "https://native.hotwired.dev",
+                demoSite = "https://hotwire-native-demo.dev"
+            )
+        )
     }
 
     @Test
@@ -142,4 +157,30 @@ class PathConfigurationTest : BaseRepositoryTest() {
         assertThat(pathConfiguration.properties("$url/home").pullToRefreshEnabled).isTrue
         assertThat(pathConfiguration.properties("$url/new").pullToRefreshEnabled).isFalse
     }
+
+    @Test
+    fun customProperties() {
+        assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.size)).isEqualTo(1)
+        assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.first()?.label)).isEqualTo("Tab 1")
+    }
+
+    // Extension functions to show support for deserializing custom properties/settings
+
+    private fun PathConfigurationProperties.getTabs(): List<Tab>? {
+        return get("tabs")?.toJson()?.toObject(object : TypeToken<List<Tab>>() {})
+    }
+
+    private fun PathConfigurationSettings.getCustomAppData(): CustomAppData? {
+        return get("custom_app_data")?.toJson()?.toObject(object : TypeToken<CustomAppData>() {})
+    }
+
+    private data class Tab(
+        @SerializedName("label") val label: String,
+        @SerializedName("path") val path: String
+    )
+
+    private data class CustomAppData(
+        @SerializedName("marketing_site") val marketingSite: String,
+        @SerializedName("demo_site") val demoSite: String
+    )
 }
