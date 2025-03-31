@@ -123,24 +123,24 @@ typealias PathConfigurationSettings = HashMap<String, Any>
 
 val PathConfigurationProperties.presentation: Presentation
     @SuppressLint("DefaultLocale") get() = try {
-        val value = get("presentation") ?: "default"
-        Presentation.valueOf(value.toString().uppercase())
+        val value = get("presentation")?.toString() ?: "default"
+        Presentation.valueOf(value.uppercase())
     } catch (e: IllegalArgumentException) {
         Presentation.DEFAULT
     }
 
 val PathConfigurationProperties.queryStringPresentation: QueryStringPresentation
     @SuppressLint("DefaultLocale") get() = try {
-        val value = get("query_string_presentation") ?: "default"
-        QueryStringPresentation.valueOf(value.toString().uppercase())
+        val value = get("query_string_presentation")?.toString() ?: "default"
+        QueryStringPresentation.valueOf(value.uppercase())
     } catch (e: IllegalArgumentException) {
         QueryStringPresentation.DEFAULT
     }
 
 val PathConfigurationProperties.context: PresentationContext
     @SuppressLint("DefaultLocale") get() = try {
-        val value = get("context") ?: "default"
-        PresentationContext.valueOf(value.toString().uppercase())
+        val value = get("context")?.toString() ?: "default"
+        PresentationContext.valueOf(value.uppercase())
     } catch (e: IllegalArgumentException) {
         PresentationContext.DEFAULT
     }
