@@ -123,10 +123,10 @@ internal class NavigatorRule(
                 newPresentation != Presentation.REPLACE_ROOT
 
         return when {
+            presentationNone -> NavigatorMode.NONE
             dismissModalContext -> NavigatorMode.DISMISS_MODAL
             navigateToModalContext -> NavigatorMode.TO_MODAL
             presentationRefresh -> NavigatorMode.REFRESH
-            presentationNone -> NavigatorMode.NONE
             else -> NavigatorMode.IN_CONTEXT
         }
     }
@@ -147,7 +147,7 @@ internal class NavigatorRule(
             location = newLocation,
             options = newVisitOptions.copy(action = action),
             bundle = newBundle,
-            shouldNavigate = newProperties.presentation != Presentation.NONE
+            shouldNavigate = newProperties.presentation != Presentation.NONE && newProperties.presentation != Presentation.POP
         )
     }
 
