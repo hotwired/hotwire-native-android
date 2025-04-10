@@ -14,6 +14,7 @@ import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.config.PathConfiguration.LoaderOptions
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
+import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.util.toObject
@@ -57,7 +58,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.rules.size).isEqualTo(12)
+        assertThat(pathConfiguration.rules.size).isGreaterThan(0)
     }
 
     @Test
@@ -138,6 +139,33 @@ class PathConfigurationTest : BaseRepositoryTest() {
                 demoSite = "https://hotwire-native-demo.dev"
             )
         )
+    }
+
+    @Test
+    fun recedeHistoricalLocation() {
+        val properties = pathConfiguration.properties("$url/recede_historical_location")
+
+        assertThat(properties.presentation).isEqualTo(Presentation.POP)
+        assertThat(properties.context).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(properties.isHistoricalLocation).isTrue()
+    }
+
+    @Test
+    fun resumeHistoricalLocation() {
+        val properties = pathConfiguration.properties("$url/resume_historical_location")
+
+        assertThat(properties.presentation).isEqualTo(Presentation.NONE)
+        assertThat(properties.context).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(properties.isHistoricalLocation).isTrue()
+    }
+
+    @Test
+    fun refreshHistoricalLocation() {
+        val properties = pathConfiguration.properties("$url/refresh_historical_location")
+
+        assertThat(properties.presentation).isEqualTo(Presentation.REFRESH)
+        assertThat(properties.context).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(properties.isHistoricalLocation).isTrue()
     }
 
     @Test

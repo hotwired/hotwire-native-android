@@ -19,6 +19,7 @@ import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.destinations.HotwireDialogDestination
 import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.routing.Router
+import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.util.location
 
 class Navigator(
@@ -70,6 +71,21 @@ class Navigator(
         if (HotwireNavigation.registeredBridgeComponentFactories.isNotEmpty()) {
             Bridge.initialize(it.webView)
         }
+    }
+
+    internal fun shouldRouteToModalResult(result: SessionModalResult): Boolean {
+        val rule = NavigatorRule(
+            location = result.location,
+            visitOptions = result.options,
+            bundle = result.bundle,
+            navOptions = navOptions(result.location, result.options.action),
+            extras = null,
+            pathConfiguration = Hotwire.config.pathConfiguration,
+            navigatorName = configuration.name,
+            controller = currentControllerForLocation(result.location)
+        )
+
+        return rule.newNavigationMode != NavigatorMode.NONE
     }
 
     /**
@@ -152,7 +168,7 @@ class Navigator(
                 navigateWithinContext(rule)
             }
             NavigatorMode.REFRESH -> {
-                route(rule.currentLocation, VisitOptions())
+                route(rule.currentLocation, VisitOptions(action = VisitAction.REPLACE))
             }
             NavigatorMode.NONE -> {
                 // Do nothing

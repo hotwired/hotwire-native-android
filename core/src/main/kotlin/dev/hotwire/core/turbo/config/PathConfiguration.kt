@@ -79,7 +79,7 @@ class PathConfiguration {
 
         loader?.load(location, options) {
             cachedProperties.clear()
-            rules = it.rules
+            rules = it.rules + historicalLocationRules
             settings = it.settings
         }
     }
@@ -159,3 +159,6 @@ val PathConfigurationProperties.pullToRefreshEnabled: Boolean
 
 val PathConfigurationProperties.animated: Boolean
     get() = get("animated")?.let { it as Boolean } ?: true
+
+val PathConfigurationProperties.isHistoricalLocation: Boolean
+    get() = get("historical_location")?.let { it as Boolean } ?: false

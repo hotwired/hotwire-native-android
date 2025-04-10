@@ -67,30 +67,6 @@
     },
     {
       "patterns": [
-        "/custom/recede"
-      ],
-      "properties": {
-        "presentation": "pop"
-      }
-    },
-    {
-      "patterns": [
-        "/custom/refresh"
-      ],
-      "properties": {
-        "presentation": "refresh"
-      }
-    },
-    {
-      "patterns": [
-        "/custom/resume"
-      ],
-      "properties": {
-        "presentation": "none"
-      }
-    },
-    {
-      "patterns": [
         "/custom/modal"
       ],
       "properties": {
