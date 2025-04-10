@@ -4,6 +4,9 @@ import androidx.core.net.toUri
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 
+/**
+ * Navigates internal urls through in-app routing.
+ */
 class AppNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "app-navigation"
 

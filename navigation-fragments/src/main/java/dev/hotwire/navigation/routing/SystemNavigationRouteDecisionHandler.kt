@@ -7,8 +7,11 @@ import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.logging.logError
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 
-class BrowserRouteDecisionHandler : Router.RouteDecisionHandler {
-    override val name = "browser"
+/**
+ * Opens external urls via a new Activity intent. Non-HTTP/S schemes are supported.
+ */
+class SystemNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
+    override val name = "system-navigation"
 
     override fun matches(
         location: String,
@@ -27,7 +30,7 @@ class BrowserRouteDecisionHandler : Router.RouteDecisionHandler {
         try {
             activity.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            logError("BrowserRouteDecisionHandler", e)
+            logError("SystemNavigationRouteDecisionHandler", e)
         }
 
         return Router.Decision.CANCEL

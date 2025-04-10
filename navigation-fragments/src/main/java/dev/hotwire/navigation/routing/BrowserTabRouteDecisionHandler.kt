@@ -8,6 +8,13 @@ import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.util.colorFromThemeAttr
 
+/**
+ * Opens external HTTP/S urls via a browser Custom Tab so the user
+ * stays in-app. If the device default browser does not support
+ * Custom Tabs, the url will open directly in the default browser.
+ *
+ * https://developer.chrome.com/docs/android/custom-tabs
+ */
 class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "browser-tab"
 
@@ -15,7 +22,10 @@ class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
         location: String,
         configuration: NavigatorConfiguration
     ): Boolean {
-        return configuration.startLocation.toUri().host != location.toUri().host
+        val locationUri = location.toUri()
+
+        return configuration.startLocation.toUri().host != locationUri.host &&
+                (locationUri.scheme?.lowercase() == "https" || locationUri.scheme?.lowercase() == "http")
     }
 
     override fun handle(

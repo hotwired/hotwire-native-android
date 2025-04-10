@@ -12,10 +12,10 @@ import org.robolectric.Robolectric.buildActivity
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class BrowserRouteDecisionHandlerTest {
+class SystemNavigationRouteDecisionHandlerTest {
     private lateinit var activity: HotwireActivity
 
-    private val route = BrowserRouteDecisionHandler()
+    private val route = SystemNavigationRouteDecisionHandler()
     private val config = NavigatorConfiguration(
         name = "test",
         startLocation = "https://my.app.com",
@@ -49,6 +49,12 @@ class BrowserRouteDecisionHandlerTest {
     fun `url on app domain does not match`() {
         val url = "https://my.app.com/page"
         assertFalse(route.matches(url, config))
+    }
+
+    @Test
+    fun `non-http scheme matches`() {
+        val url = "sms:555-555-5555"
+        assertTrue(route.matches(url, config))
     }
 
     private class TestActivity : HotwireActivity() {
