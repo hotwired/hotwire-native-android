@@ -19,9 +19,6 @@ import dev.hotwire.demo.features.web.WebModalFragment
 import dev.hotwire.navigation.config.defaultFragmentDestination
 import dev.hotwire.navigation.config.registerBridgeComponents
 import dev.hotwire.navigation.config.registerFragmentDestinations
-import dev.hotwire.navigation.config.registerRouteDecisionHandlers
-import dev.hotwire.navigation.routing.AppNavigationRouteDecisionHandler
-import dev.hotwire.navigation.routing.BrowserTabRouteDecisionHandler
 
 class DemoApplication : Application() {
     override fun onCreate() {

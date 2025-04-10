@@ -24,8 +24,8 @@ class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
     ): Boolean {
         val locationUri = location.toUri()
 
-        return configuration.startLocation.toUri().host != location.toUri().host &&
-                (locationUri.scheme == "https" || locationUri.scheme == "http")
+        return configuration.startLocation.toUri().host != locationUri.host &&
+                (locationUri.scheme?.lowercase() == "https" || locationUri.scheme?.lowercase() == "http")
     }
 
     override fun handle(
