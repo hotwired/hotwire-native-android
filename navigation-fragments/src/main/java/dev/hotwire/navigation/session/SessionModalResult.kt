@@ -15,6 +15,5 @@ import dev.hotwire.core.turbo.visit.VisitOptions
 data class SessionModalResult(
     val location: String,
     val options: VisitOptions,
-    val bundle: Bundle?,
-    val shouldNavigate: Boolean
+    val bundle: Bundle?
 )

@@ -41,9 +41,9 @@ class NavigatorRuleTest {
     private val featureTwoUrl = "https://hotwired.dev/feature-two"
     private val newUrl = "https://hotwired.dev/feature/new"
     private val editUrl = "https://hotwired.dev/feature/edit"
-    private val recedeUrl = "https://hotwired.dev/custom/recede"
-    private val refreshUrl = "https://hotwired.dev/custom/refresh"
-    private val resumeUrl = "https://hotwired.dev/custom/resume"
+    private val recedeUrl = "https://hotwired.dev/recede_historical_location"
+    private val refreshUrl = "https://hotwired.dev/refresh_historical_location"
+    private val resumeUrl = "https://hotwired.dev/resume_historical_location"
     private val modalRootUrl = "https://hotwired.dev/custom/modal"
     private val filterUrl = "https://hotwired.dev/feature?filter=true"
     private val customUrl = "https://hotwired.dev/custom"
@@ -302,7 +302,29 @@ class NavigatorRuleTest {
     }
 
     @Test
-    fun `refresh the current destination`() {
+    fun `recede historical location in default context pops the current destination`() {
+        controller.navigate(webDestinationId, locationArgs(featureUrl))
+        val rule = getNavigatorRule(recedeUrl)
+
+        // Current destination
+        assertThat(rule.previousLocation).isEqualTo(homeUrl)
+        assertThat(rule.currentLocation).isEqualTo(featureUrl)
+        assertThat(rule.currentPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.isAtStartDestination).isFalse()
+
+        // New destination
+        assertThat(rule.newLocation).isEqualTo(recedeUrl)
+        assertThat(rule.newPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.newPresentation).isEqualTo(Presentation.POP)
+        assertThat(rule.newQueryStringPresentation).isEqualTo(QueryStringPresentation.DEFAULT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.IN_CONTEXT)
+        assertThat(rule.newModalResult).isNull()
+        assertThat(rule.newDestination).isNotNull()
+        assertThat(rule.newNavOptions).isEqualTo(navOptions)
+    }
+
+    @Test
+    fun `refresh historical location in default context refreshes the current destination`() {
         controller.navigate(webDestinationId, locationArgs(featureUrl))
         val rule = getNavigatorRule(refreshUrl)
 
@@ -325,7 +347,80 @@ class NavigatorRuleTest {
     }
 
     @Test
-    fun `resume the previous destination after leaving modal context`() {
+    fun `resume historical location in default context does nothing`() {
+        controller.navigate(webDestinationId, locationArgs(featureUrl))
+        val rule = getNavigatorRule(resumeUrl)
+
+        // Current destination
+        assertThat(rule.previousLocation).isEqualTo(homeUrl)
+        assertThat(rule.currentLocation).isEqualTo(featureUrl)
+        assertThat(rule.currentPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.isAtStartDestination).isFalse()
+
+        // New destination
+        assertThat(rule.newLocation).isEqualTo(resumeUrl)
+        assertThat(rule.newPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.newPresentation).isEqualTo(Presentation.NONE)
+        assertThat(rule.newQueryStringPresentation).isEqualTo(QueryStringPresentation.DEFAULT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.NONE)
+        assertThat(rule.newModalResult).isNull()
+        assertThat(rule.newDestinationUri).isEqualTo(webUri)
+        assertThat(rule.newDestination).isNotNull()
+        assertThat(rule.newNavOptions).isEqualTo(navOptions)
+    }
+
+    @Test
+    fun `recede historical location from modal context dismisses with result`() {
+        controller.navigate(webDestinationId, locationArgs(featureUrl))
+        controller.navigate(webModalDestinationId, locationArgs(newUrl))
+        val rule = getNavigatorRule(recedeUrl)
+
+        // Current destination
+        assertThat(rule.previousLocation).isEqualTo(featureUrl)
+        assertThat(rule.currentLocation).isEqualTo(newUrl)
+        assertThat(rule.currentPresentationContext).isEqualTo(PresentationContext.MODAL)
+        assertThat(rule.isAtStartDestination).isFalse()
+
+        // New destination
+        assertThat(rule.newLocation).isEqualTo(recedeUrl)
+        assertThat(rule.newPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.newPresentation).isEqualTo(Presentation.POP)
+        assertThat(rule.newQueryStringPresentation).isEqualTo(QueryStringPresentation.DEFAULT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.DISMISS_MODAL)
+        assertThat(rule.newModalResult).isNotNull()
+        assertThat(rule.newModalResult?.location).isEqualTo(recedeUrl)
+        assertThat(rule.newDestinationUri).isEqualTo(webUri)
+        assertThat(rule.newDestination).isNotNull()
+        assertThat(rule.newNavOptions).isEqualTo(navOptions)
+    }
+
+    @Test
+    fun `refresh historical location from modal context dismisses with result`() {
+        controller.navigate(webDestinationId, locationArgs(featureUrl))
+        controller.navigate(webModalDestinationId, locationArgs(newUrl))
+        val rule = getNavigatorRule(refreshUrl)
+
+        // Current destination
+        assertThat(rule.previousLocation).isEqualTo(featureUrl)
+        assertThat(rule.currentLocation).isEqualTo(newUrl)
+        assertThat(rule.currentPresentationContext).isEqualTo(PresentationContext.MODAL)
+        assertThat(rule.isAtStartDestination).isFalse()
+
+        // New destination
+        assertThat(rule.newLocation).isEqualTo(refreshUrl)
+        assertThat(rule.newPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.newPresentation).isEqualTo(Presentation.REFRESH)
+        assertThat(rule.newQueryStringPresentation).isEqualTo(QueryStringPresentation.DEFAULT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.DISMISS_MODAL)
+        assertThat(rule.newModalResult).isNotNull()
+        assertThat(rule.newModalResult?.location).isEqualTo(refreshUrl)
+        assertThat(rule.newDestinationUri).isEqualTo(webUri)
+        assertThat(rule.newDestination).isNotNull()
+        assertThat(rule.newNavOptions).isEqualTo(navOptions)
+    }
+
+    @Test
+    fun `resume historical location from modal context dismisses with result`() {
         controller.navigate(webDestinationId, locationArgs(featureUrl))
         controller.navigate(webModalDestinationId, locationArgs(newUrl))
         val rule = getNavigatorRule(resumeUrl)
@@ -344,7 +439,6 @@ class NavigatorRuleTest {
         assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.DISMISS_MODAL)
         assertThat(rule.newModalResult).isNotNull()
         assertThat(rule.newModalResult?.location).isEqualTo(resumeUrl)
-        assertThat(rule.newModalResult?.shouldNavigate).isFalse()
         assertThat(rule.newDestinationUri).isEqualTo(webUri)
         assertThat(rule.newDestination).isNotNull()
         assertThat(rule.newNavOptions).isEqualTo(navOptions)

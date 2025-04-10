@@ -24,22 +24,13 @@
     },
     {
       "patterns": [
-        "/signin$",
+        "/new$",
+        "/modal$",
         "/bridge-form$"
       ],
       "properties": {
         "context": "modal",
         "uri": "hotwire://fragment/web/modal",
-        "pull_to_refresh_enabled": false
-      }
-    },
-    {
-      "patterns": [
-        "/new$"
-      ],
-      "properties": {
-        "context": "modal",
-        "uri": "hotwire://fragment/web/modal/sheet",
         "pull_to_refresh_enabled": false
       }
     },

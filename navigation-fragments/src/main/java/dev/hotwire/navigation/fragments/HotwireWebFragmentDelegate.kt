@@ -94,7 +94,7 @@ internal class HotwireWebFragmentDelegate(
      * modal result. Will navigate if the result indicates it should.
      */
     fun onStartAfterModalResult(result: SessionModalResult) {
-        if (!result.shouldNavigate) {
+        if (!navigator.shouldRouteToModalResult(result)) {
             initNavigationVisit()
             initWebChromeClient()
         }

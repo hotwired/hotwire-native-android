@@ -146,8 +146,7 @@ internal class NavigatorRule(
         return SessionModalResult(
             location = newLocation,
             options = newVisitOptions.copy(action = action),
-            bundle = newBundle,
-            shouldNavigate = newProperties.presentation != Presentation.NONE
+            bundle = newBundle
         )
     }
 
