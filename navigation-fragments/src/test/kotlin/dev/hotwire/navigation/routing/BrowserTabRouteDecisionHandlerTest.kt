@@ -51,6 +51,12 @@ class BrowserTabRouteDecisionHandlerTest {
         assertFalse(route.matches(url, config))
     }
 
+    @Test
+    fun `non-http scheme does not match`() {
+        val url = "sms:555-555-5555"
+        assertFalse(route.matches(url, config))
+    }
+
     private class TestActivity : HotwireActivity() {
         override fun navigatorConfigurations() = emptyList<NavigatorConfiguration>()
     }

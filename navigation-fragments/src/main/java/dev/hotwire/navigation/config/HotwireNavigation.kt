@@ -8,14 +8,16 @@ import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
 import dev.hotwire.navigation.fragments.HotwireWebFragment
 import dev.hotwire.navigation.routing.AppNavigationRouteDecisionHandler
-import dev.hotwire.navigation.routing.BrowserRouteDecisionHandler
+import dev.hotwire.navigation.routing.BrowserTabRouteDecisionHandler
+import dev.hotwire.navigation.routing.SystemNavigationRouteDecisionHandler
 import dev.hotwire.navigation.routing.Router
 import kotlin.reflect.KClass
 
 internal object HotwireNavigation {
     var router = Router(listOf(
         AppNavigationRouteDecisionHandler(),
-        BrowserRouteDecisionHandler()
+        BrowserTabRouteDecisionHandler(),
+        SystemNavigationRouteDecisionHandler()
     ))
 
     var defaultFragmentDestination: KClass<out Fragment> = HotwireWebFragment::class

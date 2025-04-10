@@ -59,12 +59,6 @@ class DemoApplication : Application() {
             BridgeComponentFactory("overflow-menu", ::OverflowMenuComponent)
         )
 
-        // Register route decision handlers
-        Hotwire.registerRouteDecisionHandlers(
-            AppNavigationRouteDecisionHandler(),
-            BrowserTabRouteDecisionHandler()
-        )
-
         // Set configuration options
         Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
