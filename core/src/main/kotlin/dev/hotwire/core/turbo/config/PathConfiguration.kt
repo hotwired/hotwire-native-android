@@ -71,7 +71,8 @@ class PathConfiguration {
     fun load(
         context: Context,
         location: Location,
-        options: LoaderOptions
+        options: LoaderOptions,
+        onCompletion: (PathConfiguration) -> Unit = {}
     ) {
         if (loader == null) {
             loader = PathConfigurationLoader(context.applicationContext)
@@ -81,6 +82,7 @@ class PathConfiguration {
             cachedProperties.clear()
             rules = it.rules + historicalLocationRules
             settings = it.settings
+            onCompletion(it)
         }
     }
 

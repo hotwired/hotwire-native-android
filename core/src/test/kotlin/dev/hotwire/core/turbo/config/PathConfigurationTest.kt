@@ -89,6 +89,66 @@ class PathConfigurationTest : BaseRepositoryTest() {
     }
 
     @Test
+    fun callbackIsInvokedWhenConfigurationIsLoaded() {
+        val localPath = "/not-animated"
+        val cachedPath = "/from-cache"
+        val remotePath = "/from-remote"
+
+        var onCompleteInvocations = 0
+        val onCompletionCallback: (PathConfiguration) -> Unit = { pathConfiguration ->
+            onCompleteInvocations++
+
+            when (onCompleteInvocations) {
+                // See PathConfiguration#load for implementation order of calls, this verifies the correct path is loaded in the correct order
+
+                // First call = loading from asset path
+                1 -> assertThat(pathConfiguration.rules.filter { it.matches(localPath)}.flatMap { it.patterns }.contains(localPath)).isTrue()
+                // Second call = from cache
+                2 -> assertThat(pathConfiguration.rules.filter { it.matches(cachedPath)}.flatMap { it.patterns }.contains(cachedPath)).isTrue()
+                // Third call = from remote
+                3 -> assertThat(pathConfiguration.rules.filter { it.matches(remotePath)}.flatMap { it.patterns }.contains(remotePath)).isTrue()
+            }
+
+        }
+
+        val assetFilePath = "json/test-configuration.json"
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+        val location = Location(
+            assetFilePath = assetFilePath,
+            remoteFileUrl = remoteUrl
+        )
+        val options = LoaderOptions()
+
+        val assetJson = context.assets.open(assetFilePath).use { String(it.readBytes()) }
+        // Update a value in the JSON to simulate a different configuration
+        val cachedFakeJson = assetJson.replace(localPath, cachedPath)
+        val remoteFakeJson = assetJson.replace(localPath, remotePath)
+
+        // Tell the mock repository to return values for the asset, cached, and remote configurations, changing a field in each to allow for assertion
+        whenever(mockRepository.getBundledConfiguration(context, assetFilePath)).thenReturn(assetJson)
+        whenever(mockRepository.getCachedConfigurationForUrl(context, remoteUrl)).thenReturn(cachedFakeJson)
+        whenever(runBlocking { mockRepository.getRemoteConfiguration(remoteUrl, options)}).thenReturn(remoteFakeJson)
+
+        pathConfiguration = PathConfiguration()
+        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+            repository = mockRepository
+        }
+
+        runBlocking {
+            pathConfiguration.load(context, location, options, onCompletionCallback)
+            verify(mockRepository).getBundledConfiguration(context, assetFilePath)
+            verify(mockRepository).getCachedConfigurationForUrl(context, remoteUrl)
+            verify(mockRepository).getRemoteConfiguration(remoteUrl, options)
+
+            // The onComplete callback should be invoked 3 times.
+            // 1 - asset path
+            // 2 - from cache
+            // 3 - from remote
+            assertThat(onCompleteInvocations).isEqualTo(3)
+        }
+    }
+
+    @Test
     fun validConfigurationIsCached() {
         pathConfiguration.loader = PathConfigurationLoader(context).apply {
             repository = mockRepository
