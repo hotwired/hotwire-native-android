@@ -209,6 +209,10 @@ internal class HotwireWebFragmentDelegate(
         removeTransitionalViews()
     }
 
+    override fun visitRequestFinished() {
+        callback.onVisitRequestFinished(location)
+    }
+
     override fun visitCompleted(completedOffline: Boolean) {
         callback.onVisitCompleted(location, completedOffline)
         navDestination.fragmentViewModel.setTitle(title())

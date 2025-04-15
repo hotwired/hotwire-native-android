@@ -65,6 +65,11 @@ interface HotwireWebFragmentCallback {
     fun onVisitRendered(location: String) {}
 
     /**
+     * Called when a Turbo visit request has finished.
+     */
+    fun onVisitRequestFinished(location: String) {}
+
+    /**
      * Called when a Turbo visit has completed.
      */
     fun onVisitCompleted(location: String, completedOffline: Boolean) {}

@@ -16,6 +16,7 @@ interface SessionCallback {
     fun requestFailedWithError(visitHasCachedSnapshot: Boolean, error: VisitError)
     fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String)
     fun visitRendered()
+    fun visitRequestFinished()
     fun visitCompleted(completedOffline: Boolean)
     fun visitLocationStarted(location: String)
     fun visitProposedToLocation(location: String, options: VisitOptions)
