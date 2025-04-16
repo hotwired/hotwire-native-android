@@ -381,6 +381,12 @@ class Session(
     @JavascriptInterface
     fun visitRequestFinished(visitIdentifier: String) {
         logEvent("visitRequestFinished", "visitIdentifier" to visitIdentifier)
+
+        currentVisit?.let { visit ->
+            if (visitIdentifier == visit.identifier) {
+                callback { it.visitRequestFinished() }
+            }
+        }
     }
 
     /**
