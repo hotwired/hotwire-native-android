@@ -12,6 +12,7 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
  */
 data class HotwireBottomTab(
     @IdRes val itemId: Int,
+    val isVisible: Boolean = true,
     val configuration: NavigatorConfiguration
 )
 

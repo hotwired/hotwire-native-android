@@ -1,6 +1,7 @@
 package dev.hotwire.demo.main
 
 import dev.hotwire.demo.Demo
+import dev.hotwire.demo.Environment
 import dev.hotwire.demo.R
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.tabs.HotwireBottomTab
@@ -34,6 +35,7 @@ private val resources = HotwireBottomTab(
 
 private val bugsAndFixes = HotwireBottomTab(
     itemId = R.id.bottom_nav_bugs_fixes,
+    isVisible = Demo.current == Environment.Local,
     configuration = NavigatorConfiguration(
         name = "bugs-fixes",
         navigatorHostId = R.id.bugs_fixes_navigator_host,

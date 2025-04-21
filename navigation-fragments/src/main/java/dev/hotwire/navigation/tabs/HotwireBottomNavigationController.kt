@@ -70,6 +70,7 @@ class HotwireBottomNavigationController(
 
         view.selectedItemId = initialTab.itemId
 
+        initTabVisibility()
         initOnItemSelectedListener()
         initDestinationChangedListener()
         applyWindowInsets()
@@ -108,6 +109,12 @@ class HotwireBottomNavigationController(
     ) {
         if (activity.delegate.currentNavigator?.host?.navController == controller) {
             destinationIsModal = arguments?.presentationContext == PresentationContext.MODAL
+        }
+    }
+
+    private fun initTabVisibility() {
+        tabs.forEach {
+            view.menu.findItem(it.itemId)?.isVisible = it.isVisible
         }
     }
 
