@@ -19,7 +19,8 @@ import dev.hotwire.navigation.navigator.NavigatorHost
 import dev.hotwire.navigation.navigator.presentationContext
 
 /**
- *
+ * A [BottomNavigationView] controller that manages multiple [HotwireBottomTab]s, each associated
+ * with its own [NavigatorHost] instance in the Activity layout.
  */
 class HotwireBottomNavigationController(
     val activity: HotwireActivity,
@@ -43,7 +44,7 @@ class HotwireBottomNavigationController(
     private var listener: ((HotwireBottomTab) -> Unit)? = null
 
     /**
-     *
+     * The currently selected tab in the [BottomNavigationView].
      */
     val currentTab: HotwireBottomTab
         get() {
@@ -52,15 +53,22 @@ class HotwireBottomNavigationController(
         }
 
     /**
-     *
+     * The tabs that have been loaded into the [BottomNavigationView].
      */
     var tabs = listOf<HotwireBottomTab>()
         private set
 
     /**
+     * Load the tabs and their navigator configurations into the [BottomNavigationView].
      *
+     * @param tabs The list of [HotwireBottomTab] instances that correspond to the
+     *  [BottomNavigationView] tabs.
+     * @param selectedTabIndex The index of the initially selected tab.
      */
-    fun load(tabs: List<HotwireBottomTab>, selectedTabIndex: Int = 0) {
+    fun load(
+        tabs: List<HotwireBottomTab>,
+        selectedTabIndex: Int = 0
+    ) {
         require(tabs.isNotEmpty()) { "Tabs cannot be empty." }
         removeDestinationChangedListener()
 
@@ -79,9 +87,9 @@ class HotwireBottomNavigationController(
     }
 
     /**
-     *
+     * Set a listener that will be notified when a navigation tab is selected.
      */
-    fun setOnTabSwitchedListener(listener: ((HotwireBottomTab) -> Unit)?) {
+    fun setOnTabSelectedListener(listener: ((HotwireBottomTab) -> Unit)?) {
         this.listener = listener
     }
 
