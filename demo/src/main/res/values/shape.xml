@@ -43,4 +43,10 @@
         <item name="cornerSize">20dp</item>
     </style>
 
+    <!-- Shape Appearance for circles -->
+    <style name="ShapeAppearanceOverlay.MyTheme.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>

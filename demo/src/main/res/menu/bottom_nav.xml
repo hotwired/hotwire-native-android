@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bottom_nav_navigation"
+        android:title="@string/bottom_nav_navigation"
+        android:icon="@drawable/ic_tab_navigation"/>
+    <item
+        android:id="@+id/bottom_nav_bridge_components"
+        android:title="@string/bottom_nav_bridge_components"
+        android:icon="@drawable/ic_tab_bridge_components"/>
+    <item
+        android:id="@+id/bottom_nav_resources"
+        android:title="@string/bottom_nav_resources"
+        android:icon="@drawable/ic_tab_resources"/>
+</menu>

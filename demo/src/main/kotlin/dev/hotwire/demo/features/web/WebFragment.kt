@@ -27,14 +27,6 @@ open class WebFragment : HotwireWebFragment() {
         menuProgress?.isVisible = false
     }
 
-    override fun onVisitErrorReceived(location: String, error: VisitError) {
-        if (error is HttpError.ClientError.Unauthorized) {
-            navigator.route(Urls.signInUrl, VisitOptions(action = REPLACE))
-        } else {
-            super.onVisitErrorReceived(location, error)
-        }
-    }
-
     private fun setupMenu() {
         toolbarForNavigation()?.inflateMenu(R.menu.web)
     }

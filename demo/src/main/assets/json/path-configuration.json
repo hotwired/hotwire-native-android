@@ -18,28 +18,18 @@
         "^/$"
       ],
       "properties": {
-        "uri": "hotwire://fragment/web/home",
-        "presentation": "replace_root"
+        "presentation": "replace_root",
+        "comment": "Reset navigation stacks when visiting root page."
       }
     },
     {
       "patterns": [
-        "/signin$",
-        "/bridge-form$"
+        "/new$",
+        "/edit$",
+        "/modal"
       ],
       "properties": {
         "context": "modal",
-        "uri": "hotwire://fragment/web/modal",
-        "pull_to_refresh_enabled": false
-      }
-    },
-    {
-      "patterns": [
-        "/new$"
-      ],
-      "properties": {
-        "context": "modal",
-        "uri": "hotwire://fragment/web/modal/sheet",
         "pull_to_refresh_enabled": false
       }
     },
@@ -49,18 +39,8 @@
       ],
       "properties": {
         "uri": "hotwire://fragment/numbers",
-        "title": "Numbers"
-      }
-    },
-    {
-      "patterns": [
-        "/numbers/[0-9]+$"
-      ],
-      "properties": {
-        "context": "modal",
-        "uri": "hotwire://fragment/numbers/sheet",
-        "title": "Number",
-        "description": "This is a native bottom sheet fragment"
+        "title": "Numbers",
+        "comment": "Intercept with a native view."
       }
     },
     {

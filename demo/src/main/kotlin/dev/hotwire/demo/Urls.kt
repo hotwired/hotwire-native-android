@@ -5,7 +5,7 @@ object Urls {
     private const val useLocalDev = false
 
     // Update with your local dev IP address
-    private const val localDevUrl = "http://192.168.1.1:45678"
+    private const val localDevUrl = "http://192.168.1.1:3000"
 
     // Remote demo server
     private const val remoteUrl = "https://hotwire-native-demo.dev"
@@ -13,7 +13,10 @@ object Urls {
     // Base app url
     private val appUrl = if (useLocalDev) localDevUrl else remoteUrl
 
-    val homeUrl = appUrl
+    val navigationUrl = appUrl
+    val bridgeComponentsUrl = "$appUrl/components"
+    val resourcesUrl = "$appUrl/resources"
+
     val signInUrl = "$appUrl/signin"
     val numbersUrl = "$appUrl/numbers"
 }

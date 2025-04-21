@@ -56,6 +56,7 @@
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MyTheme.AlertDialog</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.MyTheme.BottomSheetDialog</item>
         <item name="toolbarStyle">@style/Widget.MyTheme.Toolbar</item>
+        <item name="bottomNavigationStyle">@style/Widget.MyTheme.BottomNavigationView</item>
         <item name="appBarLayoutStyle">@style/Widget.MyTheme.AppBarLayout</item>
         <item name="materialButtonStyle">@style/Widget.MyTheme.Button</item>
         <item name="buttonOutlineStyle">@style/Widget.MyTheme.OutlinedButton</item>
