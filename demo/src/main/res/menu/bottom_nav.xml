@@ -12,4 +12,8 @@
         android:id="@+id/bottom_nav_resources"
         android:title="@string/bottom_nav_resources"
         android:icon="@drawable/ic_tab_resources"/>
+    <item
+        android:id="@+id/bottom_nav_bugs_fixes"
+        android:title="@string/bottom_nav_bugs_fixes"
+        android:icon="@drawable/ic_tab_bugs_fixes"/>
 </menu>

@@ -35,6 +35,15 @@
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:defaultNavHost="false" />
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/bugs_fixes_navigator_host"
+        android:name="dev.hotwire.navigation.navigator.NavigatorHost"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+        app:defaultNavHost="false" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"

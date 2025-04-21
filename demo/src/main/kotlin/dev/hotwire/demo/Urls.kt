@@ -16,6 +16,7 @@ object Urls {
     val navigationUrl = appUrl
     val bridgeComponentsUrl = "$appUrl/components"
     val resourcesUrl = "$appUrl/resources"
+    val bugsAndFixesUrl = "$appUrl/bugs"
 
     val signInUrl = "$appUrl/signin"
     val numbersUrl = "$appUrl/numbers"
