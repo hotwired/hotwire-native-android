@@ -8,7 +8,6 @@ import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.visit.VisitAction.REPLACE
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.demo.R
-import dev.hotwire.demo.Urls
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireWebFragment
 
