@@ -28,7 +28,8 @@ class DemoApplication : Application() {
         Hotwire.loadPathConfiguration(
             context = this,
             location = PathConfiguration.Location(
-                assetFilePath = "json/path-configuration.json"
+                assetFilePath = "json/path-configuration.json",
+                remoteFileUrl = "${Demo.current.url}/configurations/android_v1.json"
             )
         )
 
