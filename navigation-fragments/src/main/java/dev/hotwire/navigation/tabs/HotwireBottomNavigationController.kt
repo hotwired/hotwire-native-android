@@ -24,6 +24,7 @@ import dev.hotwire.navigation.navigator.presentationContext
 class HotwireBottomNavigationController(
     val activity: HotwireActivity,
     val view: BottomNavigationView,
+    val clearNavigationOnTabReselection: Boolean = true,
     val animateVisibilityChanges: Boolean = true
 ) : NavController.OnDestinationChangedListener {
 
@@ -124,6 +125,13 @@ class HotwireBottomNavigationController(
             switchTab(tab)
             listener?.invoke(tab)
             true
+        }
+
+        if (clearNavigationOnTabReselection) {
+            view.setOnItemReselectedListener { item ->
+                val tab = tabs.first { item.itemId == it.itemId }
+                tab.navigatorHost.navigator.clearAll()
+            }
         }
     }
 

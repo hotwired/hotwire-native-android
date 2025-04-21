@@ -189,7 +189,12 @@ class Navigator(
             // If a dialog is on top of the backstack, close it first
             currentDialogDestination?.closeDialog()
 
-            navController.popBackStack(navController.graph.startDestinationId, false)
+            do {
+                navController.popBackStack()
+            } while(
+                !isAtStartDestination()
+            )
+
             onCleared()
         }
     }

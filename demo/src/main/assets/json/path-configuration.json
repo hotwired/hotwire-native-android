@@ -18,8 +18,8 @@
         "^/$"
       ],
       "properties": {
-        "presentation": "replace_root",
-        "comment": "Reset navigation stacks when visiting root page."
+        "presentation": "clear_all",
+        "comment": "Clear navigation stack when visiting root page."
       }
     },
     {
