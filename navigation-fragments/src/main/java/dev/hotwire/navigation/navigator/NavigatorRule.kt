@@ -41,7 +41,7 @@ internal class NavigatorRule(
     // Current destination
     val previousLocation = controller.previousBackStackEntry.location
     val currentLocation = controller.currentBackStackEntry.location
-    val currentProperties = currentLocation?.let { pathConfiguration.properties(currentLocation) }
+    val currentProperties = currentLocation?.let { pathConfiguration.properties(it) }
     val currentPresentationContext = currentProperties?.context ?: PresentationContext.DEFAULT
     val isAtStartDestination = controller.previousBackStackEntry == null
 

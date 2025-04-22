@@ -20,7 +20,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         super.onCreate(savedInstanceState)
 
         activity = requireActivity() as HotwireActivity
-        navigator = Navigator(this, configuration)
+        navigator = Navigator(this, configuration, activity)
         childFragmentManager.addFragmentOnAttachListener(this)
 
         initControllerGraph()

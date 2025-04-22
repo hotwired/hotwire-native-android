@@ -105,43 +105,39 @@ interface HotwireDestination : BridgeDestination {
     fun refresh(displayProgress: Boolean = true)
 
     /**
-     * Gets the navigator that will be used for navigating to `newLocation`. You should
-     * not have to override this, unless you're using a [NestedNavigatorHostDelegate] to provide
-     * sub-navigation within your current Fragment destination and would like custom behavior.
+     * Override if you're using a [NestedNavigatorHostDelegate] to provide sub-navigation
+     * within your current Fragment destination and would like custom behavior.
+     *
+     * Return `null` to use the default `navigator` instance for navigation.
      */
-    fun navigatorForNavigation(newLocation: String): Navigator {
-        return navigator
+    fun customNavigatorForNavigation(newLocation: String): Navigator? {
+        return null
     }
 
     /**
-     * Determines whether the new location should be routed within in-app navigation from the
-     * current destination. By default, the registered [Router.RouteDecisionHandler] instances are used to
-     * determine routing logic. You can override the global behavior for a specific destination,
-     * but it's recommend to use dedicated [Router.RouteDecisionHandler] instances for routing logic.
+     * Override to provide a custom `Router.Decision` from your destination. By default, the
+     * registered [Router.RouteDecisionHandler] instances are used to determine routing logic.
+     * It's recommend to use dedicated [Router.RouteDecisionHandler] instances for routing logic.
+     *
+     * Return `null` to use the global [Router.RouteDecisionHandler] instances to determine
+     * routing logic.
      */
-    fun decideRoute(newLocation: String): Router.Decision {
-        return HotwireNavigation.router.decideRoute(
-            location = newLocation,
-            configuration = navigator.configuration,
-            activity = fragment.requireActivity() as HotwireActivity
-        )
+    fun customRouteDecision(newLocation: String): Router.Decision? {
+        return null
     }
 
     /**
-     * Gets the default set of navigation options (basic enter/exit animations) for the Android
-     * Navigation component to use to execute a navigation event. This can be overridden if
-     * you'd like to provide your own.
+     * Override to provide a custom set of navigation options (basic enter/exit animations)
+     * for the Android Navigation component to use to execute a navigation event.
+     *
+     * Return `null` to use the library's default destination animations.
      */
-    fun getNavigationOptions(
+    fun customNavigationOptions(
         newLocation: String,
         newPathProperties: PathConfigurationProperties,
         action: VisitAction
-    ): NavOptions {
-        return HotwireDestinationAnimations.defaultNavOptions(
-            currentPathProperties = pathProperties,
-            newPathProperties = newPathProperties,
-            action = action
-        )
+    ): NavOptions? {
+        return null
     }
 
     /**

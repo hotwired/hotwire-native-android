@@ -14,17 +14,21 @@ import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.destinations.HotwireDestinationAnimations
 import dev.hotwire.navigation.destinations.HotwireDialogDestination
 import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.routing.Router
 import dev.hotwire.navigation.session.SessionModalResult
+import dev.hotwire.navigation.session.SessionViewModel
 import dev.hotwire.navigation.util.location
 
 class Navigator(
     val host: NavigatorHost,
-    val configuration: NavigatorConfiguration
+    val configuration: NavigatorConfiguration,
+    val activity: HotwireActivity
 ) {
     private val navController = host.navController
 
@@ -38,10 +42,9 @@ class Navigator(
     /**
      * Retrieves the currently active [HotwireDestination] on the backstack.
      */
-    val currentDestination: HotwireDestination
+    val currentDestination: HotwireDestination?
         get() = currentDialogDestination as? HotwireDestination
             ?: host.childFragmentManager.primaryNavigationFragment as? HotwireDestination
-            ?: throw IllegalStateException("No current destination found in NavigatorHost")
 
     /**
      * Gets the location for the current destination.
@@ -64,8 +67,8 @@ class Navigator(
 
     internal fun createNewSession() = Session(
         sessionName = configuration.name,
-        activity = host.activity,
-        webView = Hotwire.config.makeCustomWebView(host.requireContext())
+        activity = activity,
+        webView = Hotwire.config.makeCustomWebView(activity)
     ).also {
         // Initialize bridge with new WebView instance
         if (HotwireNavigation.registeredBridgeComponentFactories.isNotEmpty()) {
@@ -166,7 +169,7 @@ class Navigator(
                 navigateWithinContext(rule)
             }
             NavigatorMode.REFRESH -> {
-                currentDestination.refresh(displayProgress = false)
+                currentDestination?.refresh(displayProgress = false)
             }
             NavigatorMode.NONE -> {
                 // Do nothing
@@ -220,17 +223,19 @@ class Navigator(
      * Finds the [NavigatorHost] with the given resource ID.
      */
     fun findNavigatorHost(@IdRes navigatorHostId: Int): NavigatorHost {
-        val fragment = currentDestination.fragment
-
-        return fragment.parentFragment?.childFragmentManager?.findNavigatorHost(navigatorHostId)
-            ?: fragment.parentFragment?.parentFragment?.childFragmentManager?.findNavigatorHost(navigatorHostId)
-            ?: fragment.requireActivity().supportFragmentManager.findNavigatorHost(navigatorHostId)
+        return activity.supportFragmentManager.findNavigatorHost(navigatorHostId)
             ?: throw IllegalStateException("No NavigatorHost found with ID: $navigatorHostId")
     }
 
     private fun navigateWhenReady(onReady: () -> Unit) {
-        currentDestination.onBeforeNavigation()
-        currentDestination.prepareNavigation(onReady)
+        val destination = currentDestination
+
+        if (destination != null) {
+            destination.onBeforeNavigation()
+            destination.prepareNavigation(onReady)
+        } else {
+            onReady()
+        }
     }
 
     private fun navigateWithinContext(rule: NavigatorRule) {
@@ -330,7 +335,7 @@ class Navigator(
     private fun sendModalResult(rule: NavigatorRule) {
         // Save the modal result with VisitOptions so it can be retrieved
         // by the previous destination when the backstack is popped.
-        currentDestination.delegate().sessionViewModel.sendModalResult(
+        sessionViewModel().sendModalResult(
             checkNotNull(rule.newModalResult)
         )
     }
@@ -371,7 +376,7 @@ class Navigator(
         // Save the VisitOptions so it can be retrieved by the next
         // destination. When response.responseHTML is present it is
         // too large to save directly within the args bundle.
-        currentDestination.delegate().sessionViewModel.saveVisitOptions(rule.newVisitOptions)
+        sessionViewModel().saveVisitOptions(rule.newVisitOptions)
 
         rule.newDestination?.let {
             logEvent(
@@ -408,11 +413,18 @@ class Navigator(
     }
 
     private fun currentControllerForLocation(location: String): NavController {
-        return currentDestination.navigatorForNavigation(location).navController
+        val customNavigator = currentDestination?.customNavigatorForNavigation(location)
+        return customNavigator?.navController ?: navController
     }
 
     private fun getRouteDecision(location: String): Router.Decision {
-        val decision = currentDestination.decideRoute(location)
+        val customDecision = currentDestination?.customRouteDecision(location)
+
+        val decision = customDecision ?: HotwireNavigation.router.decideRoute(
+            location = location,
+            configuration = configuration,
+            activity = activity
+        )
 
         logEvent(
             "routeDecision",
@@ -422,15 +434,27 @@ class Navigator(
         return decision
     }
 
-    private fun navOptions(location: String, action: VisitAction): NavOptions {
-        val properties = Hotwire.config.pathConfiguration.properties(location)
+    private fun navOptions(newLocation: String, action: VisitAction): NavOptions {
+        val newPathProperties = Hotwire.config.pathConfiguration.properties(newLocation)
+        val location = currentDestination?.location ?: ""
 
-        return currentDestination.getNavigationOptions(
-            newLocation = location,
-            newPathProperties = properties,
+        val customOptions = currentDestination?.customNavigationOptions(
+            newLocation = newLocation,
+            newPathProperties = newPathProperties,
+            action = action
+        )
+
+        return customOptions ?: HotwireDestinationAnimations.defaultNavOptions(
+            currentPathProperties = Hotwire.config.pathConfiguration.properties(location),
+            newPathProperties = newPathProperties,
             action = action
         )
     }
+
+    private fun sessionViewModel() = SessionViewModel.get(
+        sessionName = configuration.name,
+        activity = activity
+    )
 
     private fun FragmentManager.findNavigatorHost(navigatorHostId: Int): NavigatorHost? {
         return findFragmentById(navigatorHostId) as? NavigatorHost
@@ -440,9 +464,10 @@ class Navigator(
         get() = this?.arguments?.presentationContext == PresentationContext.MODAL
 
     private fun logEvent(event: String, vararg params: Pair<String, Any>) {
+        val destinationName = currentDestination?.fragment?.javaClass?.simpleName
         val attributes = params.toMutableList().apply {
             add(0, "navigator" to configuration.name)
-            add("currentFragment" to currentDestination.fragment.javaClass.simpleName)
+            add("currentFragment" to (destinationName ?: "NONE"))
         }
         logEvent(event, attributes)
     }
