@@ -130,9 +130,10 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun globalSetting() {
-        assertThat(pathConfiguration.settings.size).isEqualTo(2)
+        assertThat(pathConfiguration.settings.size).isEqualTo(3)
         assertThat(pathConfiguration.settings["no_such_key"]).isNull()
         assertThat(pathConfiguration.settings["custom_app_feature_enabled"]).isEqualTo(true)
+        assertThat(pathConfiguration.settings["custom_app_number"] as Long).isEqualTo(1)
         assertThat(pathConfiguration.settings.getCustomAppData()).isEqualTo(
             CustomAppData(
                 marketingSite = "https://native.hotwired.dev",
