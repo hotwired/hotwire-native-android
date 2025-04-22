@@ -75,7 +75,7 @@ android {
 
 dependencies {
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
 
     // Material
     implementation("com.google.android.material:material:1.12.0")
