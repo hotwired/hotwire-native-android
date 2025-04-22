@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.whenStateAtLeast
 import androidx.lifecycle.withStateAtLeast
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.pullToRefreshEnabled
@@ -94,7 +93,7 @@ internal class HotwireWebFragmentDelegate(
      * modal result. Will navigate if the result indicates it should.
      */
     fun onStartAfterModalResult(result: SessionModalResult) {
-        if (!navigator.shouldRouteToModalResult(result)) {
+        if (!navigator.willRouteToNewDestinationWithModalResult(result)) {
             initNavigationVisit()
             initWebChromeClient()
         }

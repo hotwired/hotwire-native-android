@@ -10,7 +10,6 @@ import dev.hotwire.core.turbo.visit.VisitOptions
  * @property location Location that the modal visited.
  * @property options Visit options that the modal used.
  * @property bundle Any additional data used by the navigation library.
- * @property shouldNavigate Whether the location should be navigated to based on its presentation property.
  */
 data class SessionModalResult(
     val location: String,

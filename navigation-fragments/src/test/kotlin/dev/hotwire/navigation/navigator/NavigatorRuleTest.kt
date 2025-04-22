@@ -535,6 +535,28 @@ class NavigatorRuleTest {
         assertThat(rule.newNavOptions).isEqualTo(navOptions)
     }
 
+    @Test
+    fun `prevent clear all presentation from start destination`() {
+        val rule = getNavigatorRule(homeUrl)
+
+        // Current destination
+        assertThat(rule.previousLocation).isNull()
+        assertThat(rule.currentLocation).isEqualTo(homeUrl)
+        assertThat(rule.currentPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.isAtStartDestination).isTrue()
+
+        // New destination
+        assertThat(rule.newLocation).isEqualTo(homeUrl)
+        assertThat(rule.newPresentationContext).isEqualTo(PresentationContext.DEFAULT)
+        assertThat(rule.newPresentation).isEqualTo(Presentation.NONE)
+        assertThat(rule.newQueryStringPresentation).isEqualTo(QueryStringPresentation.DEFAULT)
+        assertThat(rule.newNavigationMode).isEqualTo(NavigatorMode.NONE)
+        assertThat(rule.newModalResult).isNull()
+        assertThat(rule.newDestinationUri).isEqualTo(webHomeUri)
+        assertThat(rule.newDestination).isNotNull()
+        assertThat(rule.newNavOptions).isEqualTo(navOptions)
+    }
+
     private fun getNavigatorRule(
         location: String,
         visitOptions: VisitOptions = VisitOptions(),

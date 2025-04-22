@@ -73,6 +73,9 @@ internal class NavigatorRule(
             return if (isAtStartDestination && newProperties.presentation == Presentation.POP) {
                 // You cannot pop from the start destination, prevent visit
                 Presentation.NONE
+            } else if (isAtStartDestination && newProperties.presentation == Presentation.CLEAR_ALL) {
+                // You cannot clear all from the start destination, prevent visit
+                Presentation.NONE
             } else {
                 // Use the custom presentation
                 newProperties.presentation
