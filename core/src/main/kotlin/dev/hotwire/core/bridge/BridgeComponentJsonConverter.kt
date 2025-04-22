@@ -41,8 +41,9 @@ abstract class BridgeComponentJsonTypeConverter : BridgeComponentJsonConverter()
     abstract fun <T> toJson(data: T, type: Class<T>): String
 }
 
-class KotlinXJsonConverter : BridgeComponentJsonConverter() {
-    val json = Json { ignoreUnknownKeys = true }
+class KotlinXJsonConverter(
+    val json: Json = Json { ignoreUnknownKeys = true }
+) : BridgeComponentJsonConverter() {
 
     inline fun <reified T> toObject(jsonData: String): T? {
         return try {
