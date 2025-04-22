@@ -3,11 +3,15 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -16,6 +20,7 @@ import org.mockito.Mockito.verify
 class BridgeDelegateTest {
     private lateinit var delegate: BridgeDelegate<TestData.AppBridgeDestination>
     private lateinit var lifecycleOwner: TestLifecycleOwner
+    private val destination: TestData.AppBridgeDestination = mock()
     private val bridge: Bridge = mock()
     private val webView: WebView = mock()
 
@@ -30,12 +35,13 @@ class BridgeDelegateTest {
 
     @Before
     fun setup() {
+        whenever(destination.bridgeWebViewIsReady()).thenReturn(true)
         whenever(bridge.webView).thenReturn(webView)
         Bridge.initialize(bridge)
 
         delegate = BridgeDelegate(
             location = "https://37signals.com",
-            destination = TestData.AppBridgeDestination(),
+            destination = destination,
             componentFactories = factories
         )
         delegate.bridge = bridge
@@ -75,6 +81,21 @@ class BridgeDelegateTest {
         assertNull(delegate.component<TestData.OneBridgeComponent>())
         assertEquals(true, delegate.bridgeDidReceiveMessage(message))
         assertNotNull(delegate.component<TestData.OneBridgeComponent>())
+    }
+
+    @Test
+    fun bridgeNotifiesWhenComponentIsInitialized() {
+        val message = Message(
+            id = "1",
+            component = "one",
+            event = "connect",
+            metadata = Metadata("https://37signals.com"),
+            jsonData = """{"title":"Page-title","subtitle":"Page-subtitle"}"""
+        )
+
+        delegate.bridgeDidReceiveMessage(message)
+        delegate.bridgeDidReceiveMessage(message)
+        verify(destination, times(1)).onBridgeComponentInitialized(any())
     }
 
     @Test
