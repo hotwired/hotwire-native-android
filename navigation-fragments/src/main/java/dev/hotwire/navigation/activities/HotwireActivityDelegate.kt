@@ -45,10 +45,10 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      */
     val currentNavigator: Navigator?
         get() {
-            val navigator = navigatorHosts[currentNavigatorHostId]
+            val host = navigatorHosts[currentNavigatorHostId]
 
-            return if (navigator?.isReady() == true) {
-                navigator.navigator
+            return if (host?.isReady() == true) {
+                host.navigator
             } else {
                 null
             }
@@ -94,15 +94,14 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     /**
-     * Finds the navigator host associated with the provided resource ID.
+     * Finds the registered navigator host associated with the provided resource ID.
      *
      * @param navigatorHostId
-     * @return
+     * @return The [NavigatorHost] instance if it's view has been created and it has
+     *  been registered with the Activity, otherwise `null`.
      */
-    fun navigatorHost(@IdRes navigatorHostId: Int): NavigatorHost {
-        return requireNotNull(navigatorHosts[navigatorHostId]) {
-            "No registered NavigatorHost found"
-        }
+    fun navigatorHost(@IdRes navigatorHostId: Int): NavigatorHost? {
+        return navigatorHosts[navigatorHostId]
     }
 
     /**
