@@ -3,6 +3,7 @@ package dev.hotwire.demo.main
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.hotwire.demo.R
 import dev.hotwire.navigation.activities.HotwireActivity
@@ -12,6 +13,7 @@ import dev.hotwire.navigation.util.applyDefaultImeWindowInsets
 
 class MainActivity : HotwireActivity() {
     private lateinit var bottomNavigationController: HotwireBottomNavigationController
+    private val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -27,7 +29,10 @@ class MainActivity : HotwireActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
         bottomNavigationController = HotwireBottomNavigationController(this, bottomNavigationView)
-        bottomNavigationController.load(mainTabs)
+        bottomNavigationController.load(mainTabs, viewModel.selectedTabIndex)
+        bottomNavigationController.setOnTabSelectedListener { index, _ ->
+            viewModel.selectedTabIndex = index
+        }
     }
 
     override fun navigatorConfigurations() = mainTabs.navigatorConfigurations

@@ -3,8 +3,4 @@
     <string name="error_web_home">Error loading page</string>
     <string name="error_web_home_description">The demo server may be starting up. Pull-to-refresh to try again in a minute.</string>
     <string name="menu_progress">Loading…</string>
-    <string name="bottom_nav_navigation">Navigation</string>
-    <string name="bottom_nav_bridge_components">Bridge Components</string>
-    <string name="bottom_nav_resources">Resources</string>
-    <string name="bottom_nav_bugs_fixes">Bugs &amp; Fixes</string>
 </resources>

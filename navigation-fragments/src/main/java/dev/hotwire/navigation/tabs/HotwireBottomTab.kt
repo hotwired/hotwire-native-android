@@ -1,6 +1,6 @@
 package dev.hotwire.navigation.tabs
 
-import androidx.annotation.IdRes
+import androidx.annotation.DrawableRes
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 
 /**
@@ -11,7 +11,8 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
  *  @param configuration The [NavigatorConfiguration] for the tab.
  */
 data class HotwireBottomTab(
-    @IdRes val itemId: Int,
+    val title: String,
+    @DrawableRes val iconResId: Int,
     val isVisible: Boolean = true,
     val configuration: NavigatorConfiguration
 )

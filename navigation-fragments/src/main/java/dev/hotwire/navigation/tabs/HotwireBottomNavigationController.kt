@@ -41,7 +41,7 @@ class HotwireBottomNavigationController(
             updateVisibility()
         }
 
-    private var listener: ((HotwireBottomTab) -> Unit)? = null
+    private var listener: ((Int, HotwireBottomTab) -> Unit)? = null
 
     /**
      * The currently selected tab in the [BottomNavigationView].
@@ -49,7 +49,7 @@ class HotwireBottomNavigationController(
     val currentTab: HotwireBottomTab
         get() {
             require(tabs.isNotEmpty()) { "No tabs have been loaded." }
-            return tabs.first { view.selectedItemId == it.itemId }
+            return tabs[view.selectedItemId]
         }
 
     /**
@@ -77,9 +77,8 @@ class HotwireBottomNavigationController(
         val initialIndex = selectedTabIndex.coerceIn(0, tabs.lastIndex)
         val initialTab = tabs[initialIndex]
 
-        view.selectedItemId = initialTab.itemId
-
-        initTabVisibility()
+        loadMenu()
+        selectTab(initialIndex)
         initOnItemSelectedListener()
         initDestinationChangedListener()
         applyWindowInsets()
@@ -87,9 +86,16 @@ class HotwireBottomNavigationController(
     }
 
     /**
+     * Select the tab for the provided index.
+     */
+    fun selectTab(tabIndex: Int) {
+        view.selectedItemId = tabIndex.coerceIn(0, tabs.lastIndex)
+    }
+
+    /**
      * Set a listener that will be notified when a navigation tab is selected.
      */
-    fun setOnTabSelectedListener(listener: ((HotwireBottomTab) -> Unit)?) {
+    fun setOnTabSelectedListener(listener: ((index: Int, tab: HotwireBottomTab) -> Unit)?) {
         this.listener = listener
     }
 
@@ -121,23 +127,30 @@ class HotwireBottomNavigationController(
         }
     }
 
-    private fun initTabVisibility() {
-        tabs.forEach {
-            view.menu.findItem(it.itemId)?.isVisible = it.isVisible
+    private fun loadMenu() {
+        view.menu.clear()
+
+        tabs.forEachIndexed { index, tab ->
+            view.menu.add(0, index, index, tab.title).apply {
+                setIcon(tab.iconResId)
+                isCheckable = true
+                isEnabled = tab.isVisible
+                isVisible = tab.isVisible
+            }
         }
     }
 
     private fun initOnItemSelectedListener() {
         view.setOnItemSelectedListener { item ->
-            val tab = tabs.first { item.itemId == it.itemId }
+            val tab = tabs[item.itemId]
             switchTab(tab)
-            listener?.invoke(tab)
+            listener?.invoke(item.itemId, tab)
             true
         }
 
         if (clearNavigationOnTabReselection) {
             view.setOnItemReselectedListener { item ->
-                val tab = tabs.first { item.itemId == it.itemId }
+                val tab = tabs[item.itemId]
                 tab.navigatorHost.navigator.clearAll()
             }
         }

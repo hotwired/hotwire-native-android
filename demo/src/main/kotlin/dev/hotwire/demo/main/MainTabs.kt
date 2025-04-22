@@ -6,7 +6,8 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.tabs.HotwireBottomTab
 
 private val navigation = HotwireBottomTab(
-    itemId = R.id.bottom_nav_navigation,
+    title = "Navigation",
+    iconResId = R.drawable.ic_tab_navigation,
     configuration = NavigatorConfiguration(
         name = "navigation",
         navigatorHostId = R.id.navigation_navigator_host,
@@ -15,7 +16,8 @@ private val navigation = HotwireBottomTab(
 )
 
 private val bridgeComponents = HotwireBottomTab(
-    itemId = R.id.bottom_nav_bridge_components,
+    title = "Bridge Components",
+    iconResId = R.drawable.ic_tab_bridge_components,
     configuration = NavigatorConfiguration(
         name = "bridge-components",
         navigatorHostId = R.id.bridge_components_navigator_host,
@@ -24,7 +26,8 @@ private val bridgeComponents = HotwireBottomTab(
 )
 
 private val resources = HotwireBottomTab(
-    itemId = R.id.bottom_nav_resources,
+    title = "Resources",
+    iconResId = R.drawable.ic_tab_resources,
     configuration = NavigatorConfiguration(
         name = "resources",
         navigatorHostId = R.id.resources_navigator_host,
@@ -33,7 +36,8 @@ private val resources = HotwireBottomTab(
 )
 
 private val bugsAndFixes = HotwireBottomTab(
-    itemId = R.id.bottom_nav_bugs_fixes,
+    title = "Bugs & Fixes",
+    iconResId = R.drawable.ic_tab_bugs_fixes,
     isVisible = Demo.current == Demo.Environment.Local,
     configuration = NavigatorConfiguration(
         name = "bugs-fixes",
