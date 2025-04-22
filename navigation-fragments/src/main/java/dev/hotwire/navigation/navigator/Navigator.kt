@@ -74,18 +74,16 @@ class Navigator(
     }
 
     internal fun shouldRouteToModalResult(result: SessionModalResult): Boolean {
-        val rule = NavigatorRule(
-            location = result.location,
-            visitOptions = result.options,
-            bundle = result.bundle,
-            navOptions = navOptions(result.location, result.options.action),
-            extras = null,
-            pathConfiguration = Hotwire.config.pathConfiguration,
-            navigatorName = configuration.name,
-            controller = currentControllerForLocation(result.location)
-        )
+        val rule = navigatorRuleFromModalResult(result)
 
         return rule.newNavigationMode != NavigatorMode.NONE
+    }
+
+    internal fun willRouteToNewDestinationWithModalResult(result: SessionModalResult): Boolean {
+        val rule = navigatorRuleFromModalResult(result)
+
+        return rule.newNavigationMode != NavigatorMode.NONE &&
+                rule.newNavigationMode != NavigatorMode.REFRESH
     }
 
     /**
@@ -168,7 +166,7 @@ class Navigator(
                 navigateWithinContext(rule)
             }
             NavigatorMode.REFRESH -> {
-                route(rule.currentLocation, VisitOptions(action = VisitAction.REPLACE))
+                currentDestination.refresh(displayProgress = false)
             }
             NavigatorMode.NONE -> {
                 // Do nothing
@@ -189,7 +187,12 @@ class Navigator(
             // If a dialog is on top of the backstack, close it first
             currentDialogDestination?.closeDialog()
 
-            navController.popBackStack(navController.graph.startDestinationId, false)
+            do {
+                navController.popBackStack()
+            } while(
+                !isAtStartDestination()
+            )
+
             onCleared()
         }
     }
@@ -329,6 +332,19 @@ class Navigator(
         // by the previous destination when the backstack is popped.
         currentDestination.delegate().sessionViewModel.sendModalResult(
             checkNotNull(rule.newModalResult)
+        )
+    }
+
+    private fun navigatorRuleFromModalResult(result: SessionModalResult): NavigatorRule {
+        return NavigatorRule(
+            location = result.location,
+            visitOptions = result.options,
+            bundle = result.bundle,
+            navOptions = navOptions(result.location, result.options.action),
+            extras = null,
+            pathConfiguration = Hotwire.config.pathConfiguration,
+            navigatorName = configuration.name,
+            controller = currentControllerForLocation(result.location)
         )
     }
 

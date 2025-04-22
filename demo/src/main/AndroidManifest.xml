@@ -13,8 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/MyTheme.DayNight"
-        tools:ignore="GoogleAppIndexingWarning"
-        tools:targetApi="P">
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
 
         <activity
             android:name="dev.hotwire.demo.main.MainActivity"

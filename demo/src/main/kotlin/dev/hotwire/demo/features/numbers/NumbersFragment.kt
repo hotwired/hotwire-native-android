@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dev.hotwire.demo.Demo
 import dev.hotwire.demo.R
-import dev.hotwire.demo.Urls
 import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireFragment
 
@@ -34,6 +34,6 @@ class NumbersFragment : HotwireFragment(), NumbersFragmentCallback {
     }
 
     override fun onItemClicked(number: Int) {
-        navigator.route("${Urls.numbersUrl}/$number")
+        navigator.route("${Demo.current.url}/numbers/$number")
     }
 }

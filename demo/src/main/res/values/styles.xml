@@ -13,7 +13,7 @@
     <style name="Widget.MyTheme.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">?shapeAppearanceLargeComponent</item>
         <item name="behavior_draggable">true</item>
-        <item name="behavior_peekHeight">400dp</item>
+        <item name="behavior_peekHeight">500dp</item>
         <item name="backgroundTint">?colorSurface</item>
     </style>
 
@@ -40,6 +40,29 @@
 
     <style name="Widget.MyTheme.Toolbar.Navigation.Tinted" parent="Widget.AppCompat.Toolbar.Button.Navigation">
         <item name="tint">?colorOnSurface</item>
+    </style>
+
+    <!-- Bottom Navigation -->
+
+    <style name="Widget.MyTheme.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?colorSurface</item>
+        <item name="itemBackground">?colorSurface</item>
+        <item name="backgroundTint">@null</item>
+        <item name="elevation">12dp</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.MyTheme.BottomNavigationView.ActiveIndicator</item>
+        <item name="itemPaddingTop">12dp</item>
+        <item name="itemPaddingBottom">16dp</item>
+        <item name="android:minHeight">80dp</item>
+    </style>
+
+    <style name="Widget.MyTheme.BottomNavigationView.ActiveIndicator">
+        <item name="android:width">64dp</item>
+        <item name="android:height">32dp</item>
+        <item name="marginHorizontal">4dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearanceOverlay.MyTheme.Circle</item>
+        <item name="android:color">@color/bottom_navigation_active_indicator</item>
     </style>
 
     <!--Solid Buttons-->

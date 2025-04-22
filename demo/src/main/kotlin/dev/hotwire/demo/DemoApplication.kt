@@ -10,12 +10,9 @@ import dev.hotwire.demo.bridge.FormComponent
 import dev.hotwire.demo.bridge.MenuComponent
 import dev.hotwire.demo.bridge.OverflowMenuComponent
 import dev.hotwire.demo.features.imageviewer.ImageViewerFragment
-import dev.hotwire.demo.features.numbers.NumberBottomSheetFragment
 import dev.hotwire.demo.features.numbers.NumbersFragment
 import dev.hotwire.demo.features.web.WebBottomSheetFragment
 import dev.hotwire.demo.features.web.WebFragment
-import dev.hotwire.demo.features.web.WebHomeFragment
-import dev.hotwire.demo.features.web.WebModalFragment
 import dev.hotwire.navigation.config.defaultFragmentDestination
 import dev.hotwire.navigation.config.registerBridgeComponents
 import dev.hotwire.navigation.config.registerFragmentDestinations
@@ -31,7 +28,8 @@ class DemoApplication : Application() {
         Hotwire.loadPathConfiguration(
             context = this,
             location = PathConfiguration.Location(
-                assetFilePath = "json/configuration.json"
+                assetFilePath = "json/path-configuration.json",
+                remoteFileUrl = "${Demo.current.url}/configurations/android_v1.json"
             )
         )
 
@@ -41,11 +39,8 @@ class DemoApplication : Application() {
         // Register fragment destinations
         Hotwire.registerFragmentDestinations(
             WebFragment::class,
-            WebHomeFragment::class,
-            WebModalFragment::class,
             WebBottomSheetFragment::class,
             NumbersFragment::class,
-            NumberBottomSheetFragment::class,
             ImageViewerFragment::class
         )
 
