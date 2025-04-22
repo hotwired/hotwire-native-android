@@ -1,6 +1,7 @@
 {
   "settings": {
     "custom_app_feature_enabled": true,
+    "custom_app_number": 1,
     "custom_app_data": {
       "marketing_site": "https://native.hotwired.dev",
       "demo_site": "https://hotwire-native-demo.dev"

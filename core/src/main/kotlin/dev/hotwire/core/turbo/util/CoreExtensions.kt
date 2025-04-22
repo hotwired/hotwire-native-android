@@ -6,6 +6,7 @@ import android.os.Handler
 import android.webkit.WebResourceRequest
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.ToNumberPolicy
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitActionAdapter
@@ -71,4 +72,5 @@ internal fun <T> String.toObject(typeToken: TypeToken<T>): T {
 
 private val gson: Gson = GsonBuilder()
     .registerTypeAdapter(VisitAction::class.java, VisitActionAdapter())
+    .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
     .create()
