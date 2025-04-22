@@ -40,9 +40,9 @@ internal class NavigatorRule(
 
     // Current destination
     val previousLocation = controller.previousBackStackEntry.location
-    val currentLocation = checkNotNull(controller.currentBackStackEntry.location)
-    val currentProperties = pathConfiguration.properties(currentLocation)
-    val currentPresentationContext = currentProperties.context
+    val currentLocation = controller.currentBackStackEntry.location
+    val currentProperties = currentLocation?.let { pathConfiguration.properties(currentLocation) }
+    val currentPresentationContext = currentProperties?.context ?: PresentationContext.DEFAULT
     val isAtStartDestination = controller.previousBackStackEntry == null
 
     // New destination
@@ -180,8 +180,8 @@ internal class NavigatorRule(
             return false
         }
 
-        val firstUri = Uri.parse(first)
-        val secondUri = Uri.parse(second)
+        val firstUri = first.toUri()
+        val secondUri = second.toUri()
 
         return when (newQueryStringPresentation) {
             QueryStringPresentation.REPLACE -> {
