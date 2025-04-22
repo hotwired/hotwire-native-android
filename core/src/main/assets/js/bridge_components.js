@@ -84,11 +84,13 @@
     // Web global
 
     get isBridgeAvailable() {
-      return window.Strada
+      // Fallback to Strada for legacy Strada web JavaScript.
+      return window.HotwireNative ?? window.Strada
     }
 
     get webBridge() {
-      return window.Strada.web
+      // Fallback to Strada for legacy Strada web JavaScript.
+      return window.HotwireNative?.web ?? window.Strada.web
     }
   }
 
