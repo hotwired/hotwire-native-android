@@ -100,7 +100,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      * @return The [NavigatorHost] instance if it's view has been created and it has
      *  been registered with the Activity, otherwise `null`.
      */
-    fun navigatorHost(@IdRes navigatorHostId: Int): NavigatorHost? {
+    fun findNavigatorHost(@IdRes navigatorHostId: Int): NavigatorHost? {
         return navigatorHosts[navigatorHostId]
     }
 

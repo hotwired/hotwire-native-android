@@ -2,7 +2,6 @@ package dev.hotwire.navigation.navigator
 
 import android.os.Bundle
 import androidx.annotation.IdRes
-import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -220,11 +219,14 @@ class Navigator(
     }
 
     /**
-     * Finds the [NavigatorHost] with the given resource ID.
+     * Finds the registered navigator host associated with the provided resource ID.
+     *
+     * @param navigatorHostId
+     * @return The [NavigatorHost] instance if it's view has been created and it has
+     *  been registered with the Activity, otherwise `null`.
      */
-    fun findNavigatorHost(@IdRes navigatorHostId: Int): NavigatorHost {
-        return activity.supportFragmentManager.findNavigatorHost(navigatorHostId)
-            ?: throw IllegalStateException("No NavigatorHost found with ID: $navigatorHostId")
+    fun findNavigatorHost(@IdRes navigatorHostId: Int): NavigatorHost? {
+        return activity.delegate.findNavigatorHost(navigatorHostId)
     }
 
     private fun navigateWhenReady(onReady: () -> Unit) {
@@ -455,10 +457,6 @@ class Navigator(
         sessionName = configuration.name,
         activity = activity
     )
-
-    private fun FragmentManager.findNavigatorHost(navigatorHostId: Int): NavigatorHost? {
-        return findFragmentById(navigatorHostId) as? NavigatorHost
-    }
 
     private val NavBackStackEntry?.isModalContext: Boolean
         get() = this?.arguments?.presentationContext == PresentationContext.MODAL
