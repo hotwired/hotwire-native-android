@@ -42,7 +42,10 @@ abstract class BridgeComponentJsonTypeConverter : BridgeComponentJsonConverter()
 }
 
 class KotlinXJsonConverter(
-    val json: Json = Json { ignoreUnknownKeys = true }
+    val json: Json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
 ) : BridgeComponentJsonConverter() {
 
     inline fun <reified T> toObject(jsonData: String): T? {
