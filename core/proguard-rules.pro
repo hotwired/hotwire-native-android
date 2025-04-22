@@ -18,6 +18,9 @@
 
 -keep class dev.hotwire.core.** { *; }
 
+# Resolve R8 issue: "ERROR: R8: Missing class java.lang.invoke.StringConcatFactory"
+-dontwarn java.lang.invoke.StringConcatFactory
+
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 -keepattributes SourceFile,LineNumberTable
