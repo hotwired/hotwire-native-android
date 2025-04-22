@@ -53,12 +53,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     sourceSets {
@@ -81,7 +81,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
 
     // AndroidX
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.lifecycle:lifecycle-common:2.8.7")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
@@ -92,19 +92,25 @@ dependencies {
     implementation("androidx.browser:browser:1.8.0")
 
     // Exported AndroidX dependencies
-    api("androidx.activity:activity-ktx:1.10.0")
-    api("androidx.fragment:fragment-ktx:1.8.5")
-    api("androidx.navigation:navigation-fragment-ktx:2.8.6")
-    api("androidx.navigation:navigation-ui-ktx:2.8.6")
+    api("androidx.activity:activity-ktx:1.10.1")
+    api("androidx.fragment:fragment-ktx:1.8.6")
+    api("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    api("androidx.navigation:navigation-ui-ktx:2.8.9")
 
     // Tests
     testImplementation("androidx.test:core:1.6.1") // Robolectric
     testImplementation("org.assertj:assertj-core:3.26.3")
-    testImplementation("androidx.navigation:navigation-testing:2.8.6")
+    testImplementation("androidx.navigation:navigation-testing:2.8.9")
     testImplementation("org.robolectric:robolectric:4.14.1")
     testImplementation("org.mockito:mockito-core:5.14.2")
     testImplementation("com.nhaarman:mockito-kotlin:1.6.0")
     testImplementation("junit:junit:4.13.2")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 tasks {
