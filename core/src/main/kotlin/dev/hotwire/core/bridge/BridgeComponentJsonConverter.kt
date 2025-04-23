@@ -45,6 +45,7 @@ class KotlinXJsonConverter(
     val json: Json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
+        explicitNulls = false
     }
 ) : BridgeComponentJsonConverter() {
 
