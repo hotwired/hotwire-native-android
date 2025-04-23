@@ -49,6 +49,23 @@ class MessageTest {
     }
 
     @Test
+    fun dataWithNullableFieldsDecodesToObject() {
+        val metadata = Metadata("https://37signals.com")
+        val message = Message(
+            id = "1",
+            component = "page",
+            event = "connect",
+            metadata = metadata,
+            jsonData = """{"title":null,"}""" // subtitle missing
+        )
+
+        val data = message.data<MessageData>()
+
+        assertEquals(null, data?.title)
+        assertEquals(null, data?.subtitle)
+    }
+
+    @Test
     fun replacingJsonData() {
         val metadata = Metadata("https://37signals.com")
         val message = Message(
@@ -136,6 +153,9 @@ class MessageTest {
 
     @Serializable
     private class MessageData(val title: String, val subtitle: String)
+
+    @Serializable
+    private class NullableMessageData(val title: String?, val subtitle: String? = null)
 
     private class InvalidMessageData()
 
