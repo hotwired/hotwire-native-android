@@ -4,6 +4,7 @@ import dev.hotwire.core.config.Hotwire
 import kotlinx.serialization.Serializable
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -46,6 +47,42 @@ class MessageTest {
         val data = message.data<InvalidMessageData>()
 
         assertNull(data)
+    }
+
+    @Test
+    fun dataWithNullableFieldsDecodesToObject() {
+        val metadata = Metadata("https://37signals.com")
+        val message = Message(
+            id = "1",
+            component = "page",
+            event = "connect",
+            metadata = metadata,
+            jsonData = """{"title":null}""" // subtitle missing
+        )
+
+        val data = message.data<NullableMessageData>()
+
+        assertNotNull(data)
+        assertEquals(null, data?.title)
+        assertEquals(null, data?.subtitle)
+    }
+
+    @Test
+    fun dataWithDefaultValuesDecodesToObject() {
+        val metadata = Metadata("https://37signals.com")
+        val message = Message(
+            id = "1",
+            component = "page",
+            event = "connect",
+            metadata = metadata,
+            jsonData = """{}""" // title and subtitle missing
+        )
+
+        val data = message.data<DefaultValuesMessageData>()
+
+        assertNotNull(data)
+        assertEquals("Page-title", data?.title)
+        assertEquals("Page-subtitle", data?.subtitle)
     }
 
     @Test
@@ -136,6 +173,15 @@ class MessageTest {
 
     @Serializable
     private class MessageData(val title: String, val subtitle: String)
+
+    @Serializable
+    private class NullableMessageData(val title: String?, val subtitle: String? = null)
+
+    @Serializable
+    private class DefaultValuesMessageData(
+        val title: String? = "Page-title",
+        val subtitle: String? = "Page-subtitle"
+    )
 
     private class InvalidMessageData()
 
