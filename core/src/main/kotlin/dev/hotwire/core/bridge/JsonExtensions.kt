@@ -27,7 +27,7 @@ internal inline fun <reified T> String.decode(): T? = try {
     null
 }
 
-private val json = Json {
+internal val json = Json {
     ignoreUnknownKeys = true
     encodeDefaults = true
     explicitNulls = false
