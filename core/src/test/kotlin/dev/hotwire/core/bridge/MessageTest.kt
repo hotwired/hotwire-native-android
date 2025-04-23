@@ -4,6 +4,7 @@ import dev.hotwire.core.config.Hotwire
 import kotlinx.serialization.Serializable
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -56,11 +57,12 @@ class MessageTest {
             component = "page",
             event = "connect",
             metadata = metadata,
-            jsonData = """{"title":null,"}""" // subtitle missing
+            jsonData = """{"title":null}""" // subtitle missing
         )
 
         val data = message.data<NullableMessageData>()
 
+        assertNotNull(data)
         assertEquals(null, data?.title)
         assertEquals(null, data?.subtitle)
     }
@@ -78,6 +80,7 @@ class MessageTest {
 
         val data = message.data<DefaultValuesMessageData>()
 
+        assertNotNull(data)
         assertEquals("Page-title", data?.title)
         assertEquals("Page-subtitle", data?.subtitle)
     }
