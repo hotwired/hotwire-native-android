@@ -172,6 +172,10 @@ class HotwireBottomNavigationController(
 
     private fun applyWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            if (!v.isShown) {
+                return@setOnApplyWindowInsetsListener insets
+            }
+
             insets.getInsets(WindowInsetsCompat.Type.systemBars()).apply {
                 v.setPadding(left, 0, right, bottom)
             }
