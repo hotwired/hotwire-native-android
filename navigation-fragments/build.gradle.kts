@@ -179,7 +179,10 @@ publishing {
     repositories {
         if (isSonatypeRelease) {
             maven {
-                url = uri("https://s01.oss.sonatype.org/content/repositories/releases/")
+                // Temporarily switching to Sonatype OSSRH Staging API
+                // until the maven-publish plugin adds support for the new Central Portal
+                // see: https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
+                url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
 
                 credentials {
                     username = System.getenv("SONATYPE_USER")
