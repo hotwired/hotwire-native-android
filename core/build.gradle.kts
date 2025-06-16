@@ -128,7 +128,10 @@ mavenPublishing {
 
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-    signAllPublications()
+    // Sign only if signingInMemoryKey is defined
+    if (project.hasProperty("signingInMemoryKey")) {
+        signAllPublications()
+    }
 
     pom {
         name.set(libraryName)
