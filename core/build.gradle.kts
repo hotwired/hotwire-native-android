@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
@@ -124,6 +125,14 @@ java {
 //   https://central.sonatype.com/artifact/dev.hotwire/core
 
 mavenPublishing {
+    configure(
+        AndroidSingleVariantLibrary(
+            variant = "release",
+            sourcesJar = true,
+            publishJavadocJar = false,
+        )
+    )
+    
     coordinates(groupId = publishedGroupId, artifactId = publishedArtifactId, version = libVersionName)
 
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
