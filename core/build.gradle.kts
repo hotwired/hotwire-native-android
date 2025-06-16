@@ -23,8 +23,6 @@ val licenseUrl by extra("https://github.com/hotwired/hotwire-native-android/blob
 val developerId by extra("basecamp")
 val developerEmail by extra("androidteam@basecamp.com")
 
-val isSonatypeRelease by extra(project.hasProperty("sonatype"))
-
 android {
     namespace = "dev.hotwire.core"
     compileSdk = 35
@@ -123,7 +121,7 @@ java {
 // Publish to Maven Central via:
 //   ./gradlew -Pversion=<version> clean build publishAndReleaseToMavenCentral --no-configuration-cache
 //   expected env variables: https://vanniktech.github.io/gradle-maven-publish-plugin/central/#secrets
-//   https://search.maven.org/artifact/dev.hotwire/core
+//   https://central.sonatype.com/artifact/dev.hotwire/core
 
 mavenPublishing {
     coordinates(groupId = publishedGroupId, artifactId = publishedArtifactId, version = libVersionName)
