@@ -19,5 +19,6 @@ jobs:
 
       - name: Publish artifact to GitHub Packages
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} clean build -x test publish --stacktrace
+          ORG_GRADLE_PROJECT_githubPackagesUsername: ${{ secrets.GITHUB_ACTOR }}
+          ORG_GRADLE_PROJECT_githubPackagesPassword: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} clean build -x test publishAllPublicationsToGithubPackagesRepository --stacktrace

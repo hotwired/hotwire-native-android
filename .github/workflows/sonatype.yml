@@ -1,4 +1,4 @@
-name: Publish to Sonatype
+name: Publish to Maven Central
 
 on:
   release:
@@ -17,11 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Publish artifact to Sonatype
+      - name: Publish artifact to Maven Central
         env:
-          SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-          GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
-          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-        run: ./gradlew -Psonatype -Pversion=${{ github.event.release.tag_name }} clean build -x test publish
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USER }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SECRET_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSWORD }}
+        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} clean build -x test publishAndReleaseToMavenCentral --no-configuration-cache

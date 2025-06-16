@@ -1,9 +1,10 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("maven-publish")
-    id("signing")
+    id("com.vanniktech.maven.publish") version "0.32.0"
 }
 
 val libVersionName by extra(version as String)
@@ -65,12 +66,6 @@ android {
         named("test")  { java { srcDirs("src/test/kotlin") } }
         named("debug") { java { srcDirs("src/debug/kotlin") } }
     }
-
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
 }
 
 dependencies {
@@ -121,92 +116,57 @@ java {
     }
 }
 
-tasks {
-    // Only sign Sonatype release artifacts
-    withType<Sign>().configureEach {
-        onlyIf { isSonatypeRelease }
-    }
-}
-
-// Sign Sonatype published release artifacts
-if (isSonatypeRelease) {
-    signing {
-        val keyId = System.getenv("GPG_KEY_ID")
-        val secretKey = System.getenv("GPG_SECRET_KEY")
-        val password = System.getenv("GPG_PASSWORD")
-
-        useInMemoryPgpKeys(keyId, secretKey, password)
-
-        setRequired({ gradle.taskGraph.hasTask("publish") })
-        sign(publishing.publications)
-    }
-}
-
 // Publish to GitHub Packages via:
-//   ./gradlew -Pversion=<version> clean build publish
+//   ./gradlew -Pversion=<version> clean build publishAllPublicationsToGithubPackagesRepository
+//   expected env variables: https://vanniktech.github.io/gradle-maven-publish-plugin/other/#github-packages-example
 //   https://github.com/orgs/hotwired/packages?repo_name=hotwire-native-android
 // Publish to Maven Central via:
-//   ./gradlew -Psonatype -Pversion=<version> clean build publish
+//   ./gradlew -Pversion=<version> clean build publishAndReleaseToMavenCentral --no-configuration-cache
+//   expected env variables: https://vanniktech.github.io/gradle-maven-publish-plugin/central/#secrets
 //   https://search.maven.org/artifact/dev.hotwire/core
-publishing {
-    publications {
-        register<MavenPublication>("release") {
-            groupId = publishedGroupId
-            artifactId = publishedArtifactId
-            version = libVersionName
 
-            pom {
-                name.set(libraryName)
-                description.set(libraryDescription)
-                url.set(siteUrl)
+mavenPublishing {
+    coordinates(groupId = publishedGroupId, artifactId = publishedArtifactId, version = libVersionName)
 
-                licenses {
-                    license {
-                        name.set(licenseType)
-                        url.set(licenseUrl)
-                    }
-                }
-                developers {
-                    developer {
-                        id.set(developerId)
-                        name.set(developerId)
-                        email.set(developerEmail)
-                    }
-                }
-                scm {
-                    url.set(gitUrl)
-                }
-            }
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-            // Applies the component for the release build variant
-            afterEvaluate {
-                from(components["release"])
+    signAllPublications()
+
+    pom {
+        name.set(libraryName)
+        description.set(libraryDescription)
+        url.set(siteUrl)
+
+        licenses {
+            license {
+                name.set(licenseType)
+                url.set(licenseUrl)
             }
         }
+
+        developers {
+            developer {
+                id.set(developerId)
+                name.set(developerId)
+                email.set(developerEmail)
+            }
+        }
+
+        scm {
+            url.set(gitUrl)
+        }
     }
+}
+
+publishing {
     repositories {
-        if (isSonatypeRelease) {
-            maven {
-                // Temporarily switching to Sonatype OSSRH Staging API
-                // until the maven-publish plugin adds support for the new Central Portal
-                // see: https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
-                url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
-
-                credentials {
-                    username = System.getenv("SONATYPE_USER")
-                    password = System.getenv("SONATYPE_PASSWORD")
-                }
-            }
-        } else {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/hotwired/hotwire-native-android")
-
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
-                }
-            }
+        maven {
+            name = "githubPackages"
+            url = uri("https://maven.pkg.github.com/hotwired/hotwire-native-android")
+            // username and password (a personal Github access token) should be specified as
+            // `ORG_GRADLE_PROJECT_githubPackagesUsername` and `ORG_GRADLE_PROJECT_githubPackagesPassword`
+            // environment variables
+            credentials(PasswordCredentials::class)
         }
     }
 }
