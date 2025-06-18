@@ -4,7 +4,7 @@
     <string name="hotwire_file_chooser_select_multiple">Select file(s)</string>
     <string name="hotwire_dialog_ok">OK</string>
     <string name="hotwire_dialog_cancel">Cancel</string>
-    <string name="webview_error_title">WebView Outdated</string>
+    <string name="webview_error_title">Update Required</string>
     <string name="webview_error_system_description">The <![CDATA[<b>Android System WebView v%1$d</b>]]> app on your device, provided by Google, is outdated. To work properly, <![CDATA[<b>v%2$d is required</b>]]> and you can update in the Play Store.</string>
     <string name="webview_error_chrome_description">The <![CDATA[<b>Google Chrome v%1$d</b>]]> app on your device is outdated. To work properly, <![CDATA[<b>v%2$d is required</b>]]> and you can update in the Play Store.</string>
     <string name="webview_error_store_unavailable">Play Store app is not available</string>
