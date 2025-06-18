@@ -17,6 +17,7 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.files.delegates.GeolocationPermissionDelegate
 import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
@@ -31,6 +32,7 @@ import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
+import dev.hotwire.core.turbo.webview.WebViewInfo
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -665,12 +667,26 @@ class Session(
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun initializeWebView() {
+        val webViewInfo = Hotwire.webViewInfo(context)
+        val unsupportedVersion = WebViewInfo.UNSUPPORTED_WEBVIEW_VERSION
+
         logEvent(
             "WebView info",
-            "package" to (webView.packageName ?: ""),
-            "version" to (webView.versionName ?: ""),
-            "major version" to (webView.majorVersion ?: "")
+            "package" to (webViewInfo.packageInfo?.packageName ?: ""),
+            "type" to (webViewInfo.webViewTypeName),
+            "version" to (webViewInfo.majorVersion ?: "")
         )
+
+        if ((webViewInfo.majorVersion ?: 0) <= unsupportedVersion) {
+            logWarning(
+                "WebView outdated",
+                "The Chromium WebView installed on the device is outdated. Minimum version " +
+                    "${unsupportedVersion + 1} is required for modern browsers in Rails 8. " +
+                    "If you're using an emulator, ensure it has Play Services enabled and " +
+                    "install the latest WebView version from the Play Store: " +
+                    "${webViewInfo.playStoreWebViewAppUri}"
+            )
+        }
 
         webView.apply {
             addJavascriptInterface(this@Session, "TurboSession")
