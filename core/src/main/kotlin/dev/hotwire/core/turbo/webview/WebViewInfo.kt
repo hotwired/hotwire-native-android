@@ -21,7 +21,7 @@ class WebViewInfo internal constructor(context: Context) {
         /**
          * Rails 8 requires Chromium 120+ for "modern" browsers.
          */
-        const val UNSUPPORTED_WEBVIEW_VERSION = 119
+        const val REQUIRED_WEBVIEW_VERSION = 120
     }
 
     /**

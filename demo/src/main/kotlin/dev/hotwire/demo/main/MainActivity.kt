@@ -5,6 +5,8 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dev.hotwire.core.turbo.webview.WebViewInfo
+import dev.hotwire.core.turbo.webview.WebViewVersionCompatibility
 import dev.hotwire.demo.R
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.tabs.HotwireBottomNavigationController
@@ -23,6 +25,11 @@ class MainActivity : HotwireActivity() {
         findViewById<View>(R.id.root).applyDefaultImeWindowInsets()
 
         initializeBottomTabs()
+
+        WebViewVersionCompatibility.displayUpdateDialogIfOutdated(
+            activity = this,
+            requiredVersion = WebViewInfo.REQUIRED_WEBVIEW_VERSION
+        )
     }
 
     private fun initializeBottomTabs() {

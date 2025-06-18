@@ -668,7 +668,7 @@ class Session(
     @SuppressLint("SetJavaScriptEnabled")
     private fun initializeWebView() {
         val webViewInfo = Hotwire.webViewInfo(context)
-        val unsupportedVersion = WebViewInfo.UNSUPPORTED_WEBVIEW_VERSION
+        val requiredVersion = WebViewInfo.REQUIRED_WEBVIEW_VERSION
 
         logEvent(
             "WebView info",
@@ -677,11 +677,11 @@ class Session(
             "version" to (webViewInfo.majorVersion ?: "")
         )
 
-        if ((webViewInfo.majorVersion ?: 0) <= unsupportedVersion) {
+        if ((webViewInfo.majorVersion ?: 0) < requiredVersion) {
             logWarning(
                 "WebView outdated",
                 "The Chromium WebView installed on the device is outdated. Minimum version " +
-                    "${unsupportedVersion + 1} is required for modern browsers in Rails 8. " +
+                    "$requiredVersion is required for modern browsers in Rails 8. " +
                     "If you're using an emulator, ensure it has Play Services enabled and " +
                     "install the latest WebView version from the Play Store: " +
                     "${webViewInfo.playStoreWebViewAppUri}"
