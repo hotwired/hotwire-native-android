@@ -2,6 +2,7 @@ package dev.hotwire.core.turbo.webview
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.text.Html
 import android.widget.Toast
@@ -13,20 +14,32 @@ import dev.hotwire.core.turbo.webview.WebViewInfo.WebViewType
 class WebViewVersionCompatibility {
     companion object {
         /**
-         * Display an alert dialog if the WebView component installed on the device is
-         * less than the `requiredVersion`. The user can tap "Update" to update the
-         * corresponding "Google Chrome" or "Android System WebView" app in the Play Store.
+         * Determines whether the WebView component version installed on the device is less
+         * than the `requiredVersion`.
+         *
+         * @return True if the WebView is outdated, otherwise false.
          */
-        fun displayUpdateDialogIfOutdated(activity: Activity, requiredVersion: Int) {
-            val versionInfo = Hotwire.webViewInfo(activity)
+        fun isOutdated(context: Context, requiredVersion: Int): Boolean {
+            val versionInfo = Hotwire.webViewInfo(context)
             val majorVersion = versionInfo.majorVersion
             val type = versionInfo.webViewType
 
-            if (type == WebViewType.UNKNOWN || majorVersion == null) {
-                return
-            }
+            return type != WebViewType.UNKNOWN &&
+                    majorVersion != null &&
+                    majorVersion < requiredVersion
+        }
 
-            if (majorVersion < requiredVersion) {
+        /**
+         * Display an alert dialog if the WebView component version installed on the device is
+         * less than the `requiredVersion`. The user can tap "Update" to update the
+         * corresponding "Google Chrome" or "Android System WebView" app in the Play Store.
+         *
+         * @return True if the WebView is outdated and the dialog is displayed, otherwise false.
+         */
+        fun displayUpdateDialogIfOutdated(activity: Activity, requiredVersion: Int): Boolean {
+            val versionInfo = Hotwire.webViewInfo(activity)
+
+            return if (isOutdated(activity, requiredVersion)) {
                 val descriptionResId = when (versionInfo.webViewType) {
                     WebViewType.CHROME -> R.string.webview_error_chrome_description
                     else -> R.string.webview_error_system_description
@@ -51,6 +64,10 @@ class WebViewVersionCompatibility {
                     }
                     .create()
                     .show()
+
+                true
+            } else {
+                false
             }
         }
     }

@@ -5,7 +5,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.util.SparseArray
-import android.webkit.*
+import android.webkit.HttpAuthHandler
+import android.webkit.JavascriptInterface
+import android.webkit.RenderProcessGoneDetail
+import android.webkit.SslErrorHandler
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.WebResourceErrorCompat
@@ -24,7 +31,10 @@ import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.errors.WebSslError
 import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.http.HttpRepository
-import dev.hotwire.core.turbo.offline.*
+import dev.hotwire.core.turbo.offline.OfflineHttpRepository
+import dev.hotwire.core.turbo.offline.OfflinePreCacheRequest
+import dev.hotwire.core.turbo.offline.OfflineRequestHandler
+import dev.hotwire.core.turbo.offline.OfflineWebViewRequestInterceptor
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 import dev.hotwire.core.turbo.util.runOnUiThread
 import dev.hotwire.core.turbo.util.toJson
@@ -33,6 +43,7 @@ import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.webview.WebViewInfo
+import dev.hotwire.core.turbo.webview.WebViewVersionCompatibility
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -677,7 +688,7 @@ class Session(
             "version" to (webViewInfo.majorVersion ?: "")
         )
 
-        if ((webViewInfo.majorVersion ?: 0) < requiredVersion) {
+        if (WebViewVersionCompatibility.isOutdated(context, requiredVersion)) {
             logWarning(
                 "WebView outdated",
                 "The Chromium WebView installed on the device is outdated. Minimum version " +
