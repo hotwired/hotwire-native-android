@@ -5,7 +5,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.util.SparseArray
-import android.webkit.*
+import android.webkit.HttpAuthHandler
+import android.webkit.JavascriptInterface
+import android.webkit.RenderProcessGoneDetail
+import android.webkit.SslErrorHandler
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.WebResourceErrorCompat
@@ -17,13 +24,17 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.files.delegates.GeolocationPermissionDelegate
 import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.errors.WebSslError
 import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.http.HttpRepository
-import dev.hotwire.core.turbo.offline.*
+import dev.hotwire.core.turbo.offline.OfflineHttpRepository
+import dev.hotwire.core.turbo.offline.OfflinePreCacheRequest
+import dev.hotwire.core.turbo.offline.OfflineRequestHandler
+import dev.hotwire.core.turbo.offline.OfflineWebViewRequestInterceptor
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 import dev.hotwire.core.turbo.util.runOnUiThread
 import dev.hotwire.core.turbo.util.toJson
@@ -31,6 +42,8 @@ import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
+import dev.hotwire.core.turbo.webview.WebViewInfo
+import dev.hotwire.core.turbo.webview.WebViewVersionCompatibility
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -665,12 +678,26 @@ class Session(
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun initializeWebView() {
+        val webViewInfo = Hotwire.webViewInfo(context)
+        val requiredVersion = WebViewInfo.REQUIRED_WEBVIEW_VERSION
+
         logEvent(
             "WebView info",
-            "package" to (webView.packageName ?: ""),
-            "version" to (webView.versionName ?: ""),
-            "major version" to (webView.majorVersion ?: "")
+            "package" to (webViewInfo.packageInfo?.packageName ?: ""),
+            "type" to (webViewInfo.webViewTypeName),
+            "version" to (webViewInfo.majorVersion ?: "")
         )
+
+        if (WebViewVersionCompatibility.isOutdated(context, requiredVersion)) {
+            logWarning(
+                "WebView outdated",
+                "The Chromium WebView installed on the device is outdated. Minimum version " +
+                    "$requiredVersion is required for modern browsers in Rails 8. " +
+                    "If you're using an emulator, ensure it has Play Services enabled and " +
+                    "install the latest WebView version from the Play Store: " +
+                    "${webViewInfo.playStoreWebViewAppUri}"
+            )
+        }
 
         webView.apply {
             addJavascriptInterface(this@Session, "TurboSession")

@@ -7,11 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.bridge.BridgeDelegate
-import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
+import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.navigation.R
@@ -128,7 +129,9 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
 
     @SuppressLint("InflateParams")
     override fun createErrorView(error: VisitError): View {
-        return layoutInflater.inflate(R.layout.hotwire_error, null)
+        return layoutInflater.inflate(R.layout.hotwire_error, null).apply {
+            findViewById<TextView>(R.id.hotwire_error_description).text = error.description()
+        }
     }
 
     override fun createWebChromeClient(): HotwireWebChromeClient {

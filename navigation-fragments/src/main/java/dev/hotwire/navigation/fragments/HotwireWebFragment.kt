@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
@@ -146,7 +147,9 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
 
     @SuppressLint("InflateParams")
     override fun createErrorView(error: VisitError): View {
-        return layoutInflater.inflate(R.layout.hotwire_error, null)
+        return layoutInflater.inflate(R.layout.hotwire_error, null).apply {
+            findViewById<TextView>(R.id.hotwire_error_description).text = error.description()
+        }
     }
 
     override fun createWebChromeClient(): HotwireWebChromeClient {
