@@ -25,9 +25,26 @@ import dev.hotwire.navigation.navigator.presentationContext
 class HotwireBottomNavigationController(
     val activity: HotwireActivity,
     val view: BottomNavigationView,
+    val initialVisibility: Visibility = Visibility.DEFAULT,
     val clearNavigationOnTabReselection: Boolean = true,
     val animateVisibilityChanges: Boolean = true
 ) : NavController.OnDestinationChangedListener {
+
+    /**
+     * The visibility mode for the `BottomNavigationView`.
+     */
+    enum class Visibility {
+        /**
+         * Visible by default, but hidden in modal screens and when the
+         * virtual keyboard is present on screen.
+         */
+        DEFAULT,
+
+        /**
+         * Always hidden.
+         */
+        HIDDEN
+    }
 
     private var keyboardVisible = false
         set(value) {
@@ -42,6 +59,15 @@ class HotwireBottomNavigationController(
         }
 
     private var listener: ((Int, HotwireBottomTab) -> Unit)? = null
+
+    /**
+     * Set the visibility of the `BottomNavigationView`.
+     */
+    var visibility = initialVisibility
+        set(value) {
+            field = value
+            updateVisibility()
+        }
 
     /**
      * The currently selected tab in the [BottomNavigationView].
@@ -182,7 +208,7 @@ class HotwireBottomNavigationController(
     }
 
     private fun updateVisibility() {
-        val visible = !keyboardVisible && !destinationIsModal
+        val visible = !keyboardVisible && !destinationIsModal && visibility != Visibility.HIDDEN
 
         if (visible != view.isVisible) {
             if (animateVisibilityChanges) {
