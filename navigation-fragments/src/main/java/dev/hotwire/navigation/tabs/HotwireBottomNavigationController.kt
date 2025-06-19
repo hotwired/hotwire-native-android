@@ -214,7 +214,7 @@ class HotwireBottomNavigationController(
             if (animateVisibilityChanges) {
                 view.translationYAnimator(200, visible).start()
             } else {
-                view.isVisible = !keyboardVisible && !destinationIsModal
+                view.isVisible = visible
             }
         }
     }
