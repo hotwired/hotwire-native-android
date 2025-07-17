@@ -2,6 +2,7 @@ package dev.hotwire.navigation.navigator
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentOnAttachListener
@@ -51,6 +52,8 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     }
 
     internal fun initControllerGraph() {
+        ensureDeeplinkStartLocationValid()
+
         navController.apply {
             graph = NavigatorGraphBuilder(
                 navigatorName = configuration.name,
@@ -62,6 +65,24 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
             )
         }
     }
+
+    private fun ensureDeeplinkStartLocationValid() {
+        val deepLinkExtrasKey = "android-support-nav:controller:deepLinkExtras"
+        val locationKey = "location"
+
+        val extrasBundle = activity.intent.extras?.getBundle(deepLinkExtrasKey) ?: return
+        val startLocation = extrasBundle.getString(locationKey) ?: return
+
+        val deepLinkStartUri = startLocation.toUriOrNull()
+        val configStartUri = configuration.startLocation.toUriOrNull()
+
+        if (deepLinkStartUri?.host != configStartUri?.host) {
+            extrasBundle.putString(locationKey, configuration.startLocation)
+            activity.intent.putExtra(deepLinkExtrasKey, extrasBundle)
+        }
+    }
+
+    private fun String.toUriOrNull() = runCatching { toUri() }.getOrNull()
 
     private val configuration get() = activity.navigatorConfigurations().firstOrNull {
         id == it.navigatorHostId
