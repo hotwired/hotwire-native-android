@@ -2,6 +2,8 @@ package dev.hotwire.navigation.navigator
 
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.Companion.PROTECTED
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -11,6 +13,9 @@ import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
+
+internal const val DEEPLINK_EXTRAS_KEY = "android-support-nav:controller:deepLinkExtras"
+internal const val LOCATION_KEY = "location"
 
 open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     internal lateinit var activity: HotwireActivity
@@ -66,19 +71,17 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         }
     }
 
-    private fun ensureDeeplinkStartLocationValid() {
-        val deepLinkExtrasKey = "android-support-nav:controller:deepLinkExtras"
-        val locationKey = "location"
-
-        val extrasBundle = activity.intent.extras?.getBundle(deepLinkExtrasKey) ?: return
-        val startLocation = extrasBundle.getString(locationKey) ?: return
+    @VisibleForTesting(otherwise = PROTECTED)
+    fun ensureDeeplinkStartLocationValid() {
+        val extrasBundle = activity.intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
+        val startLocation = extrasBundle.getString(LOCATION_KEY) ?: return
 
         val deepLinkStartUri = startLocation.toUriOrNull()
         val configStartUri = configuration.startLocation.toUriOrNull()
 
         if (deepLinkStartUri?.host != configStartUri?.host) {
-            extrasBundle.putString(locationKey, configuration.startLocation)
-            activity.intent.putExtra(deepLinkExtrasKey, extrasBundle)
+            extrasBundle.putString(LOCATION_KEY, configuration.startLocation)
+            activity.intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
         }
     }
 
