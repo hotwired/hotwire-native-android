@@ -71,6 +71,12 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         }
     }
 
+    /**
+     * Google's Navigation library automatically navigates to deep links provided in the
+     * Activity's Intent. This exposes a vulnerability for malicious Intents to open an arbitrary
+     * webpage outside of the app's domain, allowing javascript injection on the page. Ensure
+     * that deep link intents always match the app's domain.
+     */
     @VisibleForTesting(otherwise = PROTECTED)
     fun ensureDeeplinkStartLocationValid() {
         val extrasBundle = activity.intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
