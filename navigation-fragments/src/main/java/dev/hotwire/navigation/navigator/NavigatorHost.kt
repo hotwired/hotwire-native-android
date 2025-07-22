@@ -76,16 +76,14 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         val extrasBundle = activity.intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
         val startLocation = extrasBundle.getString(LOCATION_KEY) ?: return
 
-        val deepLinkStartUri = startLocation.toUriOrNull()
-        val configStartUri = configuration.startLocation.toUriOrNull()
+        val deepLinkStartUri = startLocation.toUri()
+        val configStartUri = configuration.startLocation.toUri()
 
-        if (deepLinkStartUri?.host != configStartUri?.host) {
+        if (deepLinkStartUri.host != configStartUri.host) {
             extrasBundle.putString(LOCATION_KEY, configuration.startLocation)
             activity.intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
         }
     }
-
-    private fun String.toUriOrNull() = runCatching { toUri() }.getOrNull()
 
     private val configuration get() = activity.navigatorConfigurations().firstOrNull {
         id == it.navigatorHostId
