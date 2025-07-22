@@ -2,6 +2,9 @@ package dev.hotwire.navigation.navigator
 
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.Companion.PROTECTED
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentOnAttachListener
@@ -10,6 +13,9 @@ import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
+
+internal const val DEEPLINK_EXTRAS_KEY = "android-support-nav:controller:deepLinkExtras"
+internal const val LOCATION_KEY = "location"
 
 open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     internal lateinit var activity: HotwireActivity
@@ -51,6 +57,8 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     }
 
     internal fun initControllerGraph() {
+        ensureDeeplinkStartLocationValid()
+
         navController.apply {
             graph = NavigatorGraphBuilder(
                 navigatorName = configuration.name,
@@ -60,6 +68,26 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
             ).build(
                 registeredFragments = HotwireNavigation.registeredFragmentDestinations
             )
+        }
+    }
+
+    /**
+     * Google's Navigation library automatically navigates to deep links provided in the
+     * Activity's Intent. This exposes a vulnerability for malicious Intents to open an arbitrary
+     * webpage outside of the app's domain, allowing javascript injection on the page. Ensure
+     * that deep link intents always match the app's domain.
+     */
+    @VisibleForTesting(otherwise = PROTECTED)
+    fun ensureDeeplinkStartLocationValid() {
+        val extrasBundle = activity.intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
+        val startLocation = extrasBundle.getString(LOCATION_KEY) ?: return
+
+        val deepLinkStartUri = startLocation.toUri()
+        val configStartUri = configuration.startLocation.toUri()
+
+        if (deepLinkStartUri.host != configStartUri.host) {
+            extrasBundle.putString(LOCATION_KEY, configuration.startLocation)
+            activity.intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
         }
     }
 
