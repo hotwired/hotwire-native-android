@@ -43,7 +43,7 @@ class Navigator(
      */
     val currentDestination: HotwireDestination?
         get() = currentDialogDestination as? HotwireDestination
-            ?: if (host.isAdded) {
+            ?: if (isReady()) {
                 host.childFragmentManager.primaryNavigationFragment as? HotwireDestination
             } else {
                 null
