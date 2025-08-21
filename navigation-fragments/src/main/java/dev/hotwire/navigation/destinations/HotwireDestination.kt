@@ -1,23 +1,16 @@
 package dev.hotwire.navigation.destinations
 
 import android.content.Intent
-import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
-import androidx.navigation.navOptions
 import dev.hotwire.core.bridge.BridgeDestination
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
-import dev.hotwire.core.turbo.config.presentation
-import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.visit.VisitAction
-import dev.hotwire.navigation.R
-import dev.hotwire.navigation.activities.HotwireActivity
-import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.fragments.HotwireFragmentDelegate
 import dev.hotwire.navigation.fragments.HotwireFragmentViewModel
 import dev.hotwire.navigation.navigator.Navigator

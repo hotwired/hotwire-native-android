@@ -1,7 +1,7 @@
 package dev.hotwire.navigation.fragments
 
-import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.navigator.navigatorName
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.session.SessionViewModel

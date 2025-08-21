@@ -1,7 +1,6 @@
 package dev.hotwire.core.turbo.http
 
 import android.content.Context
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.HotwireHttpLogger
 import dev.hotwire.core.logging.logError
 import okhttp3.Cache
