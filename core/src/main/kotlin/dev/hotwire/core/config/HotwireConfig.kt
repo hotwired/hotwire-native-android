@@ -5,6 +5,8 @@ import android.webkit.WebView
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
+import dev.hotwire.core.logging.DefaultHotwireLogger
+import dev.hotwire.core.logging.HotwireLogger
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
@@ -42,6 +44,12 @@ class HotwireConfig internal constructor() {
             field = value
             HotwireHttpClient.reset()
         }
+
+    /**
+     * Set a custom logger to handle debug, warning, and error messages.
+     * The default logger is [DefaultHotwireLogger].
+     */
+    var logger: HotwireLogger = DefaultHotwireLogger
 
     /**
      * Enables/disables debugging of web contents loaded into WebViews.
