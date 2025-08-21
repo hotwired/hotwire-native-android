@@ -2,6 +2,7 @@ package dev.hotwire.core.turbo.http
 
 import android.content.Context
 import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.logging.HotwireHttpLogger
 import dev.hotwire.core.logging.logError
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit
 object HotwireHttpClient {
     private var cache: Cache? = null
     private var httpCacheSize = 100L * 1024L * 1024L // 100 MBs
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+    private val loggingInterceptor = HttpLoggingInterceptor(logger = HotwireHttpLogger()).apply {
         level = HttpLoggingInterceptor.Level.BASIC
     }
 

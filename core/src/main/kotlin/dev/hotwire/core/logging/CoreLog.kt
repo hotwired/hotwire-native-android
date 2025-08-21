@@ -1,9 +1,16 @@
 package dev.hotwire.core.logging
 
 import dev.hotwire.core.config.Hotwire
+import okhttp3.logging.HttpLoggingInterceptor
 
 private const val DEFAULT_TAG = "Hotwire-Core"
 private const val PAD_END_LENGTH = 35
+
+internal class HotwireHttpLogger : HttpLoggingInterceptor.Logger {
+    override fun log(message: String) {
+        Hotwire.config.logger.d(DEFAULT_TAG, message)
+    }
+}
 
 internal fun logEvent(event: String, details: String = "") {
     Hotwire.config.logger.d(DEFAULT_TAG, "$event ".padEnd(PAD_END_LENGTH, '.') + " [$details]")
