@@ -133,7 +133,7 @@ internal class HotwireWebFragmentDelegate(
 
     /**
      * Should be called by the implementing Fragment during
-     * [androidx.fragment.app.Fragment.onDestroy].
+     * [androidx.fragment.app.Fragment.onDestroyView].
      */
     fun onDestroyView() {
         // Manually cache a snapshot of the WebView when navigating from a
