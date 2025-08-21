@@ -1,10 +1,10 @@
 package dev.hotwire.core.logging
 
 import android.util.Log
-import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.BuildConfig
 
 internal object DefaultHotwireLogger : HotwireLogger {
-    private val debugEnabled get() = Hotwire.config.debugLoggingEnabled
+    private val debugEnabled get() = BuildConfig.DEBUG
 
     override fun d(tag: String, msg: String) =
         log(Log.DEBUG, tag, msg)

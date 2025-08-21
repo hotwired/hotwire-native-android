@@ -8,7 +8,6 @@ import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.logging.DefaultHotwireLogger
 import dev.hotwire.core.logging.HotwireLogger
 import dev.hotwire.core.turbo.config.PathConfiguration
-import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.webview.HotwireWebView
 
@@ -32,18 +31,6 @@ class HotwireConfig internal constructor() {
      * Experimental: API may be removed, not ready for production use.
      */
     var offlineRequestHandler: OfflineRequestHandler? = null
-
-    /**
-     * Enables/disables debug logging. This should be disabled in production environments.
-     * Disabled by default.
-     *
-     * Important: You should not enable debug logging in production release builds.
-     */
-    var debugLoggingEnabled = false
-        set(value) {
-            field = value
-            HotwireHttpClient.reset()
-        }
 
     /**
      * Set a custom logger to handle debug, warning, and error messages.
