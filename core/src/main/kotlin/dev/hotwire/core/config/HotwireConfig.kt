@@ -34,10 +34,11 @@ class HotwireConfig internal constructor() {
 
     /**
      * Set a custom logger to handle debug, warning, and error messages.
-     * The default logger is [DefaultHotwireLogger].
      *
-     * If you implement your own logger, you should handle debug logging according the the value
-     * of [debugLoggingEnabled].
+     * The default logger is [DefaultHotwireLogger] which prints debug logs based on the value
+     * of BuildConfig.DEBUG and always prints warnings and errors to Logcat.
+     *
+     * If you'd like to change this behavior, provide your own implementation of [HotwireLogger].
      */
     var logger: HotwireLogger = DefaultHotwireLogger
 
