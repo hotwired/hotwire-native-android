@@ -55,6 +55,7 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
 
     override fun onDestroyView() {
         super.onDestroyView()
+        webDelegate.onDestroyView()
         viewLifecycleOwner.lifecycle.removeObserver(bridgeDelegate)
     }
 

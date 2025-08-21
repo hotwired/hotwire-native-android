@@ -132,6 +132,19 @@ internal class HotwireWebFragmentDelegate(
     }
 
     /**
+     * Should be called by the implementing Fragment during
+     * [androidx.fragment.app.Fragment.onDestroy].
+     */
+    fun onDestroyView() {
+        // Manually cache a snapshot of the WebView when navigating from a
+        // web screen to a native screen. This allows a "restore" visit when
+        // revisiting this location again.
+        if (navigator.session.currentVisit?.location != navigator.location) {
+            navigator.session.cacheSnapshot()
+        }
+    }
+
+    /**
      * Should be called by the implementing Fragment during [HotwireDestination.refresh].
      */
     fun refresh(displayProgress: Boolean) {
@@ -334,15 +347,9 @@ internal class HotwireWebFragmentDelegate(
 
             // Visit every time the WebView is reattached to the current Fragment.
             if (isWebViewAttachedToNewDestination) {
-                val currentSessionVisitRestored = !isInitialVisit &&
-                    session.currentVisit?.destinationIdentifier == identifier &&
-                    session.restoreCurrentVisit(this)
-
-                if (!currentSessionVisitRestored) {
-                    showProgressView(location)
-                    visit(location, restoreWithCachedSnapshot = !isInitialVisit, reload = false)
-                    isInitialVisit = false
-                }
+                showProgressView(location)
+                visit(location, restoreWithCachedSnapshot = !isInitialVisit, reload = false)
+                isInitialVisit = false
             }
         }
     }

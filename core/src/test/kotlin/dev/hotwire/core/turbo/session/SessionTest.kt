@@ -266,44 +266,6 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `restore current visit`() {
-        val visitIdentifier = "12345"
-        val restorationIdentifier = "67890"
-
-        session.currentVisit = visit.copy(identifier = visitIdentifier)
-        session.turboIsReady(true)
-        session.pageLoaded(restorationIdentifier)
-
-        assertThat(session.restoreCurrentVisit(callback)).isTrue()
-        verify(callback, times(2)).visitCompleted(false)
-    }
-
-    @Test
-    fun `restore current visit fails with no restoration identifier`() {
-        val visitIdentifier = "12345"
-
-        session.currentVisit = visit.copy(identifier = visitIdentifier)
-        session.turboIsReady(true)
-
-        assertThat(session.restoreCurrentVisit(callback)).isFalse()
-        verify(callback, times(1)).visitCompleted(false)
-    }
-
-    @Test
-    fun `restore current visit fails with session not ready`() {
-        val visitIdentifier = "12345"
-        val restorationIdentifier = "67890"
-
-        session.currentVisit = visit.copy(identifier = visitIdentifier)
-        session.pageLoaded(restorationIdentifier)
-        session.turboIsReady(false)
-
-        assertThat(session.restoreCurrentVisit(callback)).isFalse()
-        verify(callback, never()).visitCompleted(false)
-        verify(callback).requestFailedWithError(false, LoadError.NotReady)
-    }
-
-    @Test
     fun `webView is not null`() {
         assertThat(session.webView).isNotNull
     }
