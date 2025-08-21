@@ -56,13 +56,10 @@ object HotwireHttpClient {
             .connectTimeout(10L, TimeUnit.SECONDS)
             .readTimeout(30L, TimeUnit.SECONDS)
             .writeTimeout(30L, TimeUnit.SECONDS)
+            .addInterceptor(loggingInterceptor)
 
         cache?.let {
             builder.cache(it)
-        }
-
-        if (Hotwire.config.debugLoggingEnabled) {
-            builder.addInterceptor(loggingInterceptor)
         }
 
         return builder.build()
