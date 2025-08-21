@@ -48,6 +48,9 @@ class HotwireConfig internal constructor() {
     /**
      * Set a custom logger to handle debug, warning, and error messages.
      * The default logger is [DefaultHotwireLogger].
+     *
+     * If you implement your own logger, you should handle debug logging according the the value
+     * of [debugLoggingEnabled].
      */
     var logger: HotwireLogger = DefaultHotwireLogger
 
