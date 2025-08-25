@@ -1,6 +1,5 @@
 package dev.hotwire.core.logging
 
-import android.R.attr.enabled
 import android.util.Log
 import dev.hotwire.core.BuildConfig
 

@@ -33,11 +33,9 @@ class HotwireConfig internal constructor() {
     var offlineRequestHandler: OfflineRequestHandler? = null
 
     /**
-     * Set a custom logger to handle debug, warning, and error messages.
+     * Set a custom logger to handle debug messages.
      *
-     * The default logger is [DefaultHotwireLogger] which prints debug logs based on the value
-     * of BuildConfig.DEBUG and always prints warnings and errors to Logcat.
-     *
+     * The default logger is [DefaultHotwireLogger] which prints logs to Logcat.
      * If you'd like to change this behavior, provide your own implementation of [HotwireLogger].
      */
     var logger: HotwireLogger = DefaultHotwireLogger
