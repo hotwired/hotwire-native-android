@@ -3,7 +3,6 @@ package dev.hotwire.navigation.routing
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
-import dev.hotwire.navigation.routing.Router.RouteDecisionHandler
 
 /**
  * Routes location urls within in-app navigation or with custom behaviors

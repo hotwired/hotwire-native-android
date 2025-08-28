@@ -12,7 +12,6 @@ import android.view.View
 import dev.hotwire.navigation.logging.logError
 import dev.hotwire.navigation.logging.logEvent
 import dev.hotwire.navigation.views.HotwireView
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 

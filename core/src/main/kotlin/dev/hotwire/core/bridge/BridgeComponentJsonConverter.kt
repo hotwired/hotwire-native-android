@@ -2,7 +2,6 @@ package dev.hotwire.core.bridge
 
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logError
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 abstract class BridgeComponentJsonConverter {
