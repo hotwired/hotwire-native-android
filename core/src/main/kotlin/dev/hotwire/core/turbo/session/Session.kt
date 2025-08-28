@@ -181,7 +181,25 @@ class Session(
         visitRendered(visit.identifier)
         visitCompleted(visit.identifier, restorationIdentifier)
 
+        webView.restoreCurrentVisit()
+
         return true
+    }
+
+    /**
+     * Cache a snapshot of the current visit.
+     */
+    fun cacheSnapshot() {
+        if (!isReady) return
+
+        currentVisit?.let {
+            logEvent("cacheSnapshot",
+                "location" to it.location,
+                "visitIdentifier" to it.identifier
+            )
+
+            webView.cacheSnapshot()
+        }
     }
 
     fun removeCallback(callback: SessionCallback) {
