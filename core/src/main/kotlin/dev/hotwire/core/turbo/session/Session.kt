@@ -159,6 +159,34 @@ class Session(
     }
 
     /**
+     * Synthetically restore the WebView's current visit without using a cached snapshot or a
+     * visit request. This is used when restoring a destination from the backstack,
+     * but the WebView's current location hasn't changed from the destination's location.
+     */
+    fun restoreCurrentVisit(callback: SessionCallback): Boolean {
+        val visit = currentVisit ?: return false
+        val restorationIdentifier = restorationIdentifiers[visit.destinationIdentifier]
+
+        if (!isReady || restorationIdentifier == null) {
+            return false
+        }
+
+        logEvent("restoreCurrentVisit",
+            "location" to visit.location,
+            "visitIdentifier" to visit.identifier,
+            "restorationIdentifier" to restorationIdentifier
+        )
+
+        visit.callback = callback
+        visitRendered(visit.identifier)
+        visitCompleted(visit.identifier, restorationIdentifier)
+
+        webView.restoreCurrentVisit()
+
+        return true
+    }
+
+    /**
      * Cache a snapshot of the current visit.
      */
     fun cacheSnapshot() {

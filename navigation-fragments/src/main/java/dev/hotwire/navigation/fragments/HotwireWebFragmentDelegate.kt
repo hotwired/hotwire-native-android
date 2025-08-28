@@ -347,9 +347,15 @@ internal class HotwireWebFragmentDelegate(
 
             // Visit every time the WebView is reattached to the current Fragment.
             if (isWebViewAttachedToNewDestination) {
-                showProgressView(location)
-                visit(location, restoreWithCachedSnapshot = !isInitialVisit, reload = false)
-                isInitialVisit = false
+                val currentSessionVisitRestored = !isInitialVisit &&
+                    session.currentVisit?.destinationIdentifier == identifier &&
+                    session.restoreCurrentVisit(this)
+
+                if (!currentSessionVisitRestored) {
+                    showProgressView(location)
+                    visit(location, restoreWithCachedSnapshot = !isInitialVisit, reload = false)
+                    isInitialVisit = false
+                }
             }
         }
     }
