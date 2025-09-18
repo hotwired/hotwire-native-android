@@ -629,19 +629,14 @@ class Session(
             else -> ""
         }
 
-        val options = when (restorationIdentifier) {
-            "" -> visit.options.copy(action = VisitAction.ADVANCE)
-            else -> visit.options
-        }
-
         logEvent(
             "visitLocation",
             "location" to visit.location,
-            "options" to options,
+            "options" to visit.options,
             "restorationIdentifier" to restorationIdentifier
         )
 
-        webView.visitLocation(visit.location, options, restorationIdentifier)
+        webView.visitLocation(visit.location, visit.options, restorationIdentifier)
     }
 
     private fun visitLocationAsColdBoot(visit: Visit) {
