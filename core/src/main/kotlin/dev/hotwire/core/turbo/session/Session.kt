@@ -181,7 +181,25 @@ class Session(
         visitRendered(visit.identifier)
         visitCompleted(visit.identifier, restorationIdentifier)
 
+        webView.restoreCurrentVisit()
+
         return true
+    }
+
+    /**
+     * Cache a snapshot of the current visit.
+     */
+    fun cacheSnapshot() {
+        if (!isReady) return
+
+        currentVisit?.let {
+            logEvent("cacheSnapshot",
+                "location" to it.location,
+                "visitIdentifier" to it.identifier
+            )
+
+            webView.cacheSnapshot()
+        }
     }
 
     fun removeCallback(callback: SessionCallback) {
@@ -605,25 +623,27 @@ class Session(
     // Private
 
     private fun visitLocation(visit: Visit) {
-        val restorationIdentifier = when (visit.options.action) {
-            VisitAction.RESTORE -> restorationIdentifiers[visit.destinationIdentifier] ?: ""
-            VisitAction.ADVANCE -> ""
-            else -> ""
+        val restorationIdentifier = if (visit.options.action == VisitAction.RESTORE) {
+            restorationIdentifiers[visit.destinationIdentifier]
+        } else {
+            null
         }
 
-        val options = when (restorationIdentifier) {
-            "" -> visit.options.copy(action = VisitAction.ADVANCE)
-            else -> visit.options
+        // Only initiate a restore visit if a restorationIdentifier is available
+        val options = if (visit.options.action == VisitAction.RESTORE && restorationIdentifier == null) {
+            visit.options.copy(action = VisitAction.ADVANCE)
+        } else {
+            visit.options
         }
 
         logEvent(
             "visitLocation",
             "location" to visit.location,
             "options" to options,
-            "restorationIdentifier" to restorationIdentifier
+            "restorationIdentifier" to (restorationIdentifier ?: "")
         )
 
-        webView.visitLocation(visit.location, options, restorationIdentifier)
+        webView.visitLocation(visit.location, options, restorationIdentifier ?: "")
     }
 
     private fun visitLocationAsColdBoot(visit: Visit) {

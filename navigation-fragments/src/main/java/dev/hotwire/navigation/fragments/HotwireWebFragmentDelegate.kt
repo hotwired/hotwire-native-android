@@ -132,6 +132,19 @@ internal class HotwireWebFragmentDelegate(
     }
 
     /**
+     * Should be called by the implementing Fragment during
+     * [androidx.fragment.app.Fragment.onDestroyView].
+     */
+    fun onDestroyView() {
+        // Manually cache a snapshot of the WebView when navigating from a
+        // web screen to a native screen. This allows a "restore" visit when
+        // revisiting this location again.
+        if (navigator.session.currentVisit?.location != navigator.location) {
+            navigator.session.cacheSnapshot()
+        }
+    }
+
+    /**
      * Should be called by the implementing Fragment during [HotwireDestination.refresh].
      */
     fun refresh(displayProgress: Boolean) {

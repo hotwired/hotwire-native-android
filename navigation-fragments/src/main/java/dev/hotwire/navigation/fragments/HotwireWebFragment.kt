@@ -55,6 +55,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        webDelegate.onDestroyView()
         viewLifecycleOwner.lifecycle.removeObserver(bridgeDelegate)
     }
 

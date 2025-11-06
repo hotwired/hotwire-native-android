@@ -12,6 +12,7 @@ import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -276,6 +277,7 @@ class SessionTest : BaseRepositoryTest() {
 
         assertThat(session.restoreCurrentVisit(callback)).isTrue()
         verify(callback, times(2)).visitCompleted(false)
+        verify(webView, times(1)).restoreCurrentVisit()
     }
 
     @Test
@@ -287,6 +289,84 @@ class SessionTest : BaseRepositoryTest() {
 
         assertThat(session.restoreCurrentVisit(callback)).isFalse()
         verify(callback, times(1)).visitCompleted(false)
+    }
+
+    @Test
+    fun `restore visit with restoration identifier uses restore visit`() {
+        val visitIdentifier = "12345"
+        val restorationIdentifier = "67890"
+        val restoreVisit = visit.copy(
+            options = VisitOptions(action = VisitAction.RESTORE)
+        )
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.turboIsReady(true)
+        session.pageLoaded(restorationIdentifier)
+        session.visit(restoreVisit)
+
+        verify(webView, times(1)).visitLocation(
+            location = restoreVisit.location,
+            options = restoreVisit.options,
+            restorationIdentifier = "67890"
+        )
+    }
+
+    @Test
+    fun `restore visit with no restoration identifier uses advance visit`() {
+        val visitIdentifier = "12345"
+        val restoreVisit = visit.copy(
+            options = VisitOptions(action = VisitAction.RESTORE)
+        )
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.turboIsReady(true)
+        session.visit(restoreVisit)
+
+        verify(webView, times(1)).visitLocation(
+            location = restoreVisit.location,
+            options = restoreVisit.options.copy(action = VisitAction.ADVANCE),
+            restorationIdentifier = ""
+        )
+    }
+
+    @Test
+    fun `advance visit does not use restoration identifier`() {
+        val visitIdentifier = "12345"
+        val restorationIdentifier = "67890"
+        val advanceVisit = visit.copy(
+            options = VisitOptions(action = VisitAction.ADVANCE)
+        )
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.turboIsReady(true)
+        session.pageLoaded(restorationIdentifier)
+        session.visit(advanceVisit)
+
+        verify(webView, times(1)).visitLocation(
+            location = advanceVisit.location,
+            options = advanceVisit.options,
+            restorationIdentifier = ""
+        )
+    }
+
+    @Test
+    fun `replace visit does not use restoration identifier`() {
+        val visitIdentifier = "12345"
+        val restorationIdentifier = "67890"
+        val replaceVisit = visit.copy(
+            options = VisitOptions(action = VisitAction.REPLACE)
+        )
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.turboIsReady(true)
+        session.pageLoaded(restorationIdentifier)
+        session.visit(replaceVisit)
+
+        verify(webView, times(1)).visitLocation(
+            location = replaceVisit.location,
+            options = replaceVisit.options,
+            restorationIdentifier = ""
+        )
     }
 
     @Test
