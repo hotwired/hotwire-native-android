@@ -12,6 +12,12 @@ internal class HotwireHttpLogger : HttpLoggingInterceptor.Logger {
     }
 }
 
+internal fun logVerbose(event: String, details: String = "") {
+    Hotwire.config.logger.v(DEFAULT_TAG) {
+        "${"$event ".padEnd(PAD_END_LENGTH, '.')} [$details]"
+    }
+}
+
 internal fun logEvent(event: String, details: String = "") {
     Hotwire.config.logger.d(DEFAULT_TAG) {
         "${"$event ".padEnd(PAD_END_LENGTH, '.')} [$details]"

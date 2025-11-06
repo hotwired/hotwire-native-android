@@ -4,6 +4,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
 import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logVerbose
 import kotlinx.serialization.json.JsonElement
 import java.lang.ref.WeakReference
 
@@ -99,7 +100,7 @@ class Bridge internal constructor(webView: WebView) {
     }
 
     internal fun evaluate(javascript: String) {
-        logEvent("evaluatingJavascript", javascript)
+        logVerbose("evaluatingJavascript", javascript)
         webView?.evaluateJavascript(javascript) {}
     }
 
