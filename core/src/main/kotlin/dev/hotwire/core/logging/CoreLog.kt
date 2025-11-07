@@ -18,13 +18,13 @@ internal fun logVerbose(event: String, details: String = "") {
     }
 }
 
-internal fun logEvent(event: String, details: String = "") {
+internal fun logDebug(event: String, details: String = "") {
     Hotwire.config.logger.d(DEFAULT_TAG) {
         "${"$event ".padEnd(PAD_END_LENGTH, '.')} [$details]"
     }
 }
 
-internal fun logEvent(event: String, attributes: List<Pair<String, Any>>) {
+internal fun logDebug(event: String, attributes: List<Pair<String, Any>>) {
     Hotwire.config.logger.d(DEFAULT_TAG) {
         val description = attributes.joinToString(prefix = "[", postfix = "]", separator = ", ") {
             "${it.first}: ${it.second}"

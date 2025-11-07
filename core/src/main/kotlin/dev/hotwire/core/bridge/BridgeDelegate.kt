@@ -3,7 +3,7 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logWarning
 
 @Suppress("unused")
@@ -63,7 +63,7 @@ class BridgeDelegate<D : BridgeDestination>(
 
     internal fun bridgeDidReceiveMessage(message: Message): Boolean {
         return if (destinationIsActive && resolvedLocation == message.metadata?.url) {
-            logEvent("bridgeDidReceiveMessage", message.toString())
+            logDebug("bridgeDidReceiveMessage", message.toString())
             getOrCreateComponent(message.component)?.didReceive(message)
             true
         } else {
@@ -79,7 +79,7 @@ class BridgeDelegate<D : BridgeDestination>(
     // Lifecycle events
 
     override fun onStart(owner: LifecycleOwner) {
-        logEvent("bridgeDestinationDidStart", resolvedLocation)
+        logDebug("bridgeDestinationDidStart", resolvedLocation)
         destinationIsActive = true
         activeComponents.forEach { it.didStart() }
     }
@@ -87,12 +87,12 @@ class BridgeDelegate<D : BridgeDestination>(
     override fun onStop(owner: LifecycleOwner) {
         activeComponents.forEach { it.didStop() }
         destinationIsActive = false
-        logEvent("bridgeDestinationDidStop", resolvedLocation)
+        logDebug("bridgeDestinationDidStop", resolvedLocation)
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
         destinationIsActive = false
-        logEvent("bridgeDestinationDidDestroy", resolvedLocation)
+        logDebug("bridgeDestinationDidDestroy", resolvedLocation)
     }
 
     // Retrieve component(s) by type

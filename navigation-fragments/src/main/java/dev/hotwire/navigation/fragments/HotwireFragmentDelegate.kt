@@ -1,7 +1,7 @@
 package dev.hotwire.navigation.fragments
 
 import dev.hotwire.navigation.destinations.HotwireDestination
-import dev.hotwire.navigation.logging.logEvent
+import dev.hotwire.navigation.logging.logDebug
 import dev.hotwire.navigation.navigator.navigatorName
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.session.SessionViewModel
@@ -119,6 +119,6 @@ class HotwireFragmentDelegate(private val navDestination: HotwireDestination) {
             add(0, "navigator" to navigator.configuration.name)
             add("fragment" to fragment.javaClass.simpleName)
         }
-        logEvent(event, attributes)
+        logDebug(event, attributes)
     }
 }

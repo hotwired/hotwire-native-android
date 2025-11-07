@@ -18,7 +18,7 @@ import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.destinations.HotwireDestinationAnimations
 import dev.hotwire.navigation.destinations.HotwireDialogDestination
-import dev.hotwire.navigation.logging.logEvent
+import dev.hotwire.navigation.logging.logDebug
 import dev.hotwire.navigation.routing.Router
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.session.SessionViewModel
@@ -471,6 +471,6 @@ class Navigator(
             add(0, "navigator" to configuration.name)
             add("currentFragment" to (destinationName ?: "NONE"))
         }
-        logEvent(event, attributes)
+        logDebug(event, attributes)
     }
 }

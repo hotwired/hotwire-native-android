@@ -3,7 +3,7 @@ package dev.hotwire.core.bridge
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logVerbose
 import kotlinx.serialization.json.JsonElement
 import java.lang.ref.WeakReference
@@ -31,37 +31,37 @@ class Bridge internal constructor(webView: WebView) {
     }
 
     internal fun register(component: String) {
-        logEvent("bridgeWillRegisterComponent", component)
+        logDebug("bridgeWillRegisterComponent", component)
         val javascript = generateJavaScript("register", component.toJsonElement())
         evaluate(javascript)
     }
 
     internal fun register(components: List<String>) {
-        logEvent("bridgeWillRegisterComponents", components.joinToString())
+        logDebug("bridgeWillRegisterComponents", components.joinToString())
         val javascript = generateJavaScript("register", components.toJsonElement())
         evaluate(javascript)
     }
 
     internal fun unregister(component: String) {
-        logEvent("bridgeWillUnregisterComponent", component)
+        logDebug("bridgeWillUnregisterComponent", component)
         val javascript = generateJavaScript("unregister", component.toJsonElement())
         evaluate(javascript)
     }
 
     internal fun replyWith(message: Message) {
-        logEvent("bridgeWillReplyWithMessage", message.toString())
+        logDebug("bridgeWillReplyWithMessage", message.toString())
         val internalMessage = InternalMessage.fromMessage(message)
         val javascript = generateJavaScript("replyWith", internalMessage.toJson().toJsonElement())
         evaluate(javascript)
     }
 
     internal fun load() {
-        logEvent("bridgeWillLoad")
+        logDebug("bridgeWillLoad")
         evaluate(userScript())
     }
 
     internal fun reset() {
-        logEvent("bridgeDidReset")
+        logDebug("bridgeDidReset")
         componentsAreRegistered = false
     }
 
@@ -71,7 +71,7 @@ class Bridge internal constructor(webView: WebView) {
 
     @JavascriptInterface
     fun bridgeDidInitialize() {
-        logEvent("bridgeDidInitialize", "success")
+        logDebug("bridgeDidInitialize", "success")
         runOnUiThread {
             delegate?.bridgeDidInitialize()
         }
@@ -79,7 +79,7 @@ class Bridge internal constructor(webView: WebView) {
 
     @JavascriptInterface
     fun bridgeDidUpdateSupportedComponents() {
-        logEvent("bridgeDidUpdateSupportedComponents", "success")
+        logDebug("bridgeDidUpdateSupportedComponents", "success")
         componentsAreRegistered = true
     }
 

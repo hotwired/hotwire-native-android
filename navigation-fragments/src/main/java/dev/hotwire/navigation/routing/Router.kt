@@ -1,7 +1,7 @@
 package dev.hotwire.navigation.routing
 
 import dev.hotwire.navigation.activities.HotwireActivity
-import dev.hotwire.navigation.logging.logEvent
+import dev.hotwire.navigation.logging.logDebug
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 
 /**
@@ -61,7 +61,7 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
     ): Decision {
         decisionHandlers.forEach { handler ->
             if (handler.matches(location, configuration)) {
-                logEvent("handlerMatch", listOf(
+                logDebug("handlerMatch", listOf(
                     "handler" to handler.name,
                     "location" to location
                 ))
@@ -70,7 +70,7 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
             }
         }
 
-        logEvent("noHandlerForLocation", location)
+        logDebug("noHandlerForLocation", location)
         return Decision.CANCEL
     }
 }
