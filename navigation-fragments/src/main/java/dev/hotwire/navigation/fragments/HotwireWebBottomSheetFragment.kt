@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
+import dev.hotwire.core.bridge.BridgeComponent
+import dev.hotwire.core.bridge.BridgeComponentFragmentLifecycle
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
@@ -50,12 +52,18 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         webDelegate.onViewCreated()
+        bridgeDelegate.forEachInitializedComponent<BridgeComponentFragmentLifecycle> {
+            it.onViewCreated()
+        }
         viewLifecycleOwner.lifecycle.addObserver(bridgeDelegate)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         webDelegate.onDestroyView()
+        bridgeDelegate.forEachInitializedComponent<BridgeComponentFragmentLifecycle> {
+            it.onDestroyView()
+        }
         viewLifecycleOwner.lifecycle.removeObserver(bridgeDelegate)
     }
 
@@ -70,6 +78,14 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
         return when (requestCode) {
             HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION -> webDelegate.geoLocationPermissionResultLauncher
             else -> null
+        }
+    }
+
+    override fun onBridgeComponentInitialized(component: BridgeComponent<*>) {
+        super.onBridgeComponentInitialized(component)
+
+        if (component is BridgeComponentFragmentLifecycle) {
+            component.onViewCreated()
         }
     }
 
