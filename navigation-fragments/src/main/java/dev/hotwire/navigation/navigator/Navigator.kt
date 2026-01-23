@@ -62,20 +62,38 @@ class Navigator(
         get() = navController.previousBackStackEntry?.location
 
     /**
-     * The [Session] instance that is shared with all destinations that are
-     * hosted inside this [NavigatorHost].
+     * The [Session] instance that is shared with all default context destinations
+     * that are hosted inside this [NavigatorHost].
      */
-    var session = createNewSession()
+    var session = createSession(forModalContext = false)
         private set
 
-    internal fun createNewSession() = Session(
-        sessionName = configuration.name,
-        activity = activity,
-        webView = Hotwire.config.makeCustomWebView(activity)
-    ).also {
-        // Initialize bridge with new WebView instance
-        if (HotwireNavigation.registeredBridgeComponentFactories.isNotEmpty()) {
-            Bridge.initialize(it.webView)
+    /**
+     * The [Session] instance that is shared with all modal context destinations
+     * that are hosted inside this [NavigatorHost]. Using a separate session for
+     * modals allows the default context WebView to retain its content while the
+     * modal is displayed, eliminating the need for restoration when the modal
+     * is dismissed.
+     */
+    var modalSession = createSession(forModalContext = true)
+        private set
+
+    internal fun createNewSession() {
+        session = createSession(forModalContext = false)
+        modalSession = createSession(forModalContext = true)
+    }
+
+    private fun createSession(forModalContext: Boolean): Session {
+        val sessionSuffix = if (forModalContext) "-modal" else ""
+        return Session(
+            sessionName = "${configuration.name}$sessionSuffix",
+            activity = activity,
+            webView = Hotwire.config.makeCustomWebView(activity)
+        ).also {
+            // Initialize bridge with new WebView instance
+            if (HotwireNavigation.registeredBridgeComponentFactories.isNotEmpty()) {
+                Bridge.initialize(it.webView)
+            }
         }
     }
 
@@ -285,12 +303,19 @@ class Navigator(
             "location" to rule.newLocation
         )
 
+        // With separate WebViews for modal and default contexts, we don't need
+        // to detach the default WebView or take a screenshot when navigating
+        // to a modal. The modal uses its own WebView, so the default WebView
+        // can remain attached with its content intact. This eliminates the
+        // flicker that would otherwise occur when returning from the modal.
+        currentDestination?.onBeforeNavigation()
+
         when (rule.newPresentation) {
-            Presentation.REPLACE -> navigateWhenReady {
+            Presentation.REPLACE -> {
                 popBackStack(rule)
                 navigateToLocation(rule)
             }
-            else -> navigateWhenReady {
+            else -> {
                 navigateToLocation(rule)
             }
         }

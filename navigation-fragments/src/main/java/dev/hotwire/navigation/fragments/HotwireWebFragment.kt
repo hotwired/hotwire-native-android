@@ -23,8 +23,8 @@ import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.views.HotwireView
 
 /**
- * The base class from which all web "standard" fragments (non-dialogs) in a
- * Hotwire app should extend from.
+ * The base class from which all web "standard" fragments (non-dialogs) in a Hotwire app should
+ * extend from.
  *
  * For native fragments, refer to [HotwireFragment].
  */
@@ -34,9 +34,9 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
 
     private val bridgeDelegate by lazy {
         BridgeDelegate(
-            location = location,
-            destination = this,
-            componentFactories = HotwireNavigation.registeredBridgeComponentFactories
+                location = location,
+                destination = this,
+                componentFactories = HotwireNavigation.registeredBridgeComponentFactories
         )
     }
 
@@ -45,7 +45,11 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
         webDelegate = HotwireWebFragmentDelegate(delegate, this, this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.hotwire_fragment_web, container, false)
     }
 
@@ -76,8 +80,8 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     }
 
     /**
-     * Called when the Fragment has been started again after receiving a
-     * modal result. Will navigate if the result indicates it should.
+     * Called when the Fragment has been started again after receiving a modal result. Will navigate
+     * if the result indicates it should.
      */
     override fun onStartAfterModalResult(result: SessionModalResult) {
         super.onStartAfterModalResult(result)
@@ -85,8 +89,8 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     }
 
     /**
-     * Called when the Fragment has been started again after a dialog has
-     * been dismissed/canceled and no result is passed back.
+     * Called when the Fragment has been started again after a dialog has been dismissed/canceled
+     * and no result is passed back.
      */
     override fun onStartAfterDialogCancel() {
         super.onStartAfterDialogCancel()
@@ -96,10 +100,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
         }
     }
 
-    /**
-     * Refreshes the contents, performing a cold boot reload of the
-     * WebView location.
-     */
+    /** Refreshes the contents, performing a cold boot reload of the WebView location. */
     override fun refresh(displayProgress: Boolean) {
         webDelegate.refresh(displayProgress)
     }
@@ -111,9 +112,12 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
         }
     }
 
-    override fun activityPermissionResultLauncher(requestCode: Int): ActivityResultLauncher<String>? {
+    override fun activityPermissionResultLauncher(
+            requestCode: Int
+    ): ActivityResultLauncher<String>? {
         return when (requestCode) {
-            HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION -> webDelegate.geoLocationPermissionResultLauncher
+            HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION ->
+                    webDelegate.geoLocationPermissionResultLauncher
             else -> null
         }
     }
@@ -150,10 +154,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     // HotwireWebFragmentCallback interface
     // ----------------------------------------------------------------------------
 
-    /**
-     * Gets the HotwireView instance in the Fragment's view
-     * with resource ID R.id.hotwire_view.
-     */
+    /** Gets the HotwireView instance in the Fragment's view with resource ID R.id.hotwire_view. */
     final override val hotwireView: HotwireView?
         get() = view?.findViewById(R.id.hotwire_view)
 
@@ -170,7 +171,8 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     }
 
     override fun createWebChromeClient(): HotwireWebChromeClient {
-        return HotwireWebChromeClient(navigator.session)
+        val session = if (isModal) navigator.modalSession else navigator.session
+        return HotwireWebChromeClient(session)
     }
 
     override fun onVisitErrorReceived(location: String, error: VisitError) {

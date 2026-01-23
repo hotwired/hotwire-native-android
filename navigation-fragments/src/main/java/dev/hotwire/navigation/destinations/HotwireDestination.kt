@@ -173,6 +173,7 @@ interface HotwireDestination : BridgeDestination {
     fun prepareNavigation(onReady: () -> Unit)
 
     override fun bridgeWebViewIsReady(): Boolean {
-        return navigator.session.isReady
+        val session = if (isModal) navigator.modalSession else navigator.session
+        return session.isReady
     }
 }

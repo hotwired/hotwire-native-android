@@ -152,7 +152,8 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
     }
 
     override fun createWebChromeClient(): HotwireWebChromeClient {
-        return HotwireWebChromeClient(navigator.session)
+        val session = if (isModal) navigator.modalSession else navigator.session
+        return HotwireWebChromeClient(session)
     }
 
     override fun onVisitErrorReceived(location: String, error: VisitError) {

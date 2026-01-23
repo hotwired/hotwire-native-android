@@ -108,7 +108,10 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      * Resets the sessions associated with all registered navigator hosts.
      */
     fun resetSessions() {
-        navigatorHosts.forEach { it.value.navigator.session.reset() }
+        navigatorHosts.forEach {
+            it.value.navigator.session.reset()
+            it.value.navigator.modalSession.reset()
+        }
     }
 
     /**
