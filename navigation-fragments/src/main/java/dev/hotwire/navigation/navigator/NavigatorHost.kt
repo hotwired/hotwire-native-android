@@ -79,7 +79,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
      */
     @VisibleForTesting(otherwise = PROTECTED)
     fun ensureDeeplinkStartLocationValid() {
-        val extrasBundle = activity.intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
+        val extrasBundle = activity.intent?.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
         val startLocation = extrasBundle.getString(LOCATION_KEY) ?: return
 
         val deepLinkStartUri = startLocation.toUri()
