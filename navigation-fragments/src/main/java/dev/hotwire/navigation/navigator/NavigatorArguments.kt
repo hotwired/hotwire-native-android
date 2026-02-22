@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.navigation.logging.logError
-import kotlin.text.uppercase
 
 internal const val ARG_LOCATION = "location"
 internal const val ARG_NAVIGATOR_NAME = "navigator-name"

@@ -9,7 +9,10 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.core.view.*
+import androidx.core.view.ScrollingView
+import androidx.core.view.contains
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import dev.hotwire.navigation.R
 

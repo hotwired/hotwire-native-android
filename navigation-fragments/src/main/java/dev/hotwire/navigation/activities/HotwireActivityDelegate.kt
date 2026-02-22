@@ -2,7 +2,7 @@ package dev.hotwire.navigation.activities
 
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
-import dev.hotwire.navigation.logging.logEvent
+import dev.hotwire.navigation.logging.logDebug
 import dev.hotwire.navigation.navigator.Navigator
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.navigator.NavigatorHost
@@ -61,7 +61,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      *  you must update this whenever the current navigator changes.
      */
     fun setCurrentNavigator(configuration: NavigatorConfiguration) {
-        logEvent("navigatorSetAsCurrent", listOf("navigator" to configuration.name))
+        logDebug("navigatorSetAsCurrent", listOf("navigator" to configuration.name))
         currentNavigatorHostId = configuration.navigatorHostId
 
         val navigatorHost = navigatorHosts[currentNavigatorHostId]
@@ -71,7 +71,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     internal fun registerNavigatorHost(host: NavigatorHost) {
-        logEvent("navigatorRegistered", listOf("navigator" to host.navigator.configuration.name))
+        logDebug("navigatorRegistered", listOf("navigator" to host.navigator.configuration.name))
 
         if (navigatorHosts[host.id] == null) {
             navigatorHosts[host.id] = host
@@ -84,12 +84,12 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     }
 
     internal fun unregisterNavigatorHost(host: NavigatorHost) {
-        logEvent("navigatorUnregistered", listOf("navigator" to host.navigator.configuration.name))
+        logDebug("navigatorUnregistered", listOf("navigator" to host.navigator.configuration.name))
         navigatorHosts.remove(host.id)
     }
 
     internal fun onNavigatorHostReady(host: NavigatorHost) {
-        logEvent("navigatorReady", listOf("navigator" to host.navigator.configuration.name))
+        logDebug("navigatorReady", listOf("navigator" to host.navigator.configuration.name))
         activity.onNavigatorReady(host.navigator)
     }
 

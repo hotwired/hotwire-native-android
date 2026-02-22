@@ -10,9 +10,8 @@ import android.os.Looper
 import android.view.PixelCopy
 import android.view.View
 import dev.hotwire.navigation.logging.logError
-import dev.hotwire.navigation.logging.logEvent
+import dev.hotwire.navigation.logging.logDebug
 import dev.hotwire.navigation.views.HotwireView
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -66,7 +65,7 @@ internal class HotwireViewScreenshotHolder {
                     window, rect, bitmap,
                     { result ->
                         if (result == PixelCopy.SUCCESS) {
-                            logEvent(
+                            logDebug(
                                 "viewScreenshotCreated", listOf(
                                     "size" to "${bitmap.width}x${bitmap.height}",
                                     "duration" to "${System.currentTimeMillis() - start}ms",

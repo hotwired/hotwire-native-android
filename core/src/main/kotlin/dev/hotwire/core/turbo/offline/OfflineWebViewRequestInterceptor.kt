@@ -3,7 +3,7 @@ package dev.hotwire.core.turbo.offline
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 
@@ -56,6 +56,6 @@ internal class OfflineWebViewRequestInterceptor(val session: Session) {
         val attributes = params.toMutableList().apply {
             add(0, "session" to session.sessionName)
         }
-        logEvent("interceptRequest", attributes)
+        logDebug("interceptRequest", attributes)
     }
 }
