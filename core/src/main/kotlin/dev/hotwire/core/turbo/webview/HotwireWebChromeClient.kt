@@ -77,7 +77,7 @@ open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
         isUserGesture: Boolean,
         resultMsg: Message?
     ): Boolean {
-        val message = webView.handler.obtainMessage()
+        val message = webView.handler?.obtainMessage() ?: return false
         webView.requestFocusNodeHref(message)
 
         message.data.getString("url")?.let {
