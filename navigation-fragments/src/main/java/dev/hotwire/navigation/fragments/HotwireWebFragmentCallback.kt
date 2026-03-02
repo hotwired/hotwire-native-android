@@ -3,9 +3,9 @@ package dev.hotwire.navigation.fragments
 import android.view.View
 import android.webkit.HttpAuthHandler
 import dev.hotwire.core.turbo.errors.VisitError
-import dev.hotwire.navigation.views.HotwireView
 import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
 import dev.hotwire.core.turbo.webview.HotwireWebView
+import dev.hotwire.navigation.views.HotwireView
 
 /**
  * Callback interface to be implemented by a [HotwireWebFragment],

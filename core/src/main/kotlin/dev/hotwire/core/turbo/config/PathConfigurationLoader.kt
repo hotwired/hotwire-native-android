@@ -3,7 +3,7 @@ package dev.hotwire.core.turbo.config
 import android.content.Context
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.logging.logError
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +42,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         launch {
             repository.getRemoteConfiguration(url, options)?.let { json ->
                 load(json)?.let {
-                    logEvent("remotePathConfigurationLoaded", url)
+                    logDebug("remotePathConfigurationLoaded", url)
                     onCompletion(it)
                     cacheConfigurationForUrl(url, it)
                 }
@@ -56,7 +56,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
     ) {
         val json = repository.getBundledConfiguration(context, filePath)
         load(json)?.let {
-            logEvent("bundledPathConfigurationLoaded", filePath)
+            logDebug("bundledPathConfigurationLoaded", filePath)
             onCompletion(it)
         }
     }
@@ -67,7 +67,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
     ) {
         repository.getCachedConfigurationForUrl(context, url)?.let { json ->
             load(json)?.let {
-                logEvent("cachedPathConfigurationLoaded", url)
+                logDebug("cachedPathConfigurationLoaded", url)
                 onCompletion(it)
             }
         }

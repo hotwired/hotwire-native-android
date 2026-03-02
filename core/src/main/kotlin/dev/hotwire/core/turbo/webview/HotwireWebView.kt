@@ -2,7 +2,6 @@ package dev.hotwire.core.turbo.webview
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Build
 import android.util.AttributeSet
 import android.webkit.WebView

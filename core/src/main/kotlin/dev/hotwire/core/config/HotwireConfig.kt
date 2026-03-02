@@ -5,8 +5,9 @@ import android.webkit.WebView
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
+import dev.hotwire.core.logging.DefaultHotwireLogger
+import dev.hotwire.core.logging.HotwireLogger
 import dev.hotwire.core.turbo.config.PathConfiguration
-import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.webview.HotwireWebView
 
@@ -32,16 +33,12 @@ class HotwireConfig internal constructor() {
     var offlineRequestHandler: OfflineRequestHandler? = null
 
     /**
-     * Enables/disables debug logging. This should be disabled in production environments.
-     * Disabled by default.
+     * Set a custom logger to handle debug messages.
      *
-     * Important: You should not enable debug logging in production release builds.
+     * The default logger is [DefaultHotwireLogger] which prints logs to Logcat.
+     * If you'd like to change this behavior, provide your own implementation of [HotwireLogger].
      */
-    var debugLoggingEnabled = false
-        set(value) {
-            field = value
-            HotwireHttpClient.reset()
-        }
+    var logger: HotwireLogger = DefaultHotwireLogger
 
     /**
      * Enables/disables debugging of web contents loaded into WebViews.
