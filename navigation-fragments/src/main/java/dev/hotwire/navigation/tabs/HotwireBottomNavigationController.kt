@@ -3,6 +3,7 @@ package dev.hotwire.navigation.tabs
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.animation.doOnEnd
 import androidx.core.view.ViewCompat
@@ -15,6 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.navigation.activities.HotwireActivity
+import dev.hotwire.navigation.logging.logEvent
+import dev.hotwire.navigation.logging.logWarning
 import dev.hotwire.navigation.navigator.NavigatorHost
 import dev.hotwire.navigation.navigator.presentationContext
 
@@ -60,6 +63,8 @@ class HotwireBottomNavigationController(
 
     private var listener: ((Int, HotwireBottomTab) -> Unit)? = null
 
+    private val initializedTabs = mutableSetOf<Int>()
+
     /**
      * Set the visibility of the `BottomNavigationView`.
      */
@@ -99,6 +104,7 @@ class HotwireBottomNavigationController(
         removeDestinationChangedListener()
 
         this.tabs = tabs
+        initializedTabs.clear()
 
         val initialIndex = selectedTabIndex.coerceIn(0, tabs.lastIndex)
         val initialTab = tabs[initialIndex]
@@ -106,7 +112,7 @@ class HotwireBottomNavigationController(
         loadMenu()
         selectTab(initialIndex)
         initOnItemSelectedListener()
-        initDestinationChangedListener()
+        initializeTab(initialTab, initialIndex)
         applyWindowInsets()
         switchTab(initialTab)
     }
@@ -220,12 +226,38 @@ class HotwireBottomNavigationController(
     }
 
     private fun switchTab(tab: HotwireBottomTab) {
+        val tabIndex = tabs.indexOf(tab)
+
+        if (!this.initializedTabs.contains(tabIndex)) {
+            initializeTab(tab, tabIndex)
+        }
         activity.delegate.setCurrentNavigator(tab.configuration)
 
         tabs.forEach {
             val navigatorHostView = activity.findViewById<View>(it.configuration.navigatorHostId)
             navigatorHostView?.isVisible = it == tab
         }
+    }
+
+    private fun initializeTab(
+        tab: HotwireBottomTab,
+        index: Int,
+    ) {
+        if (initializedTabs.contains(index)) return
+
+        val existingFragment = activity.supportFragmentManager.findFragmentById(tab.configuration.navigatorHostId)
+
+        if (existingFragment == null) {
+            activity.supportFragmentManager
+                .beginTransaction()
+                .add(tab.configuration.navigatorHostId, NavigatorHost::class.java, null)
+                .commitNow()
+        } else if (initializedTabs.isEmpty()) {
+            logWarning("HotwireBottomNavigationController", "Remove android:name attribute from FragmentContainerView in XML for lazy loading to work.")
+        }
+
+        initializedTabs.add(index)
+        tab.navigatorHost.navController.addOnDestinationChangedListener(this)
     }
 
     private val HotwireBottomTab.navigatorHost: NavigatorHost
