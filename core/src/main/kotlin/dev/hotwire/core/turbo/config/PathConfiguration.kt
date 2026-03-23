@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
+import kotlinx.coroutines.flow.StateFlow
 import java.net.URL
 
 /**
@@ -18,6 +19,14 @@ class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
 
     internal var loader: PathConfigurationLoader? = null
+
+    /**
+     * A [StateFlow] that emits the current state of the path configuration
+     * loading process. Observe this to know when the configuration has been
+     * loaded and from which source (bundled asset, cached remote, or fresh remote).
+     */
+    val loadState: StateFlow<PathConfigurationLoadState>
+        get() = loader!!.loadState
 
     @SerializedName("rules")
     internal var rules: List<PathConfigurationRule> = emptyList()

@@ -8,11 +8,17 @@ import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.util.toObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
     internal var repository = PathConfigurationRepository()
+
+    private val _loadState = MutableStateFlow<PathConfigurationLoadState>(PathConfigurationLoadState.Idle)
+    val loadState: StateFlow<PathConfigurationLoadState> = _loadState.asStateFlow()
 
     override val coroutineContext: CoroutineContext
         get() = dispatcherProvider.io + Job()
@@ -44,6 +50,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
                 load(json)?.let {
                     logEvent("remotePathConfigurationLoaded", url)
                     onCompletion(it)
+                    _loadState.value = PathConfigurationLoadState.RemoteLoaded(it)
                     cacheConfigurationForUrl(url, it)
                 }
             }
@@ -58,6 +65,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         load(json)?.let {
             logEvent("bundledPathConfigurationLoaded", filePath)
             onCompletion(it)
+            _loadState.value = PathConfigurationLoadState.BundledAssetLoaded(it)
         }
     }
 
@@ -69,6 +77,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
             load(json)?.let {
                 logEvent("cachedPathConfigurationLoaded", url)
                 onCompletion(it)
+                _loadState.value = PathConfigurationLoadState.CachedRemoteLoaded(it)
             }
         }
     }
