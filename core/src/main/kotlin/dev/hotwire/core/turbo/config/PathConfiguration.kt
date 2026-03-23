@@ -8,7 +8,10 @@ import com.google.gson.annotations.SerializedName
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.net.URL
 
 /**
@@ -17,6 +20,7 @@ import java.net.URL
  */
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
+    private var observerJob: Job? = null
 
     @Transient
     internal var loader = PathConfigurationLoader()
@@ -83,11 +87,8 @@ class PathConfiguration {
         location: Location,
         options: LoaderOptions
     ) {
-        loader.load(context.applicationContext, location, options) {
-            cachedProperties.clear()
-            rules = it.rules + historicalLocationRules
-            settings = it.settings
-        }
+        observeLoadState()
+        loader.load(context.applicationContext, location, options)
     }
 
     /**
@@ -121,6 +122,22 @@ class PathConfiguration {
             null -> url.path
             else -> "${url.path}?${url.query}"
         }
+    }
+
+    private fun observeLoadState() {
+        observerJob?.cancel()
+        observerJob = loader.loadState.onEach { state ->
+            val config = when (state) {
+                is PathConfigurationLoadState.BundledAssetLoaded -> state.config
+                is PathConfigurationLoadState.CachedRemoteLoaded -> state.config
+                is PathConfigurationLoadState.RemoteLoaded -> state.config
+                is PathConfigurationLoadState.Idle -> return@onEach
+            }
+
+            cachedProperties.clear()
+            rules = config.rules + historicalLocationRules
+            settings = config.settings
+        }.launchIn(loader)
     }
 }
 

@@ -26,62 +26,54 @@ internal class PathConfigurationLoader : CoroutineScope {
     fun load(
         context: Context,
         location: PathConfiguration.Location,
-        options: PathConfiguration.LoaderOptions,
-        onCompletion: (PathConfiguration) -> Unit
+        options: PathConfiguration.LoaderOptions
     ) {
         location.assetFilePath?.let {
-            loadBundledAssetConfiguration(context, it, onCompletion)
+            loadBundledAssetConfiguration(context, it)
         }
 
-        location.remoteFileUrl?.let {
-            downloadRemoteConfiguration(context, it, options, onCompletion)
-        }
-    }
+        location.remoteFileUrl?.let { url ->
+            loadCachedConfigurationForUrl(context, url)
 
-    private fun downloadRemoteConfiguration(
-        context: Context,
-        url: String,
-        options: PathConfiguration.LoaderOptions,
-        onCompletion: (PathConfiguration) -> Unit
-    ) {
-        // Always load the previously cached version first, if available
-        loadCachedConfigurationForUrl(context, url, onCompletion)
-
-        launch {
-            repository.getRemoteConfiguration(url, options)?.let { json ->
-                load(json)?.let {
-                    logEvent("remotePathConfigurationLoaded", url)
-                    onCompletion(it)
-                    _loadState.value = PathConfigurationLoadState.RemoteLoaded(it)
-                    cacheConfigurationForUrl(context, url, it)
-                }
+            launch {
+                downloadRemoteConfigurationForUrl(context, url, options)
             }
         }
     }
 
     private fun loadBundledAssetConfiguration(
         context: Context,
-        filePath: String,
-        onCompletion: (PathConfiguration) -> Unit
+        filePath: String
     ) {
         val json = repository.getBundledConfiguration(context, filePath)
         load(json)?.let {
             logEvent("bundledPathConfigurationLoaded", filePath)
-            onCompletion(it)
             _loadState.value = PathConfigurationLoadState.BundledAssetLoaded(it)
         }
     }
 
     private fun loadCachedConfigurationForUrl(
         context: Context,
-        url: String,
-        onCompletion: (PathConfiguration) -> Unit
+        url: String
     ) {
         repository.getCachedConfigurationForUrl(context, url)?.let { json ->
             load(json)?.let {
                 logEvent("cachedPathConfigurationLoaded", url)
-                onCompletion(it)
                 _loadState.value = PathConfigurationLoadState.CachedRemoteLoaded(it)
+            }
+        }
+    }
+
+    private suspend fun downloadRemoteConfigurationForUrl(
+        context: Context,
+        url: String,
+        options: PathConfiguration.LoaderOptions
+    ) {
+        repository.getRemoteConfiguration(url, options)?.let { json ->
+            load(json)?.let {
+                logEvent("remotePathConfigurationLoaded", url)
+                _loadState.value = PathConfigurationLoadState.RemoteLoaded(it)
+                cacheConfigurationForUrl(context, url, it)
             }
         }
     }
