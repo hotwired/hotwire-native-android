@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
+internal class PathConfigurationLoader : CoroutineScope {
     internal var repository = PathConfigurationRepository()
 
     private val _loadState = MutableStateFlow<PathConfigurationLoadState>(PathConfigurationLoadState.Idle)
@@ -24,26 +24,28 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
         get() = dispatcherProvider.io + Job()
 
     fun load(
+        context: Context,
         location: PathConfiguration.Location,
         options: PathConfiguration.LoaderOptions,
         onCompletion: (PathConfiguration) -> Unit
     ) {
         location.assetFilePath?.let {
-            loadBundledAssetConfiguration(it, onCompletion)
+            loadBundledAssetConfiguration(context, it, onCompletion)
         }
 
         location.remoteFileUrl?.let {
-            downloadRemoteConfiguration(it, options, onCompletion)
+            downloadRemoteConfiguration(context, it, options, onCompletion)
         }
     }
 
     private fun downloadRemoteConfiguration(
+        context: Context,
         url: String,
         options: PathConfiguration.LoaderOptions,
         onCompletion: (PathConfiguration) -> Unit
     ) {
         // Always load the previously cached version first, if available
-        loadCachedConfigurationForUrl(url, onCompletion)
+        loadCachedConfigurationForUrl(context, url, onCompletion)
 
         launch {
             repository.getRemoteConfiguration(url, options)?.let { json ->
@@ -51,13 +53,14 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
                     logEvent("remotePathConfigurationLoaded", url)
                     onCompletion(it)
                     _loadState.value = PathConfigurationLoadState.RemoteLoaded(it)
-                    cacheConfigurationForUrl(url, it)
+                    cacheConfigurationForUrl(context, url, it)
                 }
             }
         }
     }
 
     private fun loadBundledAssetConfiguration(
+        context: Context,
         filePath: String,
         onCompletion: (PathConfiguration) -> Unit
     ) {
@@ -70,6 +73,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
     }
 
     private fun loadCachedConfigurationForUrl(
+        context: Context,
         url: String,
         onCompletion: (PathConfiguration) -> Unit
     ) {
@@ -83,6 +87,7 @@ internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
     }
 
     private fun cacheConfigurationForUrl(
+        context: Context,
         url: String,
         pathConfiguration: PathConfiguration
     ) {

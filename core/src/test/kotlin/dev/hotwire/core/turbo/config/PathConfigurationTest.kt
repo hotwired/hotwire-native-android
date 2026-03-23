@@ -73,7 +73,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun remoteConfigurationIsFetched() {
-        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+        pathConfiguration.loader = PathConfigurationLoader().apply {
             repository = mockRepository
         }
 
@@ -90,7 +90,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun validConfigurationIsCached() {
-        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+        pathConfiguration.loader = PathConfigurationLoader().apply {
             repository = mockRepository
         }
 
@@ -110,7 +110,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun malformedConfigurationIsNotCached() {
-        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+        pathConfiguration.loader = PathConfigurationLoader().apply {
             repository = mockRepository
         }
 

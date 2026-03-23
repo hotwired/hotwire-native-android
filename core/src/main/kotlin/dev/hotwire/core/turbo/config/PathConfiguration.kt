@@ -18,7 +18,8 @@ import java.net.URL
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
 
-    internal var loader: PathConfigurationLoader? = null
+    @Transient
+    internal var loader = PathConfigurationLoader()
 
     /**
      * A [StateFlow] that emits the current state of the path configuration
@@ -26,7 +27,7 @@ class PathConfiguration {
      * loaded and from which source (bundled asset, cached remote, or fresh remote).
      */
     val loadState: StateFlow<PathConfigurationLoadState>
-        get() = loader!!.loadState
+        get() = loader.loadState
 
     @SerializedName("rules")
     internal var rules: List<PathConfigurationRule> = emptyList()
@@ -82,11 +83,7 @@ class PathConfiguration {
         location: Location,
         options: LoaderOptions
     ) {
-        if (loader == null) {
-            loader = PathConfigurationLoader(context.applicationContext)
-        }
-
-        loader?.load(location, options) {
+        loader.load(context.applicationContext, location, options) {
             cachedProperties.clear()
             rules = it.rules + historicalLocationRules
             settings = it.settings
