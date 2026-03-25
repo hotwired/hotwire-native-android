@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -18,7 +19,9 @@ import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.util.toObject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -191,6 +194,44 @@ class PathConfigurationTest : BaseRepositoryTest() {
     fun customProperties() {
         assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.size)).isEqualTo(1)
         assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.first()?.label)).isEqualTo("Tab 1")
+    }
+
+    @Test
+    fun bundledAssetIsLoadedBeforeCachedRemote() {
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+        val bundledJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
+        val cachedJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}, {"patterns": ["/new$"], "properties": {"context": "modal"}}] }"""
+
+        val loader = PathConfigurationLoader().apply {
+            repository = mock {
+                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn bundledJson
+                on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn cachedJson
+            }
+        }
+
+        val collectedStates = mutableListOf<PathConfigurationLoadState>()
+
+        runBlocking {
+            val job = launch(Dispatchers.Unconfined) {
+                loader.loadState.collect {
+                    collectedStates.add(it)
+                }
+            }
+
+            loader.load(
+                context = context,
+                location = Location(
+                    assetFilePath = "json/test-configuration.json",
+                    remoteFileUrl = remoteUrl
+                ),
+                options = LoaderOptions()
+            )
+
+            job.cancel()
+        }
+
+        assertThat(collectedStates.map { it.javaClass.simpleName })
+            .containsExactly("Idle", "BundledAssetLoaded", "CachedRemoteLoaded")
     }
 
     // Extension functions to show support for deserializing custom properties/settings

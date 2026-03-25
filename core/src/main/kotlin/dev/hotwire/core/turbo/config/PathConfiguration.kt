@@ -10,10 +10,8 @@ import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -24,7 +22,8 @@ import kotlinx.coroutines.launch
  */
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
-    private val scope: CoroutineScope = CoroutineScope(dispatcherProvider.main + SupervisorJob())
+    private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())
+    private val observerScope: CoroutineScope = CoroutineScope(dispatcherProvider.main + SupervisorJob())
     private var observingLoadState = false
 
     internal var loader = PathConfigurationLoader()
@@ -94,7 +93,7 @@ class PathConfiguration {
             observeLoadState()
         }
 
-        scope.launch {
+        loadingScope.launch {
             loader.load(context.applicationContext, location, options)
         }
     }
@@ -134,7 +133,7 @@ class PathConfiguration {
                 "Rules" to data.rules.size,
                 "Settings" to data.settings.size
             ))
-        }.flowOn(Dispatchers.Unconfined).launchIn(scope)
+        }.launchIn(observerScope)
     }
 }
 
