@@ -49,7 +49,7 @@ internal class PathConfigurationLoader {
         val json = repository.getBundledConfiguration(context, filePath)
         load(json)?.let {
             logEvent("bundledPathConfigurationLoaded", filePath)
-            _loadState.value = PathConfigurationLoadState.BundledAssetLoaded(it)
+            _loadState.value = PathConfigurationLoadState.Loaded.BundledAssetLoaded(it)
         }
     }
 
@@ -64,7 +64,7 @@ internal class PathConfigurationLoader {
 
         return if (config != null) {
             logEvent("cachedPathConfigurationLoaded", url)
-            _loadState.value = PathConfigurationLoadState.CachedRemoteLoaded(config)
+            _loadState.value = PathConfigurationLoadState.Loaded.CachedRemoteLoaded(config)
             true
         } else {
             logEvent("cachedPathConfigurationFailedToLoad", url)
@@ -82,7 +82,7 @@ internal class PathConfigurationLoader {
         repository.getRemoteConfiguration(url, options)?.let { json ->
             load(json)?.let {
                 logEvent("remotePathConfigurationLoaded", url)
-                _loadState.value = PathConfigurationLoadState.RemoteLoaded(it)
+                _loadState.value = PathConfigurationLoadState.Loaded.RemoteLoaded(it)
                 cacheConfigurationForUrl(context, url, it)
             }
         }

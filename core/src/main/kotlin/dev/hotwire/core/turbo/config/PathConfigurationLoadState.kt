@@ -12,17 +12,24 @@ sealed class PathConfigurationLoadState {
     data object Idle : PathConfigurationLoadState()
 
     /**
-     * The configuration was loaded from the locally bundled asset file.
+     * The configuration was successfully loaded from a source. Check the
+     * specific subclass to determine the source: [BundledAssetLoaded],
+     * [CachedRemoteLoaded], or [RemoteLoaded].
      */
-    data class BundledAssetLoaded(val configuration: PathConfigurationData) : PathConfigurationLoadState()
+    sealed class Loaded(val configuration: PathConfigurationData) : PathConfigurationLoadState() {
+        /**
+         * The configuration was loaded from the locally bundled asset file.
+         */
+        class BundledAssetLoaded(configuration: PathConfigurationData) : Loaded(configuration)
 
-    /**
-     * The configuration was loaded from a previously cached remote file.
-     */
-    data class CachedRemoteLoaded(val configuration: PathConfigurationData) : PathConfigurationLoadState()
+        /**
+         * The configuration was loaded from a previously cached remote file.
+         */
+        class CachedRemoteLoaded(configuration: PathConfigurationData) : Loaded(configuration)
 
-    /**
-     * The configuration was freshly loaded from the remote server.
-     */
-    data class RemoteLoaded(val configuration: PathConfigurationData) : PathConfigurationLoadState()
+        /**
+         * The configuration was freshly loaded from the remote server.
+         */
+        class RemoteLoaded(configuration: PathConfigurationData) : Loaded(configuration)
+    }
 }

@@ -118,21 +118,18 @@ class PathConfiguration {
 
     private fun observeLoadState() {
         loader.loadState.onEach { state ->
-            val config = when (state) {
-                is PathConfigurationLoadState.BundledAssetLoaded -> state.configuration
-                is PathConfigurationLoadState.CachedRemoteLoaded -> state.configuration
-                is PathConfigurationLoadState.RemoteLoaded -> state.configuration
-                is PathConfigurationLoadState.Idle -> return@onEach
+            if (state is PathConfigurationLoadState.Loaded) {
+                cachedProperties.clear()
+                data = state.configuration
+
+                logEvent(
+                    "pathConfigurationUpdated", listOf(
+                        "Source" to state.javaClass.simpleName,
+                        "Rules" to data.rules.size,
+                        "Settings" to data.settings.size
+                    )
+                )
             }
-
-            cachedProperties.clear()
-            data = config
-
-            logEvent("pathConfigurationUpdated", listOf(
-                "Source" to state.javaClass.simpleName,
-                "Rules" to data.rules.size,
-                "Settings" to data.settings.size
-            ))
         }.launchIn(observerScope)
     }
 }
