@@ -42,4 +42,17 @@ class PathConfigurationData internal constructor(
             else -> "${url.path}?${url.query}"
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PathConfigurationData) return false
+
+        return rules == other.rules && settings == other.settings
+    }
+
+    override fun hashCode(): Int {
+        var result = rules.hashCode()
+        result = 31 * result + settings.hashCode()
+        return result
+    }
 }
