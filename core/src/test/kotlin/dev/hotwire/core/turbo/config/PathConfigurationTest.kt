@@ -59,7 +59,8 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.data.rules.size).isGreaterThan(0)
+        val state = pathConfiguration.loadState.value as PathConfigurationLoadState.Loaded
+        assertThat(state.configuration.rules.size).isGreaterThan(0)
     }
 
     @Test
@@ -288,7 +289,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun loadStateAndDataStayInSync() {
+    fun loadStateAndPropertiesStayInSync() {
         val remoteUrl = "$url/demo/configurations/android-v1.json"
         val config = PathConfiguration().apply {
             loader = PathConfigurationLoader().apply {
@@ -305,7 +306,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
         )
 
         val state = config.loadState.value as PathConfigurationLoadState.Loaded.CachedRemoteLoaded
-        assertThat(config.data).isEqualTo(state.configuration)
+        assertThat(state.configuration).isEqualTo(load(CACHED_JSON))
         assertThat(config.properties("$url/new").context).isEqualTo(PresentationContext.MODAL)
     }
 

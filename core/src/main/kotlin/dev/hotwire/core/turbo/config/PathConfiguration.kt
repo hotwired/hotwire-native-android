@@ -24,24 +24,23 @@ class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
     private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())
     private val _loadState = MutableStateFlow<PathConfigurationLoadState>(PathConfigurationLoadState.Idle)
+    private val defaultConfiguration = PathConfigurationData()
 
     internal var loader = PathConfigurationLoader()
-    internal var data = PathConfigurationData()
 
     /**
      * A [StateFlow] that emits the current state of the path configuration
      * loading process. Observe this to know when the configuration has been
      * loaded and from which source (bundled asset, cached remote, or fresh remote).
      */
-    val loadState: StateFlow<PathConfigurationLoadState>
-        get() = _loadState.asStateFlow()
+    val loadState: StateFlow<PathConfigurationLoadState> = _loadState.asStateFlow()
 
     /**
      * Gets the top-level settings specified in the app's path configuration.
      * The settings are map of key/value `String` items.
      */
     val settings: PathConfigurationSettings
-        get() = synchronized(this) { data.settings }
+        get() = synchronized(this) { currentConfiguration.settings }
 
     /**
      * Represents the location of the app's path configuration JSON file(s).
@@ -116,7 +115,7 @@ class PathConfiguration {
         synchronized(this) {
             cachedProperties[location]?.let { return it }
 
-            val properties = data.properties(location)
+            val properties = currentConfiguration.properties(location)
             cachedProperties[location] = properties
 
             return properties
@@ -125,17 +124,19 @@ class PathConfiguration {
 
     private fun applyLoadedState(state: PathConfigurationLoadState.Loaded) = synchronized(this) {
         cachedProperties.clear()
-        data = state.configuration
         _loadState.value = state
 
         logEvent(
             "pathConfigurationUpdated", listOf(
                 "Source" to state.javaClass.simpleName,
-                "Rules" to data.rules.size,
-                "Settings" to data.settings.size
+                "Rules" to state.configuration.rules.size,
+                "Settings" to state.configuration.settings.size
             )
         )
     }
+
+    private val currentConfiguration: PathConfigurationData
+        get() = (loadState.value as? PathConfigurationLoadState.Loaded)?.configuration ?: defaultConfiguration
 }
 
 typealias PathConfigurationProperties = HashMap<String, Any>
