@@ -24,15 +24,6 @@ class DemoApplication : Application() {
     }
 
     private fun configureApp() {
-        // Loads the path configuration
-        Hotwire.loadPathConfiguration(
-            context = this,
-            location = PathConfiguration.Location(
-                assetFilePath = "json/path-configuration.json",
-                remoteFileUrl = "${Demo.current.url}/configurations/android_v1.json"
-            )
-        )
-
         // Set the default fragment destination
         Hotwire.defaultFragmentDestination = WebFragment::class
 
@@ -56,5 +47,14 @@ class DemoApplication : Application() {
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
         Hotwire.config.applicationUserAgentPrefix = "Hotwire Demo;"
+
+        // Loads the path configuration
+        Hotwire.loadPathConfiguration(
+            context = this,
+            location = PathConfiguration.Location(
+                assetFilePath = "json/path-configuration.json",
+                remoteFileUrl = "${Demo.current.url}/configurations/android_v1.json"
+            )
+        )
     }
 }
