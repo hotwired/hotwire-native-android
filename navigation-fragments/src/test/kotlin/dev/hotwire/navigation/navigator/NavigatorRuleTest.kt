@@ -14,17 +14,16 @@ import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
-import dev.hotwire.core.turbo.config.PathConfigurationLoadState
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.navigation.CoroutinesTestRule
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -71,6 +70,10 @@ class NavigatorRuleTest {
         }
     }
 
+    @Rule
+    @JvmField
+    var coroutinesTestRule = CoroutinesTestRule()
+
     @Before
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
@@ -81,11 +84,6 @@ class NavigatorRuleTest {
                 location = Location(assetFilePath = "json/test-configuration.json"),
                 options = PathConfiguration.LoaderOptions()
             )
-        }
-
-        // Wait for the async config load to complete
-        runBlocking {
-            pathConfiguration.loadState.first { it !is PathConfigurationLoadState.Idle }
         }
     }
 

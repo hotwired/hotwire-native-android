@@ -58,7 +58,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.rules.size).isGreaterThan(0)
+        assertThat(pathConfiguration.data.rules.size).isGreaterThan(0)
     }
 
     @Test

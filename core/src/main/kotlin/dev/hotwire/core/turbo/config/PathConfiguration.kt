@@ -10,8 +10,12 @@ import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
@@ -114,25 +118,23 @@ class PathConfiguration {
     }
 
     private fun observeLoadState() {
-        scope.launch {
-            loader.loadState.collect { state ->
-                val config = when (state) {
-                    is PathConfigurationLoadState.BundledAssetLoaded -> state.configuration
-                    is PathConfigurationLoadState.CachedRemoteLoaded -> state.configuration
-                    is PathConfigurationLoadState.RemoteLoaded -> state.configuration
-                    is PathConfigurationLoadState.Idle -> return@collect
-                }
-
-                cachedProperties.clear()
-                data = config
-
-                logEvent("pathConfigurationUpdated", listOf(
-                    "Source" to state.javaClass.simpleName,
-                    "Rules" to data.rules.size,
-                    "Settings" to data.settings.size
-                ))
+        loader.loadState.onEach { state ->
+            val config = when (state) {
+                is PathConfigurationLoadState.BundledAssetLoaded -> state.configuration
+                is PathConfigurationLoadState.CachedRemoteLoaded -> state.configuration
+                is PathConfigurationLoadState.RemoteLoaded -> state.configuration
+                is PathConfigurationLoadState.Idle -> return@onEach
             }
-        }
+
+            cachedProperties.clear()
+            data = config
+
+            logEvent("pathConfigurationUpdated", listOf(
+                "Source" to state.javaClass.simpleName,
+                "Rules" to data.rules.size,
+                "Settings" to data.settings.size
+            ))
+        }.flowOn(Dispatchers.Unconfined).launchIn(scope)
     }
 }
 
