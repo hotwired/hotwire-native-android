@@ -5,6 +5,8 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.turbo.config.PathConfigurationLoadState.Idle
+import dev.hotwire.core.turbo.config.PathConfigurationLoadState.Loaded
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
@@ -23,8 +25,7 @@ import kotlinx.coroutines.launch
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
     private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())
-    private val _loadState = MutableStateFlow<PathConfigurationLoadState>(PathConfigurationLoadState.Idle)
-    private val defaultConfiguration = PathConfigurationData()
+    private val _loadState = MutableStateFlow<PathConfigurationLoadState>(Idle)
 
     internal var loader = PathConfigurationLoader()
 
@@ -122,7 +123,7 @@ class PathConfiguration {
         }
     }
 
-    private fun applyLoadedState(state: PathConfigurationLoadState.Loaded) = synchronized(this) {
+    private fun applyLoadedState(state: Loaded) = synchronized(this) {
         cachedProperties.clear()
         _loadState.value = state
 
@@ -136,7 +137,7 @@ class PathConfiguration {
     }
 
     private val currentConfiguration: PathConfigurationData
-        get() = (loadState.value as? PathConfigurationLoadState.Loaded)?.configuration ?: defaultConfiguration
+        get() = (_loadState.value as? Loaded)?.configuration ?: PathConfigurationData()
 }
 
 typealias PathConfigurationProperties = HashMap<String, Any>
