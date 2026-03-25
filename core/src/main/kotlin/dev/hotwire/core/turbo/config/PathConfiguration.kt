@@ -11,6 +11,7 @@ import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.util.dispatcherProvider
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +25,9 @@ import kotlinx.coroutines.launch
  */
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
-    private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())
     private val _loadState = MutableStateFlow<PathConfigurationLoadState>(Idle)
+    private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())
+    private var loadingJob: Job? = null
 
     internal var loader = PathConfigurationLoader()
 
@@ -94,7 +96,8 @@ class PathConfiguration {
             applyLoadedState(it)
         }
 
-        loadingScope.launch {
+        loadingJob?.cancel()
+        loadingJob = loadingScope.launch {
             location.remoteFileUrl?.let { url ->
                 loader.loadRemoteConfigurationForUrl(appContext, url, options)?.let {
                     applyLoadedState(it)

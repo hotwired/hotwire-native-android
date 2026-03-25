@@ -7,6 +7,7 @@ import dev.hotwire.core.logging.logError
 import dev.hotwire.core.turbo.http.HotwireHttpClient
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.util.toJson
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import okhttp3.Request
 
@@ -69,6 +70,8 @@ internal class PathConfigurationRepository {
                     null
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logError("remotePathConfigurationException", e)
             null
