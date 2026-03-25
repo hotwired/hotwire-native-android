@@ -4,26 +4,18 @@ import android.content.Context
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logEvent
-import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.util.toObject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
-internal class PathConfigurationLoader : CoroutineScope {
+internal class PathConfigurationLoader {
     internal var repository = PathConfigurationRepository()
 
     private val _loadState = MutableStateFlow<PathConfigurationLoadState>(PathConfigurationLoadState.Idle)
     val loadState: StateFlow<PathConfigurationLoadState> = _loadState.asStateFlow()
 
-    override val coroutineContext: CoroutineContext
-        get() = dispatcherProvider.io + Job()
-
-    fun load(
+    suspend fun load(
         context: Context,
         location: PathConfiguration.Location,
         options: PathConfiguration.LoaderOptions
@@ -34,10 +26,7 @@ internal class PathConfigurationLoader : CoroutineScope {
 
         location.remoteFileUrl?.let { url ->
             loadCachedConfigurationForUrl(context, url)
-
-            launch {
-                downloadRemoteConfigurationForUrl(context, url, options)
-            }
+            downloadRemoteConfigurationForUrl(context, url, options)
         }
     }
 
@@ -45,6 +34,8 @@ internal class PathConfigurationLoader : CoroutineScope {
         context: Context,
         filePath: String
     ) {
+        logEvent("bundledPathConfigurationLoading", filePath)
+
         val json = repository.getBundledConfiguration(context, filePath)
         load(json)?.let {
             logEvent("bundledPathConfigurationLoaded", filePath)
@@ -56,6 +47,8 @@ internal class PathConfigurationLoader : CoroutineScope {
         context: Context,
         url: String
     ) {
+        logEvent("cachedPathConfigurationLoading", url)
+
         repository.getCachedConfigurationForUrl(context, url)?.let { json ->
             load(json)?.let {
                 logEvent("cachedPathConfigurationLoaded", url)
@@ -69,6 +62,8 @@ internal class PathConfigurationLoader : CoroutineScope {
         url: String,
         options: PathConfiguration.LoaderOptions
     ) {
+        logEvent("remotePathConfigurationLoading", url)
+
         repository.getRemoteConfiguration(url, options)?.let { json ->
             load(json)?.let {
                 logEvent("remotePathConfigurationLoaded", url)

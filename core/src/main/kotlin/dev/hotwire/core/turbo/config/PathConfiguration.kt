@@ -5,13 +5,15 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import com.google.gson.annotations.SerializedName
+import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
-import kotlinx.coroutines.Job
+import dev.hotwire.core.turbo.util.dispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.net.URL
 
 /**
@@ -20,7 +22,7 @@ import java.net.URL
  */
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
-    private var observerJob: Job? = null
+    private val scope: CoroutineScope = CoroutineScope(dispatcherProvider.main + SupervisorJob())
 
     @Transient
     internal var loader = PathConfigurationLoader()
@@ -78,6 +80,10 @@ class PathConfiguration {
         val httpHeaders: Map<String, String> = emptyMap()
     )
 
+    init {
+        observeLoadState()
+    }
+
     /**
      * Loads and parses the specified configuration file(s) from their local
      * and/or remote locations.
@@ -87,8 +93,11 @@ class PathConfiguration {
         location: Location,
         options: LoaderOptions
     ) {
-        observeLoadState()
-        loader.load(context.applicationContext, location, options)
+        logEvent("pathConfigurationLoading", location.toString())
+
+        scope.launch {
+            loader.load(context.applicationContext, location, options)
+        }
     }
 
     /**
@@ -125,19 +134,22 @@ class PathConfiguration {
     }
 
     private fun observeLoadState() {
-        observerJob?.cancel()
-        observerJob = loader.loadState.onEach { state ->
-            val config = when (state) {
-                is PathConfigurationLoadState.BundledAssetLoaded -> state.config
-                is PathConfigurationLoadState.CachedRemoteLoaded -> state.config
-                is PathConfigurationLoadState.RemoteLoaded -> state.config
-                is PathConfigurationLoadState.Idle -> return@onEach
-            }
+        scope.launch {
+            loader.loadState.collect { state ->
+                val config = when (state) {
+                    is PathConfigurationLoadState.BundledAssetLoaded -> state.config
+                    is PathConfigurationLoadState.CachedRemoteLoaded -> state.config
+                    is PathConfigurationLoadState.RemoteLoaded -> state.config
+                    is PathConfigurationLoadState.Idle -> return@collect
+                }
 
-            cachedProperties.clear()
-            rules = config.rules + historicalLocationRules
-            settings = config.settings
-        }.launchIn(loader)
+                cachedProperties.clear()
+                rules = config.rules + historicalLocationRules
+                settings = config.settings
+
+                logEvent("pathConfigurationUpdated", "Rules: ${rules.size} Settings: ${settings.size}")
+            }
+        }
     }
 }
 
