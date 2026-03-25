@@ -20,12 +20,22 @@ internal class PathConfigurationLoader {
         location: PathConfiguration.Location,
         options: PathConfiguration.LoaderOptions
     ) {
-        location.assetFilePath?.let {
-            loadBundledAssetConfiguration(context, it)
+        // Attempt to load the cached remote configuration for the url, if available
+        val cachedLoaded = if (location.remoteFileUrl != null) {
+            loadCachedConfigurationForUrl(context, location.remoteFileUrl)
+        } else {
+            false
         }
 
+        // Only load the bundled config if a cached config is not available
+        if (!cachedLoaded) {
+            location.assetFilePath?.let {
+                loadBundledAssetConfiguration(context, it)
+            }
+        }
+
+        // Load a fresh remote config from the server
         location.remoteFileUrl?.let { url ->
-            loadCachedConfigurationForUrl(context, url)
             downloadRemoteConfigurationForUrl(context, url, options)
         }
     }
@@ -46,14 +56,19 @@ internal class PathConfigurationLoader {
     private fun loadCachedConfigurationForUrl(
         context: Context,
         url: String
-    ) {
+    ): Boolean {
         logEvent("cachedPathConfigurationLoading", url)
 
-        repository.getCachedConfigurationForUrl(context, url)?.let { json ->
-            load(json)?.let {
-                logEvent("cachedPathConfigurationLoaded", url)
-                _loadState.value = PathConfigurationLoadState.CachedRemoteLoaded(it)
-            }
+        val json = repository.getCachedConfigurationForUrl(context, url)
+        val config = json?.let { load(it) }
+
+        return if (config != null) {
+            logEvent("cachedPathConfigurationLoaded", url)
+            _loadState.value = PathConfigurationLoadState.CachedRemoteLoaded(config)
+            true
+        } else {
+            logEvent("cachedPathConfigurationFailedToLoad", url)
+            false
         }
     }
 

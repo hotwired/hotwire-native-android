@@ -197,7 +197,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun bundledAssetIsLoadedBeforeCachedRemote() {
+    fun cachedConfigurationSkipsBundled() {
         val remoteUrl = "$url/demo/configurations/android-v1.json"
         val bundledJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
         val cachedJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}, {"patterns": ["/new$"], "properties": {"context": "modal"}}] }"""
@@ -213,9 +213,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
         runBlocking {
             val job = launch(Dispatchers.Unconfined) {
-                loader.loadState.collect {
-                    collectedStates.add(it)
-                }
+                loader.loadState.collect { collectedStates.add(it) }
             }
 
             loader.load(
@@ -231,7 +229,77 @@ class PathConfigurationTest : BaseRepositoryTest() {
         }
 
         assertThat(collectedStates.map { it.javaClass.simpleName })
-            .containsExactly("Idle", "BundledAssetLoaded", "CachedRemoteLoaded")
+            .containsExactly("Idle", "CachedRemoteLoaded")
+    }
+
+    @Test
+    fun malformedCachedConfigurationFallsBackToBundled() {
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+        val bundledJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
+
+        val loader = PathConfigurationLoader().apply {
+            repository = mock {
+                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn bundledJson
+                on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn "malformed-json"
+            }
+        }
+
+        val collectedStates = mutableListOf<PathConfigurationLoadState>()
+
+        runBlocking {
+            val job = launch(Dispatchers.Unconfined) {
+                loader.loadState.collect { collectedStates.add(it) }
+            }
+
+            loader.load(
+                context = context,
+                location = Location(
+                    assetFilePath = "json/test-configuration.json",
+                    remoteFileUrl = remoteUrl
+                ),
+                options = LoaderOptions()
+            )
+
+            job.cancel()
+        }
+
+        assertThat(collectedStates.map { it.javaClass.simpleName })
+            .containsExactly("Idle", "BundledAssetLoaded")
+    }
+
+    @Test
+    fun noCachedConfigurationLoadsBundled() {
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+        val bundledJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
+
+        val loader = PathConfigurationLoader().apply {
+            repository = mock {
+                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn bundledJson
+                on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn null
+            }
+        }
+
+        val collectedStates = mutableListOf<PathConfigurationLoadState>()
+
+        runBlocking {
+            val job = launch(Dispatchers.Unconfined) {
+                loader.loadState.collect { collectedStates.add(it) }
+            }
+
+            loader.load(
+                context = context,
+                location = Location(
+                    assetFilePath = "json/test-configuration.json",
+                    remoteFileUrl = remoteUrl
+                ),
+                options = LoaderOptions()
+            )
+
+            job.cancel()
+        }
+
+        assertThat(collectedStates.map { it.javaClass.simpleName })
+            .containsExactly("Idle", "BundledAssetLoaded")
     }
 
     // Extension functions to show support for deserializing custom properties/settings
