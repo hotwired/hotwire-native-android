@@ -14,15 +14,15 @@ sealed class PathConfigurationLoadState {
     /**
      * The configuration was loaded from the locally bundled asset file.
      */
-    data class BundledAssetLoaded(val config: PathConfiguration) : PathConfigurationLoadState()
+    data class BundledAssetLoaded(val configuration: PathConfigurationData) : PathConfigurationLoadState()
 
     /**
      * The configuration was loaded from a previously cached remote file.
      */
-    data class CachedRemoteLoaded(val config: PathConfiguration) : PathConfigurationLoadState()
+    data class CachedRemoteLoaded(val configuration: PathConfigurationData) : PathConfigurationLoadState()
 
     /**
      * The configuration was freshly loaded from the remote server.
      */
-    data class RemoteLoaded(val config: PathConfiguration) : PathConfigurationLoadState()
+    data class RemoteLoaded(val configuration: PathConfigurationData) : PathConfigurationLoadState()
 }

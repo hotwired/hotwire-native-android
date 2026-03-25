@@ -47,7 +47,7 @@ internal class PathConfigurationRepository {
     fun cacheConfigurationForUrl(
         context: Context,
         url: String,
-        pathConfiguration: PathConfiguration
+        pathConfiguration: PathConfigurationData
     ) {
         prefs(context).edit {
             putString(url, pathConfiguration.toJson())

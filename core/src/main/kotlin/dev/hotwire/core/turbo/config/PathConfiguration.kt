@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
-import com.google.gson.annotations.SerializedName
 import dev.hotwire.core.logging.logEvent
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
@@ -14,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.net.URL
 
 /**
  * Provides the ability to load, parse, and retrieve url path
@@ -23,9 +21,10 @@ import java.net.URL
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
     private val scope: CoroutineScope = CoroutineScope(dispatcherProvider.main + SupervisorJob())
+    private var observingLoadState = false
 
-    @Transient
     internal var loader = PathConfigurationLoader()
+    internal var data = PathConfigurationData()
 
     /**
      * A [StateFlow] that emits the current state of the path configuration
@@ -35,16 +34,11 @@ class PathConfiguration {
     val loadState: StateFlow<PathConfigurationLoadState>
         get() = loader.loadState
 
-    @SerializedName("rules")
-    internal var rules: List<PathConfigurationRule> = emptyList()
-
     /**
      * Gets the top-level settings specified in the app's path configuration.
      * The settings are map of key/value `String` items.
      */
-    @SerializedName("settings")
-    var settings: PathConfigurationSettings = PathConfigurationSettings()
-        private set
+    val settings get() = data.settings
 
     /**
      * Represents the location of the app's path configuration JSON file(s).
@@ -80,10 +74,6 @@ class PathConfiguration {
         val httpHeaders: Map<String, String> = emptyMap()
     )
 
-    init {
-        observeLoadState()
-    }
-
     /**
      * Loads and parses the specified configuration file(s) from their local
      * and/or remote locations.
@@ -94,6 +84,11 @@ class PathConfiguration {
         options: LoaderOptions
     ) {
         logEvent("pathConfigurationLoading", location.toString())
+
+        if (!observingLoadState) {
+            observingLoadState = true
+            observeLoadState()
+        }
 
         scope.launch {
             loader.load(context.applicationContext, location, options)
@@ -112,42 +107,30 @@ class PathConfiguration {
     fun properties(location: String): PathConfigurationProperties {
         cachedProperties[location]?.let { return it }
 
-        val properties = PathConfigurationProperties()
-        val path = path(location)
-
-        for (rule in rules) {
-            if (rule.matches(path)) properties.putAll(rule.properties)
-        }
-
+        val properties = data.properties(location)
         cachedProperties[location] = properties
 
         return properties
-    }
-
-    private fun path(location: String): String {
-        val url = URL(location)
-
-        return when (url.query) {
-            null -> url.path
-            else -> "${url.path}?${url.query}"
-        }
     }
 
     private fun observeLoadState() {
         scope.launch {
             loader.loadState.collect { state ->
                 val config = when (state) {
-                    is PathConfigurationLoadState.BundledAssetLoaded -> state.config
-                    is PathConfigurationLoadState.CachedRemoteLoaded -> state.config
-                    is PathConfigurationLoadState.RemoteLoaded -> state.config
+                    is PathConfigurationLoadState.BundledAssetLoaded -> state.configuration
+                    is PathConfigurationLoadState.CachedRemoteLoaded -> state.configuration
+                    is PathConfigurationLoadState.RemoteLoaded -> state.configuration
                     is PathConfigurationLoadState.Idle -> return@collect
                 }
 
                 cachedProperties.clear()
-                rules = config.rules + historicalLocationRules
-                settings = config.settings
+                data = config
 
-                logEvent("pathConfigurationUpdated", "Rules: ${rules.size} Settings: ${settings.size}")
+                logEvent("pathConfigurationUpdated", listOf(
+                    "Source" to state.javaClass.simpleName,
+                    "Rules" to data.rules.size,
+                    "Settings" to data.settings.size
+                ))
             }
         }
     }

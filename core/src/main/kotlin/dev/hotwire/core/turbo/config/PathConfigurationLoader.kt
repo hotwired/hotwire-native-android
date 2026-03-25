@@ -76,13 +76,13 @@ internal class PathConfigurationLoader {
     private fun cacheConfigurationForUrl(
         context: Context,
         url: String,
-        pathConfiguration: PathConfiguration
+        pathConfiguration: PathConfigurationData
     ) {
         repository.cacheConfigurationForUrl(context, url, pathConfiguration)
     }
 
     private fun load(json: String) = try {
-        json.toObject(object : TypeToken<PathConfiguration>() {})
+        json.toObject(object : TypeToken<PathConfigurationData>() {})
     } catch(e: Exception) {
         logError("pathConfiguredFailedToParse", e)
         null
