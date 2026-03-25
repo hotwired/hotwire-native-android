@@ -88,11 +88,6 @@ class NavigatorRuleTest {
                 options = PathConfiguration.LoaderOptions()
             )
         }
-
-        // Wait for the async config load on IO to complete
-        runBlocking {
-            pathConfiguration.loadState.first { it !is PathConfigurationLoadState.Idle }
-        }
     }
 
     @Test

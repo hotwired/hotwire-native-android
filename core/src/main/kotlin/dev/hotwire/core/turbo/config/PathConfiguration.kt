@@ -11,9 +11,9 @@ import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -23,8 +23,7 @@ import kotlinx.coroutines.launch
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
     private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())
-    private val observerScope: CoroutineScope = CoroutineScope(dispatcherProvider.main + SupervisorJob())
-    private var observingLoadState = false
+    private val _loadState = MutableStateFlow<PathConfigurationLoadState>(PathConfigurationLoadState.Idle)
 
     internal var loader = PathConfigurationLoader()
     internal var data = PathConfigurationData()
@@ -35,13 +34,14 @@ class PathConfiguration {
      * loaded and from which source (bundled asset, cached remote, or fresh remote).
      */
     val loadState: StateFlow<PathConfigurationLoadState>
-        get() = loader.loadState
+        get() = _loadState.asStateFlow()
 
     /**
      * Gets the top-level settings specified in the app's path configuration.
      * The settings are map of key/value `String` items.
      */
-    val settings get() = data.settings
+    val settings: PathConfigurationSettings
+        get() = synchronized(this) { data.settings }
 
     /**
      * Represents the location of the app's path configuration JSON file(s).
@@ -88,13 +88,18 @@ class PathConfiguration {
     ) {
         logEvent("pathConfigurationLoading", location.toString())
 
-        if (!observingLoadState) {
-            observingLoadState = true
-            observeLoadState()
+        val appContext = context.applicationContext
+
+        loader.loadCachedOrBundledConfiguration(appContext, location)?.let {
+            applyLoadedState(it)
         }
 
         loadingScope.launch {
-            loader.load(context.applicationContext, location, options)
+            location.remoteFileUrl?.let { url ->
+                loader.loadRemoteConfigurationForUrl(appContext, url, options)?.let {
+                    applyLoadedState(it)
+                }
+            }
         }
     }
 
@@ -108,29 +113,28 @@ class PathConfiguration {
      * @return The map of key/value `String` properties
      */
     fun properties(location: String): PathConfigurationProperties {
-        cachedProperties[location]?.let { return it }
+        synchronized(this) {
+            cachedProperties[location]?.let { return it }
 
-        val properties = data.properties(location)
-        cachedProperties[location] = properties
+            val properties = data.properties(location)
+            cachedProperties[location] = properties
 
-        return properties
+            return properties
+        }
     }
 
-    private fun observeLoadState() {
-        loader.loadState.onEach { state ->
-            if (state is PathConfigurationLoadState.Loaded) {
-                cachedProperties.clear()
-                data = state.configuration
+    private fun applyLoadedState(state: PathConfigurationLoadState.Loaded) = synchronized(this) {
+        cachedProperties.clear()
+        data = state.configuration
+        _loadState.value = state
 
-                logEvent(
-                    "pathConfigurationUpdated", listOf(
-                        "Source" to state.javaClass.simpleName,
-                        "Rules" to data.rules.size,
-                        "Settings" to data.settings.size
-                    )
-                )
-            }
-        }.launchIn(observerScope)
+        logEvent(
+            "pathConfigurationUpdated", listOf(
+                "Source" to state.javaClass.simpleName,
+                "Rules" to data.rules.size,
+                "Settings" to data.settings.size
+            )
+        )
     }
 }
 

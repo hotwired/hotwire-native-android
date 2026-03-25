@@ -19,9 +19,7 @@ import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.util.toObject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -62,6 +60,18 @@ class PathConfigurationTest : BaseRepositoryTest() {
     @Test
     fun assetConfigurationIsLoaded() {
         assertThat(pathConfiguration.data.rules.size).isGreaterThan(0)
+    }
+
+    @Test
+    fun assetConfigurationIsAvailableImmediatelyAfterLoadReturns() {
+        val freshConfig = PathConfiguration()
+        freshConfig.load(
+            context = context,
+            location = Location(assetFilePath = "json/test-configuration.json"),
+            options = options
+        )
+
+        assertThat(freshConfig.properties("$url/new").context).isEqualTo(PresentationContext.MODAL)
     }
 
     @Test
@@ -200,102 +210,103 @@ class PathConfigurationTest : BaseRepositoryTest() {
     fun cachedConfigurationSkipsBundled() {
         val remoteUrl = "$url/demo/configurations/android-v1.json"
 
-        val loader = PathConfigurationLoader().apply {
-            repository = mock {
-                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
-                on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn CACHED_JSON
+        val config = PathConfiguration().apply {
+            loader = PathConfigurationLoader().apply {
+                repository = mock {
+                    on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
+                    on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn CACHED_JSON
+                }
             }
         }
 
-        val collectedStates = mutableListOf<PathConfigurationLoadState>()
+        config.load(
+            context = context,
+            location = Location(
+                assetFilePath = "json/test-configuration.json",
+                remoteFileUrl = remoteUrl
+            ),
+            options = LoaderOptions()
+        )
 
-        runBlocking {
-            val job = launch(Dispatchers.Main) {
-                loader.loadState.collect { collectedStates.add(it) }
-            }
-
-            loader.load(
-                context = context,
-                location = Location(
-                    assetFilePath = "json/test-configuration.json",
-                    remoteFileUrl = remoteUrl
-                ),
-                options = LoaderOptions()
-            )
-
-            job.cancel()
-        }
-
-        assertThat(collectedStates.map { it.javaClass.simpleName })
-            .containsExactly("Idle", "CachedRemoteLoaded")
+        assertThat(config.loadState.value).isEqualTo(
+            PathConfigurationLoadState.Loaded.CachedRemoteLoaded(load(CACHED_JSON))
+        )
     }
 
     @Test
     fun malformedCachedConfigurationFallsBackToBundled() {
         val remoteUrl = "$url/demo/configurations/android-v1.json"
 
-        val loader = PathConfigurationLoader().apply {
-            repository = mock {
-                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
-                on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn "malformed-json"
+        val config = PathConfiguration().apply {
+            loader = PathConfigurationLoader().apply {
+                repository = mock {
+                    on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
+                    on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn "malformed-json"
+                }
             }
         }
 
-        val collectedStates = mutableListOf<PathConfigurationLoadState>()
+        config.load(
+            context = context,
+            location = Location(
+                assetFilePath = "json/test-configuration.json",
+                remoteFileUrl = remoteUrl
+            ),
+            options = LoaderOptions()
+        )
 
-        runBlocking {
-            val job = launch(Dispatchers.Main) {
-                loader.loadState.collect { collectedStates.add(it) }
-            }
-
-            loader.load(
-                context = context,
-                location = Location(
-                    assetFilePath = "json/test-configuration.json",
-                    remoteFileUrl = remoteUrl
-                ),
-                options = LoaderOptions()
-            )
-
-            job.cancel()
-        }
-
-        assertThat(collectedStates.map { it.javaClass.simpleName })
-            .containsExactly("Idle", "BundledAssetLoaded")
+        assertThat(config.loadState.value).isEqualTo(
+            PathConfigurationLoadState.Loaded.BundledAssetLoaded(load(BUNDLED_JSON))
+        )
     }
 
     @Test
     fun noCachedConfigurationLoadsBundled() {
         val remoteUrl = "$url/demo/configurations/android-v1.json"
 
-        val loader = PathConfigurationLoader().apply {
-            repository = mock {
-                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
-                on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn null
+        val config = PathConfiguration().apply {
+            loader = PathConfigurationLoader().apply {
+                repository = mock {
+                    on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
+                    on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn null
+                }
             }
         }
 
-        val collectedStates = mutableListOf<PathConfigurationLoadState>()
+        config.load(
+            context = context,
+            location = Location(
+                assetFilePath = "json/test-configuration.json",
+                remoteFileUrl = remoteUrl
+            ),
+            options = LoaderOptions()
+        )
 
-        runBlocking {
-            val job = launch(Dispatchers.Main) {
-                loader.loadState.collect { collectedStates.add(it) }
+        assertThat(config.loadState.value).isEqualTo(
+            PathConfigurationLoadState.Loaded.BundledAssetLoaded(load(BUNDLED_JSON))
+        )
+    }
+
+    @Test
+    fun loadStateAndDataStayInSync() {
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+        val config = PathConfiguration().apply {
+            loader = PathConfigurationLoader().apply {
+                repository = mock {
+                    on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn CACHED_JSON
+                }
             }
-
-            loader.load(
-                context = context,
-                location = Location(
-                    assetFilePath = "json/test-configuration.json",
-                    remoteFileUrl = remoteUrl
-                ),
-                options = LoaderOptions()
-            )
-
-            job.cancel()
         }
 
-        assertThat(collectedStates.map { it.javaClass.simpleName })
-            .containsExactly("Idle", "BundledAssetLoaded")
+        config.load(
+            context = context,
+            location = Location(remoteFileUrl = remoteUrl),
+            options = LoaderOptions()
+        )
+
+        val state = config.loadState.value as PathConfigurationLoadState.Loaded.CachedRemoteLoaded
+        assertThat(config.data).isEqualTo(state.configuration)
+        assertThat(config.properties("$url/new").context).isEqualTo(PresentationContext.MODAL)
     }
 
     private fun load(json: String): PathConfigurationData {
