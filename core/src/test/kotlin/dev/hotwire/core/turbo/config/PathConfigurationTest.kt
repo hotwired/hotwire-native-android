@@ -199,20 +199,18 @@ class PathConfigurationTest : BaseRepositoryTest() {
     @Test
     fun cachedConfigurationSkipsBundled() {
         val remoteUrl = "$url/demo/configurations/android-v1.json"
-        val bundledJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
-        val cachedJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}, {"patterns": ["/new$"], "properties": {"context": "modal"}}] }"""
 
         val loader = PathConfigurationLoader().apply {
             repository = mock {
-                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn bundledJson
-                on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn cachedJson
+                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
+                on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn CACHED_JSON
             }
         }
 
         val collectedStates = mutableListOf<PathConfigurationLoadState>()
 
         runBlocking {
-            val job = launch(Dispatchers.Unconfined) {
+            val job = launch(Dispatchers.Main) {
                 loader.loadState.collect { collectedStates.add(it) }
             }
 
@@ -235,11 +233,10 @@ class PathConfigurationTest : BaseRepositoryTest() {
     @Test
     fun malformedCachedConfigurationFallsBackToBundled() {
         val remoteUrl = "$url/demo/configurations/android-v1.json"
-        val bundledJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
 
         val loader = PathConfigurationLoader().apply {
             repository = mock {
-                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn bundledJson
+                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
                 on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn "malformed-json"
             }
         }
@@ -247,7 +244,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
         val collectedStates = mutableListOf<PathConfigurationLoadState>()
 
         runBlocking {
-            val job = launch(Dispatchers.Unconfined) {
+            val job = launch(Dispatchers.Main) {
                 loader.loadState.collect { collectedStates.add(it) }
             }
 
@@ -270,11 +267,10 @@ class PathConfigurationTest : BaseRepositoryTest() {
     @Test
     fun noCachedConfigurationLoadsBundled() {
         val remoteUrl = "$url/demo/configurations/android-v1.json"
-        val bundledJson = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
 
         val loader = PathConfigurationLoader().apply {
             repository = mock {
-                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn bundledJson
+                on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
                 on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn null
             }
         }
@@ -282,7 +278,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
         val collectedStates = mutableListOf<PathConfigurationLoadState>()
 
         runBlocking {
-            val job = launch(Dispatchers.Unconfined) {
+            val job = launch(Dispatchers.Main) {
                 loader.loadState.collect { collectedStates.add(it) }
             }
 
@@ -300,6 +296,10 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
         assertThat(collectedStates.map { it.javaClass.simpleName })
             .containsExactly("Idle", "BundledAssetLoaded")
+    }
+
+    private fun load(json: String): PathConfigurationData {
+        return json.toObject(object : TypeToken<PathConfigurationData>() {})
     }
 
     // Extension functions to show support for deserializing custom properties/settings
@@ -321,4 +321,9 @@ class PathConfigurationTest : BaseRepositoryTest() {
         @SerializedName("marketing_site") val marketingSite: String,
         @SerializedName("demo_site") val demoSite: String
     )
+
+    companion object {
+        private const val BUNDLED_JSON = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
+        private const val CACHED_JSON = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}, {"patterns": ["/new$"], "properties": {"context": "modal"}}] }"""
+    }
 }
