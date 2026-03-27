@@ -5,31 +5,33 @@ package dev.hotwire.core.turbo.config
  * Observe [PathConfiguration.loadState] to receive updates as the configuration
  * is loaded from each source.
  */
-sealed class PathConfigurationLoadState {
+sealed interface PathConfigurationLoadState {
     /**
      * The initial state before any configuration has been loaded.
      */
-    data object NotLoaded : PathConfigurationLoadState()
+    data object NotLoaded : PathConfigurationLoadState
 
     /**
      * The configuration was successfully loaded from a source. Check the
      * specific subclass to determine the source: [BundledAssetLoaded],
      * [CachedRemoteLoaded], or [RemoteLoaded].
      */
-    sealed class Loaded(open val configuration: PathConfigurationData) : PathConfigurationLoadState() {
+    sealed interface Loaded : PathConfigurationLoadState {
+        val configuration: PathConfigurationData
+
         /**
          * The configuration was loaded from the locally bundled asset file.
          */
-        data class BundledAssetLoaded(override val configuration: PathConfigurationData) : Loaded(configuration)
+        data class BundledAssetLoaded(override val configuration: PathConfigurationData) : Loaded
 
         /**
          * The configuration was loaded from a previously cached remote file.
          */
-        data class CachedRemoteLoaded(override val configuration: PathConfigurationData) : Loaded(configuration)
+        data class CachedRemoteLoaded(override val configuration: PathConfigurationData) : Loaded
 
         /**
          * The configuration was freshly loaded from the remote server.
          */
-        data class RemoteLoaded(override val configuration: PathConfigurationData) : Loaded(configuration)
+        data class RemoteLoaded(override val configuration: PathConfigurationData) : Loaded
     }
 }
