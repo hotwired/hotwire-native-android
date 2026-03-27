@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -58,7 +59,20 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.rules.size).isGreaterThan(0)
+        val state = pathConfiguration.loadState.value as PathConfigurationLoadState.Loaded
+        assertThat(state.configuration.rules.size).isGreaterThan(0)
+    }
+
+    @Test
+    fun assetConfigurationIsAvailableImmediatelyAfterLoadReturns() {
+        val freshConfig = PathConfiguration()
+        freshConfig.load(
+            context = context,
+            location = Location(assetFilePath = "json/test-configuration.json"),
+            options = options
+        )
+
+        assertThat(freshConfig.properties("$url/new").context).isEqualTo(PresentationContext.MODAL)
     }
 
     @Test
@@ -73,7 +87,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun remoteConfigurationIsFetched() {
-        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+        pathConfiguration.loader = PathConfigurationLoader().apply {
             repository = mockRepository
         }
 
@@ -90,7 +104,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun validConfigurationIsCached() {
-        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+        pathConfiguration.loader = PathConfigurationLoader().apply {
             repository = mockRepository
         }
 
@@ -110,7 +124,7 @@ class PathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun malformedConfigurationIsNotCached() {
-        pathConfiguration.loader = PathConfigurationLoader(context).apply {
+        pathConfiguration.loader = PathConfigurationLoader().apply {
             repository = mockRepository
         }
 
@@ -193,6 +207,113 @@ class PathConfigurationTest : BaseRepositoryTest() {
         assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.first()?.label)).isEqualTo("Tab 1")
     }
 
+    @Test
+    fun cachedConfigurationSkipsBundled() {
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+
+        val config = PathConfiguration().apply {
+            loader = PathConfigurationLoader().apply {
+                repository = mock {
+                    on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
+                    on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn CACHED_JSON
+                }
+            }
+        }
+
+        config.load(
+            context = context,
+            location = Location(
+                assetFilePath = "json/test-configuration.json",
+                remoteFileUrl = remoteUrl
+            ),
+            options = LoaderOptions()
+        )
+
+        assertThat(config.loadState.value).isEqualTo(
+            PathConfigurationLoadState.Loaded.CachedRemoteLoaded(load(CACHED_JSON))
+        )
+    }
+
+    @Test
+    fun malformedCachedConfigurationFallsBackToBundled() {
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+
+        val config = PathConfiguration().apply {
+            loader = PathConfigurationLoader().apply {
+                repository = mock {
+                    on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
+                    on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn "malformed-json"
+                }
+            }
+        }
+
+        config.load(
+            context = context,
+            location = Location(
+                assetFilePath = "json/test-configuration.json",
+                remoteFileUrl = remoteUrl
+            ),
+            options = LoaderOptions()
+        )
+
+        assertThat(config.loadState.value).isEqualTo(
+            PathConfigurationLoadState.Loaded.BundledAssetLoaded(load(BUNDLED_JSON))
+        )
+    }
+
+    @Test
+    fun noCachedConfigurationLoadsBundled() {
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+
+        val config = PathConfiguration().apply {
+            loader = PathConfigurationLoader().apply {
+                repository = mock {
+                    on { getBundledConfiguration(any(), eq("json/test-configuration.json")) } doReturn BUNDLED_JSON
+                    on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn null
+                }
+            }
+        }
+
+        config.load(
+            context = context,
+            location = Location(
+                assetFilePath = "json/test-configuration.json",
+                remoteFileUrl = remoteUrl
+            ),
+            options = LoaderOptions()
+        )
+
+        assertThat(config.loadState.value).isEqualTo(
+            PathConfigurationLoadState.Loaded.BundledAssetLoaded(load(BUNDLED_JSON))
+        )
+    }
+
+    @Test
+    fun loadStateAndPropertiesStayInSync() {
+        val remoteUrl = "$url/demo/configurations/android-v1.json"
+        val config = PathConfiguration().apply {
+            loader = PathConfigurationLoader().apply {
+                repository = mock {
+                    on { getCachedConfigurationForUrl(any(), eq(remoteUrl)) } doReturn CACHED_JSON
+                }
+            }
+        }
+
+        config.load(
+            context = context,
+            location = Location(remoteFileUrl = remoteUrl),
+            options = LoaderOptions()
+        )
+
+        val state = config.loadState.value as PathConfigurationLoadState.Loaded.CachedRemoteLoaded
+        assertThat(state.configuration).isEqualTo(load(CACHED_JSON))
+        assertThat(config.properties("$url/new").context).isEqualTo(PresentationContext.MODAL)
+    }
+
+    private fun load(json: String): PathConfigurationData {
+        return json.toObject(object : TypeToken<PathConfigurationData>() {})
+    }
+
     // Extension functions to show support for deserializing custom properties/settings
 
     private fun PathConfigurationProperties.getTabs(): List<Tab>? {
@@ -212,4 +333,9 @@ class PathConfigurationTest : BaseRepositoryTest() {
         @SerializedName("marketing_site") val marketingSite: String,
         @SerializedName("demo_site") val demoSite: String
     )
+
+    companion object {
+        private const val BUNDLED_JSON = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}] }"""
+        private const val CACHED_JSON = """{ "settings": {}, "rules": [{"patterns": [".+"], "properties": {"context": "default"}}, {"patterns": ["/new$"], "properties": {"context": "modal"}}] }"""
+    }
 }

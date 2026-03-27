@@ -4,31 +4,46 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
-import com.google.gson.annotations.SerializedName
+import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.turbo.config.PathConfigurationLoadState.Loaded
+import dev.hotwire.core.turbo.config.PathConfigurationLoadState.NotLoaded
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
-import java.net.URL
+import dev.hotwire.core.turbo.util.dispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 /**
  * Provides the ability to load, parse, and retrieve url path
  * properties from the app's JSON configuration file.
  */
-class PathConfiguration {
+class PathConfiguration internal constructor() {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
+    private val _loadState = MutableStateFlow<PathConfigurationLoadState>(NotLoaded)
+    private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())
+    private var loadingJob: Job? = null
 
-    internal var loader: PathConfigurationLoader? = null
+    internal var loader = PathConfigurationLoader()
 
-    @SerializedName("rules")
-    internal var rules: List<PathConfigurationRule> = emptyList()
+    /**
+     * A [StateFlow] that emits the current state of the path configuration
+     * loading process. Observe this to know when the configuration has been
+     * loaded and from which source (bundled asset, cached remote, or fresh remote).
+     */
+    val loadState: StateFlow<PathConfigurationLoadState> = _loadState.asStateFlow()
 
     /**
      * Gets the top-level settings specified in the app's path configuration.
      * The settings are map of key/value `String` items.
      */
-    @SerializedName("settings")
-    var settings: PathConfigurationSettings = PathConfigurationSettings()
-        private set
+    val settings: PathConfigurationSettings
+        get() = synchronized(this) { currentConfiguration.settings }
 
     /**
      * Represents the location of the app's path configuration JSON file(s).
@@ -73,14 +88,21 @@ class PathConfiguration {
         location: Location,
         options: LoaderOptions
     ) {
-        if (loader == null) {
-            loader = PathConfigurationLoader(context.applicationContext)
+        logEvent("pathConfigurationLoading", location.toString())
+
+        val appContext = context.applicationContext
+        loadingJob?.cancel()
+
+        loader.loadCachedOrBundledConfiguration(appContext, location)?.let {
+            applyLoadedState(it)
         }
 
-        loader?.load(location, options) {
-            cachedProperties.clear()
-            rules = it.rules + historicalLocationRules
-            settings = it.settings
+        loadingJob = loadingScope.launch {
+            location.remoteFileUrl?.let { url ->
+                loader.loadRemoteConfigurationForUrl(appContext, url, options)?.let {
+                    applyLoadedState(it)
+                }
+            }
         }
     }
 
@@ -94,28 +116,31 @@ class PathConfiguration {
      * @return The map of key/value `String` properties
      */
     fun properties(location: String): PathConfigurationProperties {
-        cachedProperties[location]?.let { return it }
+        synchronized(this) {
+            cachedProperties[location]?.let { return it }
 
-        val properties = PathConfigurationProperties()
-        val path = path(location)
+            val properties = currentConfiguration.properties(location)
+            cachedProperties[location] = properties
 
-        for (rule in rules) {
-            if (rule.matches(path)) properties.putAll(rule.properties)
-        }
-
-        cachedProperties[location] = properties
-
-        return properties
-    }
-
-    private fun path(location: String): String {
-        val url = URL(location)
-
-        return when (url.query) {
-            null -> url.path
-            else -> "${url.path}?${url.query}"
+            return properties
         }
     }
+
+    private fun applyLoadedState(state: Loaded) = synchronized(this) {
+        cachedProperties.clear()
+        _loadState.value = state
+
+        logEvent(
+            "pathConfigurationUpdated", listOf(
+                "source" to state.javaClass.simpleName,
+                "rules" to state.configuration.rules.size,
+                "settings" to state.configuration.settings.size
+            )
+        )
+    }
+
+    private val currentConfiguration: PathConfigurationData
+        get() = (_loadState.value as? Loaded)?.configuration ?: PathConfigurationData()
 }
 
 typealias PathConfigurationProperties = HashMap<String, Any>

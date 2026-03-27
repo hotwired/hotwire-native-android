@@ -4,84 +4,84 @@ import android.content.Context
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logEvent
-import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.util.toObject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
-internal class PathConfigurationLoader(val context: Context) : CoroutineScope {
+internal class PathConfigurationLoader {
     internal var repository = PathConfigurationRepository()
 
-    override val coroutineContext: CoroutineContext
-        get() = dispatcherProvider.io + Job()
-
-    fun load(
-        location: PathConfiguration.Location,
-        options: PathConfiguration.LoaderOptions,
-        onCompletion: (PathConfiguration) -> Unit
-    ) {
-        location.assetFilePath?.let {
-            loadBundledAssetConfiguration(it, onCompletion)
+    fun loadCachedOrBundledConfiguration(
+        context: Context,
+        location: PathConfiguration.Location
+    ): PathConfigurationLoadState.Loaded? {
+        // Attempt to load the cached remote configuration for the url, if available
+        if (location.remoteFileUrl != null) {
+            loadCachedConfigurationForUrl(context, location.remoteFileUrl)
+                ?.let { return it }
         }
 
-        location.remoteFileUrl?.let {
-            downloadRemoteConfiguration(it, options, onCompletion)
-        }
-    }
-
-    private fun downloadRemoteConfiguration(
-        url: String,
-        options: PathConfiguration.LoaderOptions,
-        onCompletion: (PathConfiguration) -> Unit
-    ) {
-        // Always load the previously cached version first, if available
-        loadCachedConfigurationForUrl(url, onCompletion)
-
-        launch {
-            repository.getRemoteConfiguration(url, options)?.let { json ->
-                load(json)?.let {
-                    logEvent("remotePathConfigurationLoaded", url)
-                    onCompletion(it)
-                    cacheConfigurationForUrl(url, it)
-                }
-            }
-        }
+        // Fall back to the bundled config when a cached config is not available
+        return location.assetFilePath?.let { loadBundledAssetConfiguration(context, it) }
     }
 
     private fun loadBundledAssetConfiguration(
-        filePath: String,
-        onCompletion: (PathConfiguration) -> Unit
-    ) {
+        context: Context,
+        filePath: String
+    ): PathConfigurationLoadState.Loaded.BundledAssetLoaded? {
+        logEvent("bundledPathConfigurationLoading", filePath)
+
         val json = repository.getBundledConfiguration(context, filePath)
-        load(json)?.let {
+        return load(json)?.let {
             logEvent("bundledPathConfigurationLoaded", filePath)
-            onCompletion(it)
+            PathConfigurationLoadState.Loaded.BundledAssetLoaded(it)
         }
     }
 
     private fun loadCachedConfigurationForUrl(
+        context: Context,
+        url: String
+    ): PathConfigurationLoadState.Loaded.CachedRemoteLoaded? {
+        logEvent("cachedPathConfigurationLoading", url)
+
+        val json = repository.getCachedConfigurationForUrl(context, url)
+        val config = json?.let { load(it) }
+
+        return if (config == null) {
+            logEvent("cachedPathConfigurationFailedToLoad", url)
+            null
+        } else {
+            logEvent("cachedPathConfigurationLoaded", url)
+            PathConfigurationLoadState.Loaded.CachedRemoteLoaded(config)
+        }
+    }
+
+    suspend fun loadRemoteConfigurationForUrl(
+        context: Context,
         url: String,
-        onCompletion: (PathConfiguration) -> Unit
-    ) {
-        repository.getCachedConfigurationForUrl(context, url)?.let { json ->
-            load(json)?.let {
-                logEvent("cachedPathConfigurationLoaded", url)
-                onCompletion(it)
-            }
+        options: PathConfiguration.LoaderOptions
+    ): PathConfigurationLoadState.Loaded.RemoteLoaded? {
+        logEvent("remotePathConfigurationLoading", url)
+
+        val config = repository.getRemoteConfiguration(url, options)?.let { json -> load(json) }
+
+        return if (config == null) {
+            null
+        } else {
+            logEvent("remotePathConfigurationLoaded", url)
+            cacheConfigurationForUrl(context, url, config)
+            PathConfigurationLoadState.Loaded.RemoteLoaded(config)
         }
     }
 
     private fun cacheConfigurationForUrl(
+        context: Context,
         url: String,
-        pathConfiguration: PathConfiguration
+        pathConfiguration: PathConfigurationData
     ) {
         repository.cacheConfigurationForUrl(context, url, pathConfiguration)
     }
 
     private fun load(json: String) = try {
-        json.toObject(object : TypeToken<PathConfiguration>() {})
+        json.toObject(object : TypeToken<PathConfigurationData>() {})
     } catch(e: Exception) {
         logError("pathConfiguredFailedToParse", e)
         null
