@@ -38,9 +38,10 @@ data class PathConfigurationData internal constructor(
     private fun path(location: String): String {
         val url = URL(location)
 
-        return when (url.query) {
-            null -> url.path
-            else -> "${url.path}?${url.query}"
+        return if (url.query == null) {
+            url.path
+        } else {
+            "${url.path}?${url.query}"
         }
     }
 }
