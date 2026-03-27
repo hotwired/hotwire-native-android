@@ -5,6 +5,7 @@ import android.webkit.HttpAuthHandler
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.view.ScrollingView
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -217,6 +218,7 @@ internal class HotwireWebFragmentDelegate(
 
     override fun visitRendered() {
         callback.onVisitRendered(location)
+        resetWebViewScrollForScrollingContainer()
         navDestination.fragmentViewModel.setTitle(title())
         removeTransitionalViews()
     }
@@ -452,6 +454,19 @@ internal class HotwireWebFragmentDelegate(
 
     private fun pullToRefreshEnabled(enabled: Boolean) {
         hotwireView?.webViewRefresh?.isEnabled = enabled
+    }
+
+    /**
+     * When the WebView moves into a ScrollingView container (e.g., bottom
+     * sheet), its native scroll state carries over from the previous page
+     * and gets applied to the ScrollingView. Normally Turbo's JS would
+     * scroll to the top, but this has no effect on a WRAP_CONTENT WebView
+     * inside a ScrollingView. Reset it natively instead.
+     */
+    private fun resetWebViewScrollForScrollingContainer() {
+        if (webView.parent is ScrollingView) {
+            webView.scrollTo(0, 0)
+        }
     }
 
     private fun removeTransitionalViews() {
