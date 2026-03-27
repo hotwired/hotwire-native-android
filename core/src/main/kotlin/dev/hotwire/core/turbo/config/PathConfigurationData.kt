@@ -3,7 +3,8 @@ package dev.hotwire.core.turbo.config
 import com.google.gson.annotations.SerializedName
 import java.net.URL
 
-class PathConfigurationData internal constructor(
+@ConsistentCopyVisibility
+data class PathConfigurationData internal constructor(
     @SerializedName("rules")
     internal val rules: List<PathConfigurationRule> = emptyList(),
 
@@ -41,18 +42,5 @@ class PathConfigurationData internal constructor(
             null -> url.path
             else -> "${url.path}?${url.query}"
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is PathConfigurationData) return false
-
-        return rules == other.rules && settings == other.settings
-    }
-
-    override fun hashCode(): Int {
-        var result = rules.hashCode()
-        result = 31 * result + settings.hashCode()
-        return result
     }
 }
