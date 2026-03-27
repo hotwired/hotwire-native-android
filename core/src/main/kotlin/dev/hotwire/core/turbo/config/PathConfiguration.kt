@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
  * Provides the ability to load, parse, and retrieve url path
  * properties from the app's JSON configuration file.
  */
-class PathConfiguration {
+class PathConfiguration internal constructor() {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
     private val _loadState = MutableStateFlow<PathConfigurationLoadState>(NotLoaded)
     private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())

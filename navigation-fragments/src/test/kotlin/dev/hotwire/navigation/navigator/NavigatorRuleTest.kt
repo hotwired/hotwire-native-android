@@ -12,11 +12,8 @@ import androidx.navigation.navOptions
 import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.ui.R
 import androidx.test.core.app.ApplicationProvider
-import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfiguration.Location
-import dev.hotwire.core.turbo.config.PathConfigurationLoadState
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
@@ -38,7 +35,7 @@ import org.robolectric.annotation.Config
 class NavigatorRuleTest {
     private lateinit var context: Context
     private lateinit var controller: TestNavHostController
-    private lateinit var pathConfiguration: PathConfiguration
+    private val pathConfiguration get() = Hotwire.config.pathConfiguration
 
     private val homeUrl = "https://hotwired.dev/home"
     private val newHomeUrl = "https://hotwired.dev/new-home"
@@ -81,13 +78,10 @@ class NavigatorRuleTest {
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
         controller = buildControllerWithGraph()
-        pathConfiguration = PathConfiguration().apply {
-            load(
-                context = context,
-                location = Location(assetFilePath = "json/test-configuration.json"),
-                options = PathConfiguration.LoaderOptions()
-            )
-        }
+        Hotwire.loadPathConfiguration(
+            context = context,
+            location = Location(assetFilePath = "json/test-configuration.json")
+        )
     }
 
     @Test
