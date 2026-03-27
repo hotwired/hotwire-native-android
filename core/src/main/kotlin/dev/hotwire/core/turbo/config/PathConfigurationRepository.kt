@@ -10,6 +10,7 @@ import dev.hotwire.core.turbo.util.toJson
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import okhttp3.Request
+import okhttp3.coroutines.executeAsync
 
 internal class PathConfigurationRepository {
     private val cacheFile = "turbo"
@@ -25,10 +26,7 @@ internal class PathConfigurationRepository {
         }
 
         val request = requestBuilder.build()
-
-        return withContext(dispatcherProvider.io) {
-            issueRequest(request)
-        }
+        return issueRequest(request)
     }
 
     fun getBundledConfiguration(
@@ -55,13 +53,13 @@ internal class PathConfigurationRepository {
         }
     }
 
-    private fun issueRequest(request: Request): String? {
-        return try {
-            val call = HotwireHttpClient.instance.newCall(request)
+    private suspend fun issueRequest(request: Request): String? = try {
+        val call = HotwireHttpClient.instance.newCall(request)
 
-            call.execute().use { response ->
+        call.executeAsync().use { response ->
+            withContext(dispatcherProvider.io) {
                 if (response.isSuccessful) {
-                    response.body?.string()
+                    response.body.string()
                 } else {
                     logError(
                         "remotePathConfigurationFailure",
@@ -70,12 +68,12 @@ internal class PathConfigurationRepository {
                     null
                 }
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            logError("remotePathConfigurationException", e)
-            null
         }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        logError("remotePathConfigurationException", e)
+        null
     }
 
     private fun prefs(context: Context): SharedPreferences {
