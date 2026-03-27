@@ -132,9 +132,9 @@ class PathConfiguration internal constructor() {
 
         logEvent(
             "pathConfigurationUpdated", listOf(
-                "Source" to state.javaClass.simpleName,
-                "Rules" to state.configuration.rules.size,
-                "Settings" to state.configuration.settings.size
+                "source" to state.javaClass.simpleName,
+                "rules" to state.configuration.rules.size,
+                "settings" to state.configuration.settings.size
             )
         )
     }
