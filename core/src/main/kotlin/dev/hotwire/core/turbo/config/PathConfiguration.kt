@@ -5,7 +5,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import dev.hotwire.core.logging.logEvent
-import dev.hotwire.core.turbo.config.PathConfigurationLoadState.Idle
+import dev.hotwire.core.turbo.config.PathConfigurationLoadState.NotLoaded
 import dev.hotwire.core.turbo.config.PathConfigurationLoadState.Loaded
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
  */
 class PathConfiguration {
     private val cachedProperties: HashMap<String, PathConfigurationProperties> = hashMapOf()
-    private val _loadState = MutableStateFlow<PathConfigurationLoadState>(Idle)
+    private val _loadState = MutableStateFlow<PathConfigurationLoadState>(NotLoaded)
     private val loadingScope: CoroutineScope = CoroutineScope(dispatcherProvider.io + SupervisorJob())
     private var loadingJob: Job? = null
 

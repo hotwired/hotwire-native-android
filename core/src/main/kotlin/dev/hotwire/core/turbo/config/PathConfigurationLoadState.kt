@@ -9,7 +9,7 @@ sealed class PathConfigurationLoadState {
     /**
      * The initial state before any configuration has been loaded.
      */
-    data object Idle : PathConfigurationLoadState()
+    data object NotLoaded : PathConfigurationLoadState()
 
     /**
      * The configuration was successfully loaded from a source. Check the
