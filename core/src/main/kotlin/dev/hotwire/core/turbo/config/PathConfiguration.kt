@@ -5,14 +5,14 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import dev.hotwire.core.logging.logEvent
-import dev.hotwire.core.turbo.config.PathConfigurationLoadState.NotLoaded
 import dev.hotwire.core.turbo.config.PathConfigurationLoadState.Loaded
+import dev.hotwire.core.turbo.config.PathConfigurationLoadState.NotLoaded
 import dev.hotwire.core.turbo.nav.Presentation
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.util.dispatcherProvider
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -91,12 +91,12 @@ class PathConfiguration {
         logEvent("pathConfigurationLoading", location.toString())
 
         val appContext = context.applicationContext
+        loadingJob?.cancel()
 
         loader.loadCachedOrBundledConfiguration(appContext, location)?.let {
             applyLoadedState(it)
         }
 
-        loadingJob?.cancel()
         loadingJob = loadingScope.launch {
             location.remoteFileUrl?.let { url ->
                 loader.loadRemoteConfigurationForUrl(appContext, url, options)?.let {
