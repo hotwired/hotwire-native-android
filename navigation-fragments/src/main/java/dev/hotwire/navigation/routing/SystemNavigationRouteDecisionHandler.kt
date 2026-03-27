@@ -31,6 +31,8 @@ class SystemNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
             activity.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             logError("SystemNavigationRouteDecisionHandler", e)
+        } catch (e: SecurityException) {
+            logError("SystemNavigationRouteDecisionHandler", e)
         }
 
         return Router.Decision.CANCEL
