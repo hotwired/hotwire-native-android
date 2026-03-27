@@ -19,11 +19,9 @@ import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.nav.QueryStringPresentation
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
-import dev.hotwire.navigation.CoroutinesTestRule
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -69,10 +67,6 @@ class NavigatorRuleTest {
             popExit = R.anim.nav_default_pop_exit_anim
         }
     }
-
-    @Rule
-    @JvmField
-    var coroutinesTestRule = CoroutinesTestRule()
 
     @Before
     fun setup() {

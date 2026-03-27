@@ -98,7 +98,6 @@ dependencies {
     testImplementation("androidx.test:core:1.6.1") // Robolectric
     testImplementation("org.assertj:assertj-core:3.26.3")
     testImplementation("androidx.navigation:navigation-testing:2.8.9")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
     testImplementation("org.robolectric:robolectric:4.14.1")
     testImplementation("org.mockito:mockito-core:5.14.2")
     testImplementation("com.nhaarman:mockito-kotlin:1.6.0")
