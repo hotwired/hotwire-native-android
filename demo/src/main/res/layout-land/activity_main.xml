@@ -8,49 +8,57 @@
     android:layout_height="match_parent"
     tools:context=".main.MainActivity">
 
+    <com.google.android.material.navigationrail.NavigationRailView
+        android:id="@+id/navigation_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menuGravity="center" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/navigation_navigator_host"
         android:name="dev.hotwire.navigation.navigator.NavigatorHost"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/navigation_bar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/navigation_bar"
         app:defaultNavHost="false" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/bridge_components_navigator_host"
         android:name="dev.hotwire.navigation.navigator.NavigatorHost"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/navigation_bar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/navigation_bar"
         app:defaultNavHost="false" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/resources_navigator_host"
         android:name="dev.hotwire.navigation.navigator.NavigatorHost"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/navigation_bar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/navigation_bar"
         app:defaultNavHost="false" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/bugs_fixes_navigator_host"
         android:name="dev.hotwire.navigation.navigator.NavigatorHost"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/navigation_bar"
-        app:defaultNavHost="false" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/navigation_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:labelVisibilityMode="labeled" />
+        app:layout_constraintStart_toEndOf="@id/navigation_bar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:defaultNavHost="false" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

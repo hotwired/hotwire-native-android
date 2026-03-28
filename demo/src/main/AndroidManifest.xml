@@ -17,7 +17,7 @@
 
         <activity
             android:name="dev.hotwire.demo.main.MainActivity"
-            android:configChanges="orientation|screenSize"
+            android:configChanges="screenSize"
             android:launchMode="singleInstance"
             android:theme="@style/MyTheme.DayNight"
             android:windowSoftInputMode="adjustResize"

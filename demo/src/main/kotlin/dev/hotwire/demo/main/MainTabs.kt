@@ -3,9 +3,9 @@ package dev.hotwire.demo.main
 import dev.hotwire.demo.Demo
 import dev.hotwire.demo.R
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
-import dev.hotwire.navigation.tabs.HotwireBottomTab
+import dev.hotwire.navigation.tabs.HotwireTab
 
-private val navigation = HotwireBottomTab(
+private val navigation = HotwireTab(
     title = "Navigation",
     iconResId = R.drawable.ic_tab_navigation,
     configuration = NavigatorConfiguration(
@@ -15,7 +15,7 @@ private val navigation = HotwireBottomTab(
     )
 )
 
-private val bridgeComponents = HotwireBottomTab(
+private val bridgeComponents = HotwireTab(
     title = "Bridge Components",
     iconResId = R.drawable.ic_tab_bridge_components,
     configuration = NavigatorConfiguration(
@@ -25,7 +25,7 @@ private val bridgeComponents = HotwireBottomTab(
     )
 )
 
-private val resources = HotwireBottomTab(
+private val resources = HotwireTab(
     title = "Resources",
     iconResId = R.drawable.ic_tab_resources,
     configuration = NavigatorConfiguration(
@@ -35,7 +35,7 @@ private val resources = HotwireBottomTab(
     )
 )
 
-private val bugsAndFixes = HotwireBottomTab(
+private val bugsAndFixes = HotwireTab(
     title = "Bugs & Fixes",
     iconResId = R.drawable.ic_tab_bugs_fixes,
     isVisible = Demo.current == Demo.Environment.Local,
