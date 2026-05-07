@@ -170,6 +170,23 @@ interface HotwireDestination : BridgeDestination {
         return null
     }
 
+    /**
+     * Gets a registered `ActivityResultContracts.RequestMultiplePermissions` activity result
+     * launcher instance for the given `requestCode`.
+     *
+     * Override to provide your own [androidx.activity.result.ActivityResultLauncher]
+     * instances. If your app doesn't have a matching `requestCode`, you must call
+     * `super.activityMultiplePermissionsResultLauncher(requestCode)` to give the
+     * library an opportunity to provide a matching result launcher.
+     *
+     * @param requestCode The request code for the corresponding result launcher.
+     */
+    fun activityMultiplePermissionsResultLauncher(
+        requestCode: Int
+    ): ActivityResultLauncher<Array<String>>? {
+        return null
+    }
+
     fun prepareNavigation(onReady: () -> Unit)
 
     override fun bridgeWebViewIsReady(): Boolean {

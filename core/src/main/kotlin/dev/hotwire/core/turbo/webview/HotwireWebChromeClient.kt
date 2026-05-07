@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Message
 import android.webkit.GeolocationPermissions
 import android.webkit.JsResult
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -95,5 +96,21 @@ open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
         callback: GeolocationPermissions.Callback?
     ) {
         session.geolocationPermissionDelegate.onRequestPermission(origin, callback)
+    }
+
+    override fun onPermissionRequest(request: PermissionRequest) {
+        if (request.requestsMediaCapture()) {
+            session.webViewPermissionDelegate.onRequest(request)
+        } else {
+            super.onPermissionRequest(request)
+        }
+    }
+
+    private fun PermissionRequest.requestsMediaCapture(): Boolean {
+        val resources = resources ?: return false
+        return resources.isNotEmpty() && resources.all { resource ->
+            resource == PermissionRequest.RESOURCE_AUDIO_CAPTURE ||
+                    resource == PermissionRequest.RESOURCE_VIDEO_CAPTURE
+        }
     }
 }
