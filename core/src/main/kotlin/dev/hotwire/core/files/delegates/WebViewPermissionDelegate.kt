@@ -70,8 +70,24 @@ class WebViewPermissionDelegate(private val session: Session) {
             return
         }
 
+        // Replace any previously-held request before storing the new one so
+        // the WebView always sees a grant or deny — never an orphaned request
+        // that's silently dropped because it was overwritten.
+        pendingRequest?.deny()
         pendingRequest = request
         startPermissionRequest(runtimeNeeded)
+    }
+
+    /**
+     * Forwarded from [android.webkit.WebChromeClient.onPermissionRequestCanceled].
+     * Clears our pending state if it matches the canceled request so we don't
+     * later call grant/deny on a request that the WebView has already given up
+     * on (e.g. the user navigated away or the page was reloaded mid-prompt).
+     */
+    fun onCancel(request: PermissionRequest) {
+        if (pendingRequest === request) {
+            pendingRequest = null
+        }
     }
 
     fun onActivityResult(grantResults: Map<String, Boolean>) {

@@ -106,6 +106,13 @@ open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
         }
     }
 
+    override fun onPermissionRequestCanceled(request: PermissionRequest) {
+        // Always forward the cancel; the delegate is a no-op when the request
+        // doesn't match the one it's currently tracking.
+        session.webViewPermissionDelegate.onCancel(request)
+        super.onPermissionRequestCanceled(request)
+    }
+
     private fun PermissionRequest.requestsMediaCapture(): Boolean {
         val resources = resources ?: return false
         return resources.isNotEmpty() && resources.all { resource ->

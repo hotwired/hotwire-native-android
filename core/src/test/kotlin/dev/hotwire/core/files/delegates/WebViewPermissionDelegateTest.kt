@@ -7,11 +7,16 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.webkit.PermissionRequest
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.session.Session
+import dev.hotwire.core.turbo.session.SessionCallback
+import dev.hotwire.core.turbo.visit.Visit
+import dev.hotwire.core.turbo.visit.VisitDestination
+import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -145,6 +150,59 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
     }
 
+    @Test
+    fun `a second pending request denies the first to avoid orphaning it`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        wireDestinationWithLauncher()
+        // Permission not yet granted at runtime, so each request is held as
+        // pending after launching the system prompt. The second request should
+        // explicitly deny the first so the WebView always gets a verdict.
+        val first = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val second = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+
+        session.webViewPermissionDelegate.onRequest(first)
+        session.webViewPermissionDelegate.onRequest(second)
+
+        verify(first).deny()
+    }
+
+    @Test
+    fun `onCancel clears matching pending request so onActivityResult is a no-op`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        wireDestinationWithLauncher()
+        val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+
+        session.webViewPermissionDelegate.onRequest(request)
+        session.webViewPermissionDelegate.onCancel(request)
+        // After the cancel, the system permission dialog might still resolve;
+        // the result must be ignored rather than applied to the canceled
+        // request.
+        session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
+
+        verify(request, org.mockito.Mockito.never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        verify(request, org.mockito.Mockito.never()).deny()
+    }
+
+    @Test
+    fun `onCancel ignores a request that is not currently pending`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        // In production MODIFY_AUDIO_SETTINGS is auto-granted at install since
+        // it is a normal-level permission; Robolectric requires the explicit
+        // grant for the post-result isGranted() check to return true.
+        grantRuntimePermissions(MODIFY_AUDIO_SETTINGS)
+        wireDestinationWithLauncher()
+        val pending = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val unrelated = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+
+        session.webViewPermissionDelegate.onRequest(pending)
+        session.webViewPermissionDelegate.onCancel(unrelated)
+        // The pending request is still tracked; resolving via onActivityResult
+        // with a granted permission should grant the original request.
+        session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
+
+        verify(pending).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+    }
+
     private fun declareInManifest(vararg permissions: String) {
         val packageInfo = shadowOf(context.packageManager)
             .getInternalMutablePackageInfo(context.packageName)
@@ -154,6 +212,32 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
 
     private fun grantRuntimePermissions(vararg permissions: String) {
         shadowOf(context.applicationContext as Application).grantPermissions(*permissions)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun wireDestinationWithLauncher() {
+        // Provide a no-op launcher so onRequest holds the request as pending
+        // instead of denying it via the launcher-not-available branch.
+        val launcher = mock(ActivityResultLauncher::class.java) as ActivityResultLauncher<Array<String>>
+        val visitDestination = object : VisitDestination {
+            override fun isActive() = true
+            override fun activityResultLauncher(requestCode: Int) = null
+            override fun activityPermissionResultLauncher(requestCode: Int) = null
+            override fun activityMultiplePermissionsResultLauncher(
+                requestCode: Int
+            ): ActivityResultLauncher<Array<String>>? = launcher
+        }
+        val callback = mock(SessionCallback::class.java)
+        whenever(callback.visitDestination()).thenReturn(visitDestination)
+        session.currentVisit = Visit(
+            location = baseUrl(),
+            destinationIdentifier = 1,
+            restoreWithCachedSnapshot = false,
+            reload = false,
+            callback = callback,
+            identifier = "",
+            options = VisitOptions(),
+        )
     }
 
     private fun mockRequest(vararg resources: String): PermissionRequest {
