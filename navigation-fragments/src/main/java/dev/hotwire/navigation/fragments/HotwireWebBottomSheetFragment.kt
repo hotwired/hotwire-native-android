@@ -14,6 +14,7 @@ import dev.hotwire.core.bridge.BridgeComponentFragmentLifecycle
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
+import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_WEBVIEW_PERMISSION
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -77,6 +78,15 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
     override fun activityPermissionResultLauncher(requestCode: Int): ActivityResultLauncher<String>? {
         return when (requestCode) {
             HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION -> webDelegate.geoLocationPermissionResultLauncher
+            else -> null
+        }
+    }
+
+    override fun activityMultiplePermissionsResultLauncher(
+        requestCode: Int
+    ): ActivityResultLauncher<Array<String>>? {
+        return when (requestCode) {
+            HOTWIRE_REQUEST_CODE_WEBVIEW_PERMISSION -> webDelegate.webViewPermissionResultLauncher
             else -> null
         }
     }

@@ -3,6 +3,7 @@ package dev.hotwire.navigation.fragments
 import android.content.Intent
 import android.webkit.HttpAuthHandler
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -63,6 +64,13 @@ internal class HotwireWebFragmentDelegate(
      * The activity result launcher that handles geolocation permission results.
      */
     val geoLocationPermissionResultLauncher = registerGeolocationPermissionLauncher()
+
+    /**
+     * The activity result launcher that handles WebView-issued
+     * [android.webkit.PermissionRequest]s for media-capture resources
+     * (audio and/or video).
+     */
+    val webViewPermissionResultLauncher = registerWebViewPermissionLauncher()
 
     fun prepareNavigation(onReady: () -> Unit) {
         session.removeCallback(this)
@@ -181,6 +189,12 @@ internal class HotwireWebFragmentDelegate(
 
     override fun activityPermissionResultLauncher(requestCode: Int): ActivityResultLauncher<String>? {
         return navDestination.activityPermissionResultLauncher(requestCode)
+    }
+
+    override fun activityMultiplePermissionsResultLauncher(
+        requestCode: Int
+    ): ActivityResultLauncher<Array<String>>? {
+        return navDestination.activityMultiplePermissionsResultLauncher(requestCode)
     }
 
     // -----------------------------------------------------------------------
@@ -378,6 +392,12 @@ internal class HotwireWebFragmentDelegate(
     private fun registerGeolocationPermissionLauncher(): ActivityResultLauncher<String> {
         return navDestination.fragment.registerForActivityResult(RequestPermission()) { isGranted ->
             session.geolocationPermissionDelegate.onActivityResult(isGranted)
+        }
+    }
+
+    private fun registerWebViewPermissionLauncher(): ActivityResultLauncher<Array<String>> {
+        return navDestination.fragment.registerForActivityResult(RequestMultiplePermissions()) { results ->
+            session.webViewPermissionDelegate.onActivityResult(results)
         }
     }
 
