@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.FragmentNavigator
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.navigation.activities.HotwireActivity
@@ -19,19 +19,19 @@ import dev.hotwire.navigation.navigator.NavigatorHost
 import dev.hotwire.navigation.navigator.presentationContext
 
 /**
- * A [BottomNavigationView] controller that manages multiple [HotwireBottomTab]s, each associated
+ * A [NavigationBarView] controller that manages multiple [HotwireTab]s, each associated
  * with its own [NavigatorHost] instance in the Activity layout.
  */
-class HotwireBottomNavigationController(
+class HotwireNavigationController(
     val activity: HotwireActivity,
-    val view: BottomNavigationView,
+    val view: NavigationBarView,
     val initialVisibility: Visibility = Visibility.DEFAULT,
     val clearNavigationOnTabReselection: Boolean = true,
     val animateVisibilityChanges: Boolean = true
 ) : NavController.OnDestinationChangedListener {
 
     /**
-     * The visibility mode for the `BottomNavigationView`.
+     * The visibility mode for the `NavigationBarView`.
      */
     enum class Visibility {
         /**
@@ -58,10 +58,10 @@ class HotwireBottomNavigationController(
             updateVisibility()
         }
 
-    private var listener: ((Int, HotwireBottomTab) -> Unit)? = null
+    private var listener: ((Int, HotwireTab) -> Unit)? = null
 
     /**
-     * Set the visibility of the `BottomNavigationView`.
+     * Set the visibility of the `NavigationBarView`.
      */
     var visibility = initialVisibility
         set(value) {
@@ -70,29 +70,29 @@ class HotwireBottomNavigationController(
         }
 
     /**
-     * The currently selected tab in the [BottomNavigationView].
+     * The currently selected tab in the [NavigationBarView].
      */
-    val currentTab: HotwireBottomTab
+    val currentTab: HotwireTab
         get() {
             require(tabs.isNotEmpty()) { "No tabs have been loaded." }
             return tabs[view.selectedItemId]
         }
 
     /**
-     * The tabs that have been loaded into the [BottomNavigationView].
+     * The tabs that have been loaded into the [NavigationBarView].
      */
-    var tabs = listOf<HotwireBottomTab>()
+    var tabs = listOf<HotwireTab>()
         private set
 
     /**
-     * Load the tabs and their navigator configurations into the [BottomNavigationView].
+     * Load the tabs and their navigator configurations into the [NavigationBarView].
      *
-     * @param tabs The list of [HotwireBottomTab] instances that correspond to the
-     *  [BottomNavigationView] tabs.
+     * @param tabs The list of [HotwireTab] instances that correspond to the
+     *  [NavigationBarView] tabs.
      * @param selectedTabIndex The index of the initially selected tab.
      */
     fun load(
-        tabs: List<HotwireBottomTab>,
+        tabs: List<HotwireTab>,
         selectedTabIndex: Int = 0
     ) {
         require(tabs.isNotEmpty()) { "Tabs cannot be empty." }
@@ -121,7 +121,7 @@ class HotwireBottomNavigationController(
     /**
      * Set a listener that will be notified when a navigation tab is selected.
      */
-    fun setOnTabSelectedListener(listener: ((index: Int, tab: HotwireBottomTab) -> Unit)?) {
+    fun setOnTabSelectedListener(listener: ((index: Int, tab: HotwireTab) -> Unit)?) {
         this.listener = listener
     }
 
@@ -219,7 +219,7 @@ class HotwireBottomNavigationController(
         }
     }
 
-    private fun switchTab(tab: HotwireBottomTab) {
+    private fun switchTab(tab: HotwireTab) {
         activity.delegate.setCurrentNavigator(tab.configuration)
 
         tabs.forEach {
@@ -228,7 +228,7 @@ class HotwireBottomNavigationController(
         }
     }
 
-    private val HotwireBottomTab.navigatorHost: NavigatorHost
+    private val HotwireTab.navigatorHost: NavigatorHost
         get() {
             val fragment = activity.supportFragmentManager.findFragmentById(configuration.navigatorHostId)
             return fragment as NavigatorHost

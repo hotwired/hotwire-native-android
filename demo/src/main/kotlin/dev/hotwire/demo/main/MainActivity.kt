@@ -4,17 +4,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import dev.hotwire.core.turbo.webview.WebViewInfo
 import dev.hotwire.core.turbo.webview.WebViewVersionCompatibility
 import dev.hotwire.demo.R
 import dev.hotwire.navigation.activities.HotwireActivity
-import dev.hotwire.navigation.tabs.HotwireBottomNavigationController
+import dev.hotwire.navigation.tabs.HotwireNavigationController
 import dev.hotwire.navigation.tabs.navigatorConfigurations
 import dev.hotwire.navigation.util.applyDefaultImeWindowInsets
 
 class MainActivity : HotwireActivity() {
-    private lateinit var bottomNavigationController: HotwireBottomNavigationController
+    private lateinit var navigationController: HotwireNavigationController
     private val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +24,7 @@ class MainActivity : HotwireActivity() {
         setContentView(R.layout.activity_main)
         findViewById<View>(R.id.root).applyDefaultImeWindowInsets()
 
-        initializeBottomTabs()
+        initializeNavigation()
 
         WebViewVersionCompatibility.displayUpdateDialogIfOutdated(
             activity = this,
@@ -32,12 +32,12 @@ class MainActivity : HotwireActivity() {
         )
     }
 
-    private fun initializeBottomTabs() {
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
+    private fun initializeNavigation() {
+        val navigationView = findViewById<NavigationBarView>(R.id.navigation_bar)
 
-        bottomNavigationController = HotwireBottomNavigationController(this, bottomNavigationView)
-        bottomNavigationController.load(mainTabs, viewModel.selectedTabIndex)
-        bottomNavigationController.setOnTabSelectedListener { index, _ ->
+        navigationController = HotwireNavigationController(this, navigationView)
+        navigationController.load(mainTabs, viewModel.selectedTabIndex)
+        navigationController.setOnTabSelectedListener { index, _ ->
             viewModel.selectedTabIndex = index
         }
     }
