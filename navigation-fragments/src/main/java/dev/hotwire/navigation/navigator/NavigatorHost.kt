@@ -15,6 +15,7 @@ import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
 
 internal const val DEEPLINK_EXTRAS_KEY = "android-support-nav:controller:deepLinkExtras"
+internal const val DEEPLINK_ARGS_KEY = "android-support-nav:controller:deepLinkArgs"
 internal const val LOCATION_KEY = "location"
 
 open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
@@ -79,7 +80,16 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
      */
     @VisibleForTesting(otherwise = PROTECTED)
     fun ensureDeeplinkStartLocationValid() {
-        val extrasBundle = activity.intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
+        val intent = activity.intent
+
+        // NavController merges deepLinkArgs over the validated deepLinkExtras (last write wins), so
+        // replace each per-destination bundle with an empty one to stop it overriding the validated
+        // start location below (or injecting other arguments).
+        intent.extras?.getParcelableArrayList<Bundle>(DEEPLINK_ARGS_KEY)?.let { args ->
+            intent.putParcelableArrayListExtra(DEEPLINK_ARGS_KEY, ArrayList(args.map { Bundle() }))
+        }
+
+        val extrasBundle = intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
         val startLocation = extrasBundle.getString(LOCATION_KEY) ?: return
 
         val deepLinkStartUri = startLocation.toUri()
@@ -87,7 +97,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
 
         if (deepLinkStartUri.host != configStartUri.host) {
             extrasBundle.putString(LOCATION_KEY, configuration.startLocation)
-            activity.intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
+            intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
         }
     }
 
