@@ -1,5 +1,6 @@
 package dev.hotwire.navigation.navigator
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.VisibleForTesting
@@ -73,18 +74,18 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     }
 
     /**
-     * Google's Navigation library automatically navigates to deep links provided in the
-     * Activity's Intent. This exposes a vulnerability for malicious Intents to open an arbitrary
-     * webpage outside of the app's domain, allowing javascript injection on the page. Ensure
-     * that deep link intents always match the app's domain.
+     * Google's Navigation library automatically navigates to deep links provided in the launching
+     * Intent, which lets a malicious Intent open an arbitrary page in the WebView. Intents the app
+     * produced itself are trusted; any other Intent has its attacker-controllable deep-link
+     * arguments sanitized so the start location stays within the app's domain.
      */
     @VisibleForTesting(otherwise = PROTECTED)
     fun ensureDeeplinkStartLocationValid() {
         val intent = activity.intent
+        if (shouldTrustIntent(intent)) return
 
         // NavController merges deepLinkArgs over the validated deepLinkExtras (last write wins), so
-        // replace each per-destination bundle with an empty one to stop it overriding the validated
-        // start location below (or injecting other arguments).
+        // empty each per-destination bundle to stop it overriding the validated start location.
         intent.extras?.getParcelableArrayList<Bundle>(DEEPLINK_ARGS_KEY)?.let { args ->
             intent.putParcelableArrayListExtra(DEEPLINK_ARGS_KEY, ArrayList(args.map { Bundle() }))
         }
@@ -99,6 +100,16 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
             extrasBundle.putString(LOCATION_KEY, configuration.startLocation)
             intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
         }
+    }
+
+    private fun shouldTrustIntent(intent: Intent): Boolean {
+        // EXTRA_REFERRER / EXTRA_REFERRER_NAME back Activity.referrer and are attacker-settable, so a
+        // self-origin claim that relies on them can't be trusted.
+        if (intent.hasExtra(Intent.EXTRA_REFERRER) || intent.hasExtra(Intent.EXTRA_REFERRER_NAME)) {
+            return false
+        }
+        val caller = activity.callingPackage ?: activity.referrer?.authority
+        return caller == activity.packageName
     }
 
     private val configuration get() = activity.navigatorConfigurations().firstOrNull {
