@@ -22,6 +22,13 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     lateinit var navigator: Navigator
         private set
 
+    /**
+     * Whether the navigation graph has been built and the start destination
+     * loaded. See [initControllerGraphIfNeeded].
+     */
+    internal var isGraphInitialized = false
+        private set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,7 +36,10 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         navigator = Navigator(this, configuration, activity)
         childFragmentManager.addFragmentOnAttachListener(this)
 
-        initControllerGraph()
+        // The graph (and therefore the start destination) is not built here.
+        // It's built when the host registers with the Activity delegate in
+        // onViewCreated, which allows the delegate to load the host eagerly
+        // (the default) or defer loading until its tab is first selected.
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,7 +66,18 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         return isAdded && !isDetached && childFragmentManager.primaryNavigationFragment != null
     }
 
+    /**
+     * Builds the navigation graph and loads the start destination if it hasn't
+     * been built already. This is idempotent, so it's safe to call whenever the
+     * host may need to become ready for navigation (e.g. when its tab is selected).
+     */
+    internal fun initControllerGraphIfNeeded() {
+        if (isGraphInitialized) return
+        initControllerGraph()
+    }
+
     internal fun initControllerGraph() {
+        isGraphInitialized = true
         ensureDeeplinkStartLocationValid()
 
         navController.apply {

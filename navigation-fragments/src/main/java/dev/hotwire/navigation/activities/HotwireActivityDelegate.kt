@@ -18,6 +18,16 @@ import dev.hotwire.navigation.observers.HotwireActivityObserver
 class HotwireActivityDelegate(val activity: HotwireActivity) {
     private val navigatorHosts = mutableMapOf<Int, NavigatorHost>()
 
+    /**
+     * The IDs of navigator hosts whose start destination should not be loaded
+     * until the host first becomes the current navigator (e.g. when its bottom
+     * tab is first selected). Hosts not in this set are loaded eagerly as soon
+     * as their view is created. Populated by
+     * [dev.hotwire.navigation.tabs.HotwireBottomNavigationController] when
+     * deferred tab loading is enabled.
+     */
+    internal val deferredNavigatorHostIds = mutableSetOf<Int>()
+
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
         override fun handleOnBackPressed() {
             currentNavigator?.pop()
@@ -66,6 +76,10 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
         val navigatorHost = navigatorHosts[currentNavigatorHostId]
         if (navigatorHost != null) {
+            // Load the host's start destination on demand the first time it
+            // becomes the current navigator. This is a no-op if it's already
+            // been loaded.
+            navigatorHost.initControllerGraphIfNeeded()
             updateOnBackPressedCallback(navigatorHost)
         }
     }
@@ -79,6 +93,13 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
             if (currentNavigatorHostId == host.id) {
                 updateOnBackPressedCallback(host)
+            }
+
+            // Load the host's start destination unless it's a deferred tab host
+            // that isn't currently selected. Deferred hosts are loaded when they
+            // first become the current navigator (see setCurrentNavigator).
+            if (host.id !in deferredNavigatorHostIds || currentNavigatorHostId == host.id) {
+                host.initControllerGraphIfNeeded()
             }
         }
     }
@@ -106,16 +127,22 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
     /**
      * Resets the sessions associated with all registered navigator hosts.
+     * Hosts that haven't loaded their start destination yet are skipped.
      */
     fun resetSessions() {
-        navigatorHosts.forEach { it.value.navigator.session.reset() }
+        navigatorHosts.values
+            .filter { it.isGraphInitialized }
+            .forEach { it.navigator.session.reset() }
     }
 
     /**
      * Resets all registered navigators via [Navigator.reset].
+     * Hosts that haven't loaded their start destination yet are skipped.
      */
     fun resetNavigators() {
-        navigatorHosts.forEach { it.value.navigator.reset() }
+        navigatorHosts.values
+            .filter { it.isGraphInitialized }
+            .forEach { it.navigator.reset() }
     }
 
     private fun listenToDestinationChanges(host: NavigatorHost) {
