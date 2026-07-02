@@ -1,5 +1,6 @@
 package dev.hotwire.navigation.routing
 
+import dev.hotwire.core.turbo.visit.VisitProposal
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.logging.logDebug
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
@@ -21,12 +22,12 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
         val name: String
 
         /**
-         * Determines whether the location matches this decision handler. Use
-         * your own custom rules based on the location's domain, protocol,
-         * path, or any other factors.
+         * Determines whether the visit proposal matches this decision handler. Use
+         * your own custom rules based on the proposal's location domain, protocol,
+         * path, options, path configuration properties, or any other factors.
          */
         fun matches(
-            location: String,
+            proposal: VisitProposal,
             configuration: NavigatorConfiguration
         ): Boolean
 
@@ -36,7 +37,7 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
          * [Decision.CANCEL].
          */
         fun handle(
-            location: String,
+            proposal: VisitProposal,
             configuration: NavigatorConfiguration,
             activity: HotwireActivity
         ): Decision
@@ -55,22 +56,22 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
     }
 
     internal fun decideRoute(
-        location: String,
+        proposal: VisitProposal,
         configuration: NavigatorConfiguration,
         activity: HotwireActivity
     ): Decision {
         decisionHandlers.forEach { handler ->
-            if (handler.matches(location, configuration)) {
+            if (handler.matches(proposal, configuration)) {
                 logDebug("handlerMatch", listOf(
                     "handler" to handler.name,
-                    "location" to location
+                    "location" to proposal.location
                 ))
 
-                return handler.handle(location, configuration, activity)
+                return handler.handle(proposal, configuration, activity)
             }
         }
 
-        logDebug("noHandlerForLocation", location)
+        logDebug("noHandlerForLocation", proposal.location)
         return Decision.CANCEL
     }
 }

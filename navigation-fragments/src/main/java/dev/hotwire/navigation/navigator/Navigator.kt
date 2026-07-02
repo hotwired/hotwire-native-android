@@ -13,6 +13,7 @@ import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.core.turbo.visit.VisitProposal
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestination
@@ -138,7 +139,7 @@ class Navigator(
         extras: FragmentNavigator.Extras? = null
     ) {
 
-        if (getRouteDecision(location) == Router.Decision.CANCEL) {
+        if (getRouteDecision(location, options, bundle) == Router.Decision.CANCEL) {
             return
         }
 
@@ -423,11 +424,22 @@ class Navigator(
         return customNavigator?.navController ?: navController
     }
 
-    private fun getRouteDecision(location: String): Router.Decision {
+    private fun getRouteDecision(
+        location: String,
+        options: VisitOptions,
+        bundle: Bundle?
+    ): Router.Decision {
         val customDecision = currentDestination?.customRouteDecision(location)
 
-        val decision = customDecision ?: HotwireNavigation.router.decideRoute(
+        val proposal = VisitProposal(
             location = location,
+            options = options,
+            properties = Hotwire.config.pathConfiguration.properties(location),
+            bundle = bundle
+        )
+
+        val decision = customDecision ?: HotwireNavigation.router.decideRoute(
+            proposal = proposal,
             configuration = configuration,
             activity = activity
         )
