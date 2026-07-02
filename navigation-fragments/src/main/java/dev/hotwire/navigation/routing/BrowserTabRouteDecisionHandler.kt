@@ -1,10 +1,12 @@
 package dev.hotwire.navigation.routing
 
+import android.content.ActivityNotFoundException
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.google.android.material.R
 import dev.hotwire.navigation.activities.HotwireActivity
+import dev.hotwire.navigation.logging.logError
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.util.colorFromThemeAttr
 
@@ -39,13 +41,17 @@ class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
             .setNavigationBarColor(color)
             .build()
 
-        CustomTabsIntent.Builder()
-            .setShowTitle(true)
-            .setShareState(CustomTabsIntent.SHARE_STATE_ON)
-            .setUrlBarHidingEnabled(false)
-            .setDefaultColorSchemeParams(colorParams)
-            .build()
-            .launchUrl(activity, location.toUri())
+        try {
+            CustomTabsIntent.Builder()
+                .setShowTitle(true)
+                .setShareState(CustomTabsIntent.SHARE_STATE_ON)
+                .setUrlBarHidingEnabled(false)
+                .setDefaultColorSchemeParams(colorParams)
+                .build()
+                .launchUrl(activity, location.toUri())
+        } catch (e: ActivityNotFoundException) {
+            logError("BrowserTabRouteDecisionHandler", e)
+        }
 
         return Router.Decision.CANCEL
     }

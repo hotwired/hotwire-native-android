@@ -23,6 +23,7 @@ import androidx.webkit.WebViewFeature.isFeatureSupported
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.files.delegates.GeolocationPermissionDelegate
+import dev.hotwire.core.files.delegates.WebViewPermissionDelegate
 import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.errors.HttpError
@@ -102,6 +103,12 @@ class Session(
      * The delegate the handles WebView-requested geolocation permission requests.
      */
     val geolocationPermissionDelegate = GeolocationPermissionDelegate(this)
+
+    /**
+     * The delegate that handles WebView-issued [android.webkit.PermissionRequest]s
+     * for media-capture resources. Currently audio-only.
+     */
+    val webViewPermissionDelegate = WebViewPermissionDelegate(this)
 
     init {
         initializeWebView()

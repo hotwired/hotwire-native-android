@@ -14,10 +14,10 @@ class BridgeDelegate<D : BridgeDestination>(
 ) : DefaultLifecycleObserver {
     internal var bridge: Bridge? = null
     private var destinationIsActive: Boolean = false
-    private val initializedComponents = hashMapOf<String, BridgeComponent<D>>()
     private val resolvedLocation: String
         get() = bridge?.webView?.url ?: location
 
+    val initializedComponents = hashMapOf<String, BridgeComponent<D>>()
     val activeComponents: List<BridgeComponent<D>>
         get() = initializedComponents.map { it.value }.takeIf { destinationIsActive }.orEmpty()
 
@@ -101,8 +101,20 @@ class BridgeDelegate<D : BridgeDestination>(
         return activeComponents.filterIsInstance<C>().firstOrNull()
     }
 
-    inline fun <reified C> forEachComponent(action: (C) -> Unit) {
-        activeComponents.filterIsInstance<C>().forEach { action(it) }
+    inline fun <reified C> forEachInitializedComponent(action: (C) -> Unit) {
+        initializedComponents.forEach { (_, component) ->
+            if (component is C) {
+                action(component)
+            }
+        }
+    }
+
+    inline fun <reified C> forEachActiveComponent(action: (C) -> Unit) {
+        activeComponents.forEach { component ->
+            if (component is C) {
+                action(component)
+            }
+        }
     }
 
     private fun getOrCreateComponent(name: String): BridgeComponent<D>? {

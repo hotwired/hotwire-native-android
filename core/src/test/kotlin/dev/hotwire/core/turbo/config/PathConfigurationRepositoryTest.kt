@@ -88,8 +88,8 @@ class PathConfigurationRepositoryTest : BaseRepositoryTest() {
         }
     }
 
-    private fun load(json: String?): PathConfiguration? {
-        return json?.toObject(object : TypeToken<PathConfiguration>() {})
+    private fun load(json: String?): PathConfigurationData? {
+        return json?.toObject(object : TypeToken<PathConfigurationData>() {})
     }
 
     private fun json(): String {

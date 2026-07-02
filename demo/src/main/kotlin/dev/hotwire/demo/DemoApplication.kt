@@ -24,15 +24,6 @@ class DemoApplication : Application() {
     }
 
     private fun configureApp() {
-        // Loads the path configuration
-        Hotwire.loadPathConfiguration(
-            context = this,
-            location = PathConfiguration.Location(
-                assetFilePath = "json/path-configuration.json",
-                remoteFileUrl = "${Demo.current.url}/configurations/android_v1.json"
-            )
-        )
-
         // Set the default fragment destination
         Hotwire.defaultFragmentDestination = WebFragment::class
 
@@ -60,5 +51,14 @@ class DemoApplication : Application() {
         } else {
             HotwireLogLevel.NONE
         }
+
+        // Loads the path configuration
+        Hotwire.loadPathConfiguration(
+            context = this,
+            location = PathConfiguration.Location(
+                assetFilePath = "json/path-configuration.json",
+                remoteFileUrl = "${Demo.current.url}/configurations/android_v1.json"
+            )
+        )
     }
 }
