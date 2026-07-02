@@ -58,7 +58,10 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
      * has not been created yet.
      */
     fun isReady(): Boolean {
-        return isAdded && !isDetached && childFragmentManager.primaryNavigationFragment != null
+        return isGraphInitialized
+                && isAdded
+                && !isDetached
+                && childFragmentManager.primaryNavigationFragment != null
     }
 
     /**
