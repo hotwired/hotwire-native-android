@@ -38,7 +38,7 @@ class MainActivity : HotwireActivity() {
         bottomNavigationController = HotwireBottomNavigationController(
             activity = this,
             view = bottomNavigationView,
-            deferInitialTabLoad = true
+            lazyLoadTabs = true
         )
         bottomNavigationController.load(mainTabs, viewModel.selectedTabIndex)
         bottomNavigationController.setOnTabSelectedListener { index, _ ->
