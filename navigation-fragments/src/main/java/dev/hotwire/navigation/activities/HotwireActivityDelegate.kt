@@ -17,7 +17,6 @@ import dev.hotwire.navigation.observers.HotwireActivityObserver
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class HotwireActivityDelegate(val activity: HotwireActivity) {
     private val navigatorHosts = mutableMapOf<Int, NavigatorHost>()
-
     private val lazyNavigatorHostIds = mutableSetOf<Int>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
@@ -68,20 +67,16 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
         val navigatorHost = navigatorHosts[currentNavigatorHostId]
         if (navigatorHost != null) {
-            // Load the host's start destination on demand the first time it
-            // becomes the current navigator. This is a no-op if it's already
-            // been loaded.
             navigatorHost.initControllerGraphIfNeeded()
             updateOnBackPressedCallback(navigatorHost)
         }
     }
 
     /**
-     * Marks the given navigator hosts as lazy, meaning their start destination
+     * Sets the given navigator hosts as lazy, meaning their start destination
      * won't be loaded until the host first becomes the current navigator (e.g.
      * when its bottom tab is first selected). Any host not marked as lazy is
-     * loaded eagerly as soon as its view is created. Replaces any previously
-     * marked hosts.
+     * loaded eagerly as soon as its view is created.
      */
     internal fun setLazyNavigatorHosts(navigatorHostIds: Collection<Int>) {
         lazyNavigatorHostIds.clear()
@@ -101,7 +96,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
             // Load the host's start destination unless it's a lazy host that
             // isn't currently selected. Lazy hosts are loaded when they first
-            // become the current navigator (see setCurrentNavigator).
+            // become the current navigator.
             if (host.id !in lazyNavigatorHostIds || currentNavigatorHostId == host.id) {
                 host.initControllerGraphIfNeeded()
             }
