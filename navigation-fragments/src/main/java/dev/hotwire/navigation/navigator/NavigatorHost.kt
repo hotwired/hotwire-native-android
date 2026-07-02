@@ -1,6 +1,5 @@
 package dev.hotwire.navigation.navigator
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.VisibleForTesting
@@ -75,14 +74,13 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
 
     /**
      * Google's Navigation library automatically navigates to deep links provided in the launching
-     * Intent, which lets a malicious Intent open an arbitrary page in the WebView. Intents the app
-     * produced itself are trusted; any other Intent has its attacker-controllable deep-link
-     * arguments sanitized so the start location stays within the app's domain.
+     * Intent, which lets a malicious Intent open an arbitrary page in the WebView. Sanitize the
+     * Intent's attacker-controllable deep-link arguments so the start location stays within the
+     * app's domain.
      */
     @VisibleForTesting(otherwise = PROTECTED)
     fun ensureDeeplinkStartLocationValid() {
         val intent = activity.intent
-        if (shouldTrustIntent(intent)) return
 
         // NavController merges deepLinkArgs over the validated deepLinkExtras (last write wins), so
         // empty each per-destination bundle to stop it overriding the validated start location.
@@ -100,16 +98,6 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
             extrasBundle.putString(LOCATION_KEY, configuration.startLocation)
             intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
         }
-    }
-
-    private fun shouldTrustIntent(intent: Intent): Boolean {
-        // EXTRA_REFERRER / EXTRA_REFERRER_NAME back Activity.referrer and are attacker-settable, so a
-        // self-origin claim that relies on them can't be trusted.
-        if (intent.hasExtra(Intent.EXTRA_REFERRER) || intent.hasExtra(Intent.EXTRA_REFERRER_NAME)) {
-            return false
-        }
-        val caller = activity.callingPackage ?: activity.referrer?.authority
-        return caller == activity.packageName
     }
 
     private val configuration get() = activity.navigatorConfigurations().firstOrNull {
