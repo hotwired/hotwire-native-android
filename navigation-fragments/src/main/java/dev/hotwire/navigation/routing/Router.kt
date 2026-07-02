@@ -64,14 +64,14 @@ class Router(private val decisionHandlers: List<RouteDecisionHandler>) {
             if (handler.matches(proposal, configuration)) {
                 logDebug("handlerMatch", listOf(
                     "handler" to handler.name,
-                    "location" to proposal.location
+                    "proposal" to proposal
                 ))
 
                 return handler.handle(proposal, configuration, activity)
             }
         }
 
-        logDebug("noHandlerForLocation", proposal.location)
+        logDebug("noHandlerForProposal", proposal.toString())
         return Decision.CANCEL
     }
 }
