@@ -211,7 +211,7 @@ class Navigator(
         navigateWhenReady {
             clearAll {
                 session.reset()
-                host.initControllerGraph()
+                host.resetControllerGraph()
 
                 if (host.view == null) {
                     onReset()

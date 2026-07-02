@@ -35,7 +35,11 @@ class MainActivity : HotwireActivity() {
     private fun initializeBottomTabs() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
-        bottomNavigationController = HotwireBottomNavigationController(this, bottomNavigationView)
+        bottomNavigationController = HotwireBottomNavigationController(
+            activity = this,
+            view = bottomNavigationView,
+            lazyLoadTabs = true
+        )
         bottomNavigationController.load(mainTabs, viewModel.selectedTabIndex)
         bottomNavigationController.setOnTabSelectedListener { index, _ ->
             viewModel.selectedTabIndex = index
