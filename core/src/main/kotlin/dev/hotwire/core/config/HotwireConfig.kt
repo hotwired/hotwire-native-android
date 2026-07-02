@@ -33,7 +33,7 @@ class HotwireConfig internal constructor() {
     var offlineRequestHandler: OfflineRequestHandler? = null
 
     /**
-     * Set a custom logger to handle debug messages.
+     * Set a custom logger instance to handle library log messages in your app.
      *
      * The default logger is [DefaultHotwireLogger] which prints logs to Logcat.
      * If you'd like to change this behavior, provide your own implementation of [HotwireLogger].
