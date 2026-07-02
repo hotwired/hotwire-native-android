@@ -1,10 +1,10 @@
 package dev.hotwire.demo
 
 import android.app.Application
-import dev.hotwire.core.BuildConfig
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.logging.HotwireLogLevel
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.demo.bridge.FormComponent
 import dev.hotwire.demo.bridge.MenuComponent
@@ -43,10 +43,14 @@ class DemoApplication : Application() {
         )
 
         // Set configuration options
-        Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
         Hotwire.config.applicationUserAgentPrefix = "Hotwire Demo;"
+        Hotwire.config.logger.logLevel = if (BuildConfig.DEBUG) {
+            HotwireLogLevel.DEBUG
+        } else {
+            HotwireLogLevel.NONE
+        }
 
         // Loads the path configuration
         Hotwire.loadPathConfiguration(
