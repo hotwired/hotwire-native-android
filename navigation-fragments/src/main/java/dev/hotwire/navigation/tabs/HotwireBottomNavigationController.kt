@@ -22,6 +22,15 @@ import dev.hotwire.navigation.navigator.presentationContext
  * A [BottomNavigationView] controller that manages multiple [HotwireBottomTab]s, each associated
  * with its own [NavigatorHost] instance in the Activity layout.
  *
+ * @param activity The [HotwireActivity] that hosts the [BottomNavigationView] and its tabs.
+ * @param view The [BottomNavigationView] in your layout to manage.
+ * @param initialVisibility The initial [Visibility] mode for the [BottomNavigationView]. Defaults
+ *  to [Visibility.DEFAULT].
+ * @param clearNavigationOnTabReselection When `true` (the default), reselecting the already-active
+ *  tab clears its navigation backstack to the start destination. When `false`, reselecting a tab
+ *  has no effect.
+ * @param animateVisibilityChanges When `true` (the default), the [BottomNavigationView] animates in
+ *  and out when its visibility changes. When `false`, visibility changes are applied instantly.
  * @param lazyLoadTabs When `false` (the default), every tab's [NavigatorHost] loads its
  *  start location as soon as its view is created, so all tabs load up front. When `true`, a tab's
  *  start location is not loaded until that tab is first selected, avoiding loading (and creating a
