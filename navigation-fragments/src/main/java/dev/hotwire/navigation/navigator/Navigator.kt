@@ -429,14 +429,14 @@ class Navigator(
         options: VisitOptions,
         bundle: Bundle?
     ): Router.Decision {
-        val customDecision = currentDestination?.customRouteDecision(location)
-
         val proposal = VisitProposal(
             location = location,
             options = options,
             properties = Hotwire.config.pathConfiguration.properties(location),
             bundle = bundle
         )
+
+        val customDecision = currentDestination?.customRouteDecision(proposal)
 
         val decision = customDecision ?: HotwireNavigation.router.decideRoute(
             proposal = proposal,
