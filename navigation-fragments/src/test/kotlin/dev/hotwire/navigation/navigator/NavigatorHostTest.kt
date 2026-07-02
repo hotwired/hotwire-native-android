@@ -1,6 +1,7 @@
 package dev.hotwire.navigation.navigator
 
 import android.content.Intent
+import android.os.Bundle
 import androidx.core.os.bundleOf
 import dev.hotwire.navigation.activities.HotwireActivity
 import org.assertj.core.api.Assertions.assertThat
