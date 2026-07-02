@@ -5,6 +5,7 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.google.android.material.R
+import dev.hotwire.core.turbo.visit.VisitProposal
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.logging.logError
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
@@ -21,17 +22,17 @@ class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "browser-tab"
 
     override fun matches(
-        location: String,
+        proposal: VisitProposal,
         configuration: NavigatorConfiguration
     ): Boolean {
-        val locationUri = location.toUri()
+        val locationUri = proposal.location.toUri()
 
         return configuration.startLocation.toUri().host != locationUri.host &&
                 (locationUri.scheme?.lowercase() == "https" || locationUri.scheme?.lowercase() == "http")
     }
 
     override fun handle(
-        location: String,
+        proposal: VisitProposal,
         configuration: NavigatorConfiguration,
         activity: HotwireActivity
     ): Router.Decision {
@@ -48,7 +49,7 @@ class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
                 .setUrlBarHidingEnabled(false)
                 .setDefaultColorSchemeParams(colorParams)
                 .build()
-                .launchUrl(activity, location.toUri())
+                .launchUrl(activity, proposal.location.toUri())
         } catch (e: ActivityNotFoundException) {
             logError("BrowserTabRouteDecisionHandler", e)
         }

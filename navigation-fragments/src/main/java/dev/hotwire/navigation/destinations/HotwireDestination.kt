@@ -11,6 +11,7 @@ import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.config.context
 import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.visit.VisitAction
+import dev.hotwire.core.turbo.visit.VisitProposal
 import dev.hotwire.navigation.fragments.HotwireFragmentDelegate
 import dev.hotwire.navigation.fragments.HotwireFragmentViewModel
 import dev.hotwire.navigation.navigator.Navigator
@@ -115,7 +116,7 @@ interface HotwireDestination : BridgeDestination {
      * Return `null` to use the global [Router.RouteDecisionHandler] instances to determine
      * routing logic.
      */
-    fun customRouteDecision(newLocation: String): Router.Decision? {
+    fun customRouteDecision(proposal: VisitProposal): Router.Decision? {
         return null
     }
 
