@@ -35,11 +35,6 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         activity = requireActivity() as HotwireActivity
         navigator = Navigator(this, configuration, activity)
         childFragmentManager.addFragmentOnAttachListener(this)
-
-        // The graph (and therefore the start destination) is not built here.
-        // It's built when the host registers with the Activity delegate in
-        // onViewCreated, which allows the delegate to load the host eagerly
-        // (the default) or defer loading until its tab is first selected.
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,11 +67,16 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
      * host may need to become ready for navigation (e.g. when its tab is selected).
      */
     internal fun initControllerGraphIfNeeded() {
-        if (isGraphInitialized) return
+        if (!isGraphInitialized) {
+            initControllerGraph()
+        }
+    }
+
+    internal fun resetControllerGraph() {
         initControllerGraph()
     }
 
-    internal fun initControllerGraph() {
+    private fun initControllerGraph() {
         isGraphInitialized = true
         ensureDeeplinkStartLocationValid()
 
