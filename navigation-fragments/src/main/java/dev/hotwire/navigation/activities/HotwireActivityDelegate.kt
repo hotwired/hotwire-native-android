@@ -18,15 +18,7 @@ import dev.hotwire.navigation.observers.HotwireActivityObserver
 class HotwireActivityDelegate(val activity: HotwireActivity) {
     private val navigatorHosts = mutableMapOf<Int, NavigatorHost>()
 
-    /**
-     * The IDs of navigator hosts whose start destination should not be loaded
-     * until the host first becomes the current navigator (e.g. when its bottom
-     * tab is first selected). Hosts not in this set are loaded eagerly as soon
-     * as their view is created. Populated by
-     * [dev.hotwire.navigation.tabs.HotwireBottomNavigationController] when
-     * deferred tab loading is enabled.
-     */
-    internal val deferredNavigatorHostIds = mutableSetOf<Int>()
+    private val lazyNavigatorHostIds = mutableSetOf<Int>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
         override fun handleOnBackPressed() {
@@ -84,6 +76,18 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
         }
     }
 
+    /**
+     * Marks the given navigator hosts as lazy, meaning their start destination
+     * won't be loaded until the host first becomes the current navigator (e.g.
+     * when its bottom tab is first selected). Any host not marked as lazy is
+     * loaded eagerly as soon as its view is created. Replaces any previously
+     * marked hosts.
+     */
+    internal fun setLazyNavigatorHosts(navigatorHostIds: Collection<Int>) {
+        lazyNavigatorHostIds.clear()
+        lazyNavigatorHostIds.addAll(navigatorHostIds)
+    }
+
     internal fun registerNavigatorHost(host: NavigatorHost) {
         logEvent("navigatorRegistered", listOf("navigator" to host.navigator.configuration.name))
 
@@ -95,10 +99,10 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
                 updateOnBackPressedCallback(host)
             }
 
-            // Load the host's start destination unless it's a deferred tab host
-            // that isn't currently selected. Deferred hosts are loaded when they
-            // first become the current navigator (see setCurrentNavigator).
-            if (host.id !in deferredNavigatorHostIds || currentNavigatorHostId == host.id) {
+            // Load the host's start destination unless it's a lazy host that
+            // isn't currently selected. Lazy hosts are loaded when they first
+            // become the current navigator (see setCurrentNavigator).
+            if (host.id !in lazyNavigatorHostIds || currentNavigatorHostId == host.id) {
                 host.initControllerGraphIfNeeded()
             }
         }

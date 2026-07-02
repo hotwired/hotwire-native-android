@@ -106,14 +106,11 @@ class HotwireBottomNavigationController(
 
         this.tabs = tabs
 
-        // Register which hosts should defer loading before their views are
-        // created and registered with the delegate. The initially selected tab
-        // is still loaded immediately when it becomes the current navigator.
-        activity.delegate.deferredNavigatorHostIds.apply {
-            clear()
-            if (lazyLoadTabs) {
-                addAll(tabs.map { it.configuration.navigatorHostId })
-            }
+        // Mark the tab hosts as lazy before their views are created and
+        // registered with the delegate. The initially selected tab is still
+        // loaded immediately when it becomes the current navigator.
+        if (lazyLoadTabs) {
+            activity.delegate.setLazyNavigatorHosts(tabs.map { it.configuration.navigatorHostId })
         }
 
         val initialIndex = selectedTabIndex.coerceIn(0, tabs.lastIndex)
