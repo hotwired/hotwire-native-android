@@ -22,7 +22,7 @@ import dev.hotwire.navigation.navigator.presentationContext
  * A [BottomNavigationView] controller that manages multiple [HotwireBottomTab]s, each associated
  * with its own [NavigatorHost] instance in the Activity layout.
  *
- * @param deferInitialTabLoad When `false` (the default), every tab's [NavigatorHost] loads its
+ * @param lazyLoadTabs When `false` (the default), every tab's [NavigatorHost] loads its
  *  start location as soon as its view is created, so all tabs load up front. When `true`, a tab's
  *  start location is not loaded until that tab is first selected, avoiding loading (and creating a
  *  web view visit for) every tab at once. The initially selected tab still loads immediately.
@@ -33,7 +33,7 @@ class HotwireBottomNavigationController(
     val initialVisibility: Visibility = Visibility.DEFAULT,
     val clearNavigationOnTabReselection: Boolean = true,
     val animateVisibilityChanges: Boolean = true,
-    val deferInitialTabLoad: Boolean = false
+    val lazyLoadTabs: Boolean = false
 ) : NavController.OnDestinationChangedListener {
 
     /**
@@ -111,7 +111,7 @@ class HotwireBottomNavigationController(
         // is still loaded immediately when it becomes the current navigator.
         activity.delegate.deferredNavigatorHostIds.apply {
             clear()
-            if (deferInitialTabLoad) {
+            if (lazyLoadTabs) {
                 addAll(tabs.map { it.configuration.navigatorHostId })
             }
         }
