@@ -380,8 +380,19 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private fun title(): String {
-        return webView.title ?: ""
+        val title = webView.title.orEmpty()
+        val url = webView.url.orEmpty()
+        return if (title.isEmpty() || title.asDisplayUrl() == url.asDisplayUrl()) "" else title
     }
+
+    // Android's WebView uses the URL when a page has no <title>:
+    // Normalize the URL and compare it to the title. If they are the same,
+    // return an empty string to avoid showing the URL as the title.
+    private fun String.asDisplayUrl(): String =
+        substringAfter("://")
+            .removePrefix("www.")
+            .replace("%20", " ")
+            .trimEnd('/')
 
     private fun registerFileChooserLauncher(): ActivityResultLauncher<Intent> {
         return navDestination.fragment.registerForActivityResult(StartActivityForResult()) { result ->
