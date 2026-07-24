@@ -1,6 +1,7 @@
 package dev.hotwire.core.turbo.config
 
 import com.google.gson.annotations.SerializedName
+import java.net.MalformedURLException
 import java.net.URL
 
 @ConsistentCopyVisibility
@@ -36,7 +37,11 @@ data class PathConfigurationData internal constructor(
     }
 
     private fun path(location: String): String {
-        val url = URL(location)
+        val url = try {
+            URL(location)
+        } catch (e: MalformedURLException) {
+            return ""
+        }
 
         return if (url.query == null) {
             url.path
