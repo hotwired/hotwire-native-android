@@ -267,6 +267,25 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @Test
+    fun `cold boot visit with reload reloads the web view when it is on the visit location`() {
+        whenever(webView.url).thenReturn(visit.location)
+
+        session.visit(visit.copy(reload = true))
+
+        verify(webView).reload()
+    }
+
+    @Test
+    fun `cold boot visit with reload loads the visit location when the web view is on a different location`() {
+        whenever(webView.url).thenReturn("${visit.location}/modal")
+
+        session.visit(visit.copy(reload = true))
+
+        verify(webView, never()).reload()
+        verify(webView).loadUrl(visit.location)
+    }
+
+    @Test
     fun `restore current visit`() {
         val visitIdentifier = "12345"
         val restorationIdentifier = "67890"
