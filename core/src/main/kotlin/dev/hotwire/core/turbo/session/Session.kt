@@ -662,9 +662,10 @@ class Session(
         // sees a WebView.loadUrl() request as a same-page visit instead of
         // requesting a full page reload. To work around this, we call
         // WebView.reload(), which fully reloads the page for all URLs.
-        when (visit.reload) {
-            true -> webView.reload()
-            else -> webView.loadUrl(visit.location)
+        if (visit.reload && webView.url == visit.location) {
+            webView.reload()
+        } else {
+            webView.loadUrl(visit.location)
         }
     }
 
