@@ -94,9 +94,14 @@ internal class HotwireViewScreenshotHolder {
 
     private fun hasEnoughMemoryForScreenshot(): Boolean {
         val runtime = Runtime.getRuntime()
-        val used = runtime.totalMemory().toFloat()
-        val max = runtime.maxMemory().toFloat()
-        val remaining = 1f - (used / max)
+        return hasEnoughMemory(
+            used = runtime.totalMemory() - runtime.freeMemory(),
+            max = runtime.maxMemory()
+        )
+    }
+
+    internal fun hasEnoughMemory(used: Long, max: Long): Boolean {
+        val remaining = 1f - (used.toFloat() / max.toFloat())
 
         return remaining > .20
     }
