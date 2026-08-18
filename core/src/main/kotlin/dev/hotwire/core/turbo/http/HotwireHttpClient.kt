@@ -52,6 +52,7 @@ object HotwireHttpClient {
 
     private fun buildNewHttpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
+            .cookieJar(WebViewCookieJar())
             .connectTimeout(10L, TimeUnit.SECONDS)
             .readTimeout(30L, TimeUnit.SECONDS)
             .writeTimeout(30L, TimeUnit.SECONDS)
