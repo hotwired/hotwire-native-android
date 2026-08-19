@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.turbo.config.PathConfigurationLoadState.Loaded
 import dev.hotwire.core.turbo.config.PathConfigurationLoadState.NotLoaded
 import dev.hotwire.core.turbo.nav.Presentation
@@ -88,7 +88,7 @@ class PathConfiguration internal constructor() {
         location: Location,
         options: LoaderOptions
     ) {
-        logEvent("pathConfigurationLoading", location.toString())
+        logDebug("pathConfigurationLoading", location.toString())
 
         val appContext = context.applicationContext
         loadingJob?.cancel()
@@ -130,7 +130,7 @@ class PathConfiguration internal constructor() {
         cachedProperties.clear()
         _loadState.value = state
 
-        logEvent(
+        logDebug(
             "pathConfigurationUpdated", listOf(
                 "source" to state.javaClass.simpleName,
                 "rules" to state.configuration.rules.size,

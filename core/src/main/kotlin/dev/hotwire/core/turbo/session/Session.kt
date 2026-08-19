@@ -24,7 +24,7 @@ import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.files.delegates.GeolocationPermissionDelegate
 import dev.hotwire.core.files.delegates.WebViewPermissionDelegate
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
@@ -662,9 +662,10 @@ class Session(
         // sees a WebView.loadUrl() request as a same-page visit instead of
         // requesting a full page reload. To work around this, we call
         // WebView.reload(), which fully reloads the page for all URLs.
-        when (visit.reload) {
-            true -> webView.reload()
-            else -> webView.loadUrl(visit.location)
+        if (visit.reload && webView.url == visit.location) {
+            webView.reload()
+        } else {
+            webView.loadUrl(visit.location)
         }
     }
 
@@ -765,7 +766,7 @@ class Session(
 
     private fun logEvent(event: String, vararg params: Pair<String, Any>) {
         val attributes = params.toMutableList().apply { add(0, "session" to sessionName) }
-        logEvent(event, attributes)
+        logDebug(event, attributes)
     }
 
 

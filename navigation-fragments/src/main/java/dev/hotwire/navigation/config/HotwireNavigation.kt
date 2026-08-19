@@ -9,8 +9,8 @@ import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
 import dev.hotwire.navigation.fragments.HotwireWebFragment
 import dev.hotwire.navigation.routing.AppNavigationRouteDecisionHandler
 import dev.hotwire.navigation.routing.BrowserTabRouteDecisionHandler
-import dev.hotwire.navigation.routing.SystemNavigationRouteDecisionHandler
 import dev.hotwire.navigation.routing.Router
+import dev.hotwire.navigation.routing.SystemNavigationRouteDecisionHandler
 import kotlin.reflect.KClass
 
 internal object HotwireNavigation {

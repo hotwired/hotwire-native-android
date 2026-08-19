@@ -3,7 +3,7 @@ package dev.hotwire.core.turbo.config
 import android.content.Context
 import com.google.gson.reflect.TypeToken
 import dev.hotwire.core.logging.logError
-import dev.hotwire.core.logging.logEvent
+import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.turbo.util.toObject
 
 internal class PathConfigurationLoader {
@@ -27,11 +27,11 @@ internal class PathConfigurationLoader {
         context: Context,
         filePath: String
     ): PathConfigurationLoadState.Loaded.BundledAssetLoaded? {
-        logEvent("bundledPathConfigurationLoading", filePath)
+        logDebug("bundledPathConfigurationLoading", filePath)
 
         val json = repository.getBundledConfiguration(context, filePath)
         return load(json)?.let {
-            logEvent("bundledPathConfigurationLoaded", filePath)
+            logDebug("bundledPathConfigurationLoaded", filePath)
             PathConfigurationLoadState.Loaded.BundledAssetLoaded(it)
         }
     }
@@ -40,16 +40,16 @@ internal class PathConfigurationLoader {
         context: Context,
         url: String
     ): PathConfigurationLoadState.Loaded.CachedRemoteLoaded? {
-        logEvent("cachedPathConfigurationLoading", url)
+        logDebug("cachedPathConfigurationLoading", url)
 
         val json = repository.getCachedConfigurationForUrl(context, url)
         val config = json?.let { load(it) }
 
         return if (config == null) {
-            logEvent("cachedPathConfigurationFailedToLoad", url)
+            logDebug("cachedPathConfigurationFailedToLoad", url)
             null
         } else {
-            logEvent("cachedPathConfigurationLoaded", url)
+            logDebug("cachedPathConfigurationLoaded", url)
             PathConfigurationLoadState.Loaded.CachedRemoteLoaded(config)
         }
     }
@@ -59,14 +59,14 @@ internal class PathConfigurationLoader {
         url: String,
         options: PathConfiguration.LoaderOptions
     ): PathConfigurationLoadState.Loaded.RemoteLoaded? {
-        logEvent("remotePathConfigurationLoading", url)
+        logDebug("remotePathConfigurationLoading", url)
 
         val config = repository.getRemoteConfiguration(url, options)?.let { json -> load(json) }
 
         return if (config == null) {
             null
         } else {
-            logEvent("remotePathConfigurationLoaded", url)
+            logDebug("remotePathConfigurationLoaded", url)
             cacheConfigurationForUrl(context, url, config)
             PathConfigurationLoadState.Loaded.RemoteLoaded(config)
         }

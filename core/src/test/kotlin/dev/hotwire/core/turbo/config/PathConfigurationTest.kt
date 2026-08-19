@@ -202,6 +202,14 @@ class PathConfigurationTest : BaseRepositoryTest() {
     }
 
     @Test
+    fun unknownSchemeLocationDoesNotThrow() {
+        assertThat(pathConfiguration.properties("mailto:test@example.com")).isNotNull
+        assertThat(pathConfiguration.properties("tel:+15551234567")).isNotNull
+        assertThat(pathConfiguration.properties("sms:+15551234567")).isNotNull
+        assertThat(pathConfiguration.properties("custom-app://feature")).isNotNull
+    }
+
+    @Test
     fun customProperties() {
         assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.size)).isEqualTo(1)
         assertThat((pathConfiguration.properties("$url/custom/tabs").getTabs()?.first()?.label)).isEqualTo("Tab 1")

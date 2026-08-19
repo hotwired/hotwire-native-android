@@ -13,12 +13,13 @@ import dev.hotwire.core.turbo.nav.PresentationContext
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
+import dev.hotwire.core.turbo.visit.VisitProposal
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.destinations.HotwireDestinationAnimations
 import dev.hotwire.navigation.destinations.HotwireDialogDestination
-import dev.hotwire.navigation.logging.logEvent
+import dev.hotwire.navigation.logging.logDebug
 import dev.hotwire.navigation.routing.Router
 import dev.hotwire.navigation.session.SessionModalResult
 import dev.hotwire.navigation.session.SessionViewModel
@@ -138,7 +139,7 @@ class Navigator(
         extras: FragmentNavigator.Extras? = null
     ) {
 
-        if (getRouteDecision(location) == Router.Decision.CANCEL) {
+        if (getRouteDecision(location, options, bundle) == Router.Decision.CANCEL) {
             return
         }
 
@@ -211,7 +212,7 @@ class Navigator(
         navigateWhenReady {
             clearAll {
                 session.reset()
-                host.initControllerGraph()
+                host.resetControllerGraph()
 
                 if (host.view == null) {
                     onReset()
@@ -423,11 +424,22 @@ class Navigator(
         return customNavigator?.navController ?: navController
     }
 
-    private fun getRouteDecision(location: String): Router.Decision {
-        val customDecision = currentDestination?.customRouteDecision(location)
+    private fun getRouteDecision(
+        location: String,
+        options: VisitOptions,
+        bundle: Bundle?
+    ): Router.Decision {
+        val proposal = VisitProposal(
+            location = location,
+            options = options,
+            properties = Hotwire.config.pathConfiguration.properties(location),
+            bundle = bundle
+        )
+
+        val customDecision = currentDestination?.customRouteDecision(proposal)
 
         val decision = customDecision ?: HotwireNavigation.router.decideRoute(
-            location = location,
+            proposal = proposal,
             configuration = configuration,
             activity = activity
         )
@@ -471,6 +483,6 @@ class Navigator(
             add(0, "navigator" to configuration.name)
             add("currentFragment" to (destinationName ?: "NONE"))
         }
-        logEvent(event, attributes)
+        logDebug(event, attributes)
     }
 }

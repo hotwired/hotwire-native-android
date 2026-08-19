@@ -2,7 +2,7 @@ package dev.hotwire.navigation.activities
 
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
-import dev.hotwire.navigation.logging.logEvent
+import dev.hotwire.navigation.logging.logDebug
 import dev.hotwire.navigation.navigator.Navigator
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.navigator.NavigatorHost
@@ -17,6 +17,7 @@ import dev.hotwire.navigation.observers.HotwireActivityObserver
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class HotwireActivityDelegate(val activity: HotwireActivity) {
     private val navigatorHosts = mutableMapOf<Int, NavigatorHost>()
+    private val lazyNavigatorHostIds = mutableSetOf<Int>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
         override fun handleOnBackPressed() {
@@ -61,17 +62,29 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
      *  you must update this whenever the current navigator changes.
      */
     fun setCurrentNavigator(configuration: NavigatorConfiguration) {
-        logEvent("navigatorSetAsCurrent", listOf("navigator" to configuration.name))
+        logDebug("navigatorSetAsCurrent", listOf("navigator" to configuration.name))
         currentNavigatorHostId = configuration.navigatorHostId
 
         val navigatorHost = navigatorHosts[currentNavigatorHostId]
         if (navigatorHost != null) {
+            navigatorHost.initControllerGraphIfNeeded()
             updateOnBackPressedCallback(navigatorHost)
         }
     }
 
+    /**
+     * Sets the given navigator hosts as lazy, meaning their start destination
+     * won't be loaded until the host first becomes the current navigator (e.g.
+     * when its bottom tab is first selected). Any host not marked as lazy is
+     * loaded eagerly as soon as its view is created.
+     */
+    internal fun setLazyNavigatorHosts(navigatorHostIds: Collection<Int>) {
+        lazyNavigatorHostIds.clear()
+        lazyNavigatorHostIds.addAll(navigatorHostIds)
+    }
+
     internal fun registerNavigatorHost(host: NavigatorHost) {
-        logEvent("navigatorRegistered", listOf("navigator" to host.navigator.configuration.name))
+        logDebug("navigatorRegistered", listOf("navigator" to host.navigator.configuration.name))
 
         if (navigatorHosts[host.id] == null) {
             navigatorHosts[host.id] = host
@@ -80,16 +93,23 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
             if (currentNavigatorHostId == host.id) {
                 updateOnBackPressedCallback(host)
             }
+
+            // Load the host's start destination unless it's a lazy host that
+            // isn't currently selected. Lazy hosts are loaded when they first
+            // become the current navigator.
+            if (host.id !in lazyNavigatorHostIds || currentNavigatorHostId == host.id) {
+                host.initControllerGraphIfNeeded()
+            }
         }
     }
 
     internal fun unregisterNavigatorHost(host: NavigatorHost) {
-        logEvent("navigatorUnregistered", listOf("navigator" to host.navigator.configuration.name))
+        logDebug("navigatorUnregistered", listOf("navigator" to host.navigator.configuration.name))
         navigatorHosts.remove(host.id)
     }
 
     internal fun onNavigatorHostReady(host: NavigatorHost) {
-        logEvent("navigatorReady", listOf("navigator" to host.navigator.configuration.name))
+        logDebug("navigatorReady", listOf("navigator" to host.navigator.configuration.name))
         activity.onNavigatorReady(host.navigator)
     }
 
@@ -106,16 +126,22 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
     /**
      * Resets the sessions associated with all registered navigator hosts.
+     * Hosts that haven't loaded their start destination yet are skipped.
      */
     fun resetSessions() {
-        navigatorHosts.forEach { it.value.navigator.session.reset() }
+        navigatorHosts.values
+            .filter { it.isGraphInitialized }
+            .forEach { it.navigator.session.reset() }
     }
 
     /**
      * Resets all registered navigators via [Navigator.reset].
+     * Hosts that haven't loaded their start destination yet are skipped.
      */
     fun resetNavigators() {
-        navigatorHosts.forEach { it.value.navigator.reset() }
+        navigatorHosts.values
+            .filter { it.isGraphInitialized }
+            .forEach { it.navigator.reset() }
     }
 
     private fun listenToDestinationChanges(host: NavigatorHost) {
