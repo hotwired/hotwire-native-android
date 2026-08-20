@@ -36,6 +36,7 @@ open class BaseRepositoryTest : BaseUnitTest() {
 
     override fun teardown() {
         super.teardown()
+        HotwireHttpClient.reset()
         Dispatchers.resetMain()
         server.shutdown()
     }
