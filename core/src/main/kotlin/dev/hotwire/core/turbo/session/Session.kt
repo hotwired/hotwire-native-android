@@ -233,10 +233,12 @@ class Session(
      */
     @JavascriptInterface
     fun visitProposedToLocation(location: String, optionsJson: String) {
-        val options = VisitOptions.fromJSON(optionsJson) ?: return
-
-        logEvent("visitProposedToLocation", "location" to location, "options" to options)
-        callback { it.visitProposedToLocation(location, options) }
+        whenTrustedOrigin("visitProposedToLocation") {
+            VisitOptions.fromJSON(optionsJson)?.let { options ->
+                logEvent("visitProposedToLocation", "location" to location, "options" to options)
+                callback { it.visitProposedToLocation(location, options) }
+            }
+        }
     }
 
     private fun visitProposedToCrossOriginRedirect(
@@ -267,8 +269,11 @@ class Session(
      */
     @JavascriptInterface
     fun visitProposalRefreshingPage(location: String, optionsJson: String) {
-        val options = VisitOptions.fromJSON(optionsJson) ?: return
-        logEvent("visitProposalRefreshingPage", "location" to location, "options" to options)
+        whenTrustedOrigin("visitProposalRefreshingPage") {
+            VisitOptions.fromJSON(optionsJson)?.let { options ->
+                logEvent("visitProposalRefreshingPage", "location" to location, "options" to options)
+            }
+        }
     }
 
     /**
@@ -283,8 +288,11 @@ class Session(
      */
     @JavascriptInterface
     fun visitProposalScrollingToAnchor(location: String, optionsJson: String) {
-        val options = VisitOptions.fromJSON(optionsJson) ?: return
-        logEvent("visitProposalScrollingToAnchor", "location" to location, "options" to options)
+        whenTrustedOrigin("visitProposalScrollingToAnchor") {
+            VisitOptions.fromJSON(optionsJson)?.let { options ->
+                logEvent("visitProposalScrollingToAnchor", "location" to location, "options" to options)
+            }
+        }
     }
 
     /**
@@ -301,14 +309,16 @@ class Session(
     fun visitStarted(visitIdentifier: String, visitHasCachedSnapshot: Boolean,
                      visitIsPageRefresh: Boolean, location: String
     ) {
-        logEvent(
-            "visitStarted", "location" to location,
-            "visitIdentifier" to visitIdentifier,
-            "visitHasCachedSnapshot" to visitHasCachedSnapshot,
-            "visitIsPageRefresh" to visitIsPageRefresh
-        )
+        whenTrustedOrigin("visitStarted") {
+            logEvent(
+                "visitStarted", "location" to location,
+                "visitIdentifier" to visitIdentifier,
+                "visitHasCachedSnapshot" to visitHasCachedSnapshot,
+                "visitIsPageRefresh" to visitIsPageRefresh
+            )
 
-        currentVisit?.identifier = visitIdentifier
+            currentVisit?.identifier = visitIdentifier
+        }
     }
 
     /**
@@ -318,7 +328,9 @@ class Session(
      */
     @JavascriptInterface
     fun visitRequestStarted(visitIdentifier: String) {
-        logEvent("visitRequestStarted", "visitIdentifier" to visitIdentifier)
+        whenTrustedOrigin("visitRequestStarted") {
+            logEvent("visitRequestStarted", "visitIdentifier" to visitIdentifier)
+        }
     }
 
     /**
@@ -328,7 +340,9 @@ class Session(
      */
     @JavascriptInterface
     fun visitRequestCompleted(visitIdentifier: String) {
-        logEvent("visitRequestCompleted", "visitIdentifier" to visitIdentifier)
+        whenTrustedOrigin("visitRequestCompleted") {
+            logEvent("visitRequestCompleted", "visitIdentifier" to visitIdentifier)
+        }
     }
 
     /**
@@ -349,18 +363,20 @@ class Session(
         visitHasCachedSnapshot: Boolean,
         statusCode: Int
     ) {
-        val visitError = HttpError.from(statusCode)
+        whenTrustedOrigin("visitRequestFailedWithStatusCode") {
+            val visitError = HttpError.from(statusCode)
 
-        logEvent(
-            "visitRequestFailedWithStatusCode",
-            "location" to location,
-            "visitIdentifier" to visitIdentifier,
-            "visitHasCachedSnapshot" to visitHasCachedSnapshot,
-            "error" to visitError
-        )
+            logEvent(
+                "visitRequestFailedWithStatusCode",
+                "location" to location,
+                "visitIdentifier" to visitIdentifier,
+                "visitHasCachedSnapshot" to visitHasCachedSnapshot,
+                "error" to visitError
+            )
 
-        if (visitIdentifier == currentVisit?.identifier) {
-            callback { it.requestFailedWithError(visitHasCachedSnapshot, visitError) }
+            if (visitIdentifier == currentVisit?.identifier) {
+                callback { it.requestFailedWithError(visitHasCachedSnapshot, visitError) }
+            }
         }
     }
 
@@ -380,6 +396,16 @@ class Session(
      */
     @JavascriptInterface
     fun visitRequestFailedWithNonHttpStatusCode(
+        location: String,
+        visitIdentifier: String,
+        visitHasCachedSnapshot: Boolean
+    ) {
+        whenTrustedOrigin("visitRequestFailedWithNonHttpStatusCode") {
+            visitRequestFailedWithNonHttpStatusCodeTrusted(location, visitIdentifier, visitHasCachedSnapshot)
+        }
+    }
+
+    private fun visitRequestFailedWithNonHttpStatusCodeTrusted(
         location: String,
         visitIdentifier: String,
         visitHasCachedSnapshot: Boolean
@@ -421,11 +447,13 @@ class Session(
      */
     @JavascriptInterface
     fun visitRequestFinished(visitIdentifier: String) {
-        logEvent("visitRequestFinished", "visitIdentifier" to visitIdentifier)
+        whenTrustedOrigin("visitRequestFinished") {
+            logEvent("visitRequestFinished", "visitIdentifier" to visitIdentifier)
 
-        currentVisit?.let { visit ->
-            if (visitIdentifier == visit.identifier) {
-                callback { it.visitRequestFinished() }
+            currentVisit?.let { visit ->
+                if (visitIdentifier == visit.identifier) {
+                    callback { it.visitRequestFinished() }
+                }
             }
         }
     }
@@ -441,10 +469,12 @@ class Session(
      */
     @JavascriptInterface
     fun pageLoaded(restorationIdentifier: String) {
-        logEvent("pageLoaded", "restorationIdentifier" to restorationIdentifier)
+        whenTrustedOrigin("pageLoaded") {
+            logEvent("pageLoaded", "restorationIdentifier" to restorationIdentifier)
 
-        currentVisit?.let { visit ->
-            restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
+            currentVisit?.let { visit ->
+                restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
+            }
         }
     }
 
@@ -458,14 +488,16 @@ class Session(
      */
     @JavascriptInterface
     fun visitRendered(visitIdentifier: String) {
-        logEvent("visitRendered", "visitIdentifier" to visitIdentifier)
+        whenTrustedOrigin("visitRendered") {
+            logEvent("visitRendered", "visitIdentifier" to visitIdentifier)
 
-        currentVisit?.let { visit ->
-            if (visitIdentifier == coldBootVisitIdentifier || visitIdentifier == visit.identifier) {
-                if (isFeatureSupported(VISUAL_STATE_CALLBACK)) {
-                    postVisitVisualStateCallback(visitIdentifier)
-                } else {
-                    callback { it.visitRendered() }
+            currentVisit?.let { visit ->
+                if (visitIdentifier == coldBootVisitIdentifier || visitIdentifier == visit.identifier) {
+                    if (isFeatureSupported(VISUAL_STATE_CALLBACK)) {
+                        postVisitVisualStateCallback(visitIdentifier)
+                    } else {
+                        callback { it.visitRendered() }
+                    }
                 }
             }
         }
@@ -484,16 +516,18 @@ class Session(
      */
     @JavascriptInterface
     fun visitCompleted(visitIdentifier: String, restorationIdentifier: String) {
-        logEvent(
-            "visitCompleted",
-            "visitIdentifier" to visitIdentifier,
-            "restorationIdentifier" to restorationIdentifier
-        )
+        whenTrustedOrigin("visitCompleted") {
+            logEvent(
+                "visitCompleted",
+                "visitIdentifier" to visitIdentifier,
+                "restorationIdentifier" to restorationIdentifier
+            )
 
-        currentVisit?.let { visit ->
-            if (visitIdentifier == visit.identifier) {
-                restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
-                callback { it.visitCompleted(visit.completedOffline) }
+            currentVisit?.let { visit ->
+                if (visitIdentifier == visit.identifier) {
+                    restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
+                    callback { it.visitCompleted(visit.completedOffline) }
+                }
             }
         }
     }
@@ -508,13 +542,15 @@ class Session(
      */
     @JavascriptInterface
     fun formSubmissionStarted(location: String) {
-        logEvent(
-            "formSubmissionStarted",
-            "location" to location
-        )
+        whenTrustedOrigin("formSubmissionStarted") {
+            logEvent(
+                "formSubmissionStarted",
+                "location" to location
+            )
 
-        currentVisit?.let {
-            callback { it.formSubmissionStarted(location) }
+            currentVisit?.let {
+                callback { it.formSubmissionStarted(location) }
+            }
         }
     }
 
@@ -528,13 +564,15 @@ class Session(
      */
     @JavascriptInterface
     fun formSubmissionFinished(location: String) {
-        logEvent(
-            "formSubmissionFinished",
-            "location" to location
-        )
+        whenTrustedOrigin("formSubmissionFinished") {
+            logEvent(
+                "formSubmissionFinished",
+                "location" to location
+            )
 
-        currentVisit?.let {
-            callback { it.formSubmissionFinished(location) }
+            currentVisit?.let {
+                callback { it.formSubmissionFinished(location) }
+            }
         }
     }
 
@@ -548,12 +586,14 @@ class Session(
      */
     @JavascriptInterface
     fun pageInvalidated() {
-        logEvent("pageInvalidated")
+        whenTrustedOrigin("pageInvalidated") {
+            logEvent("pageInvalidated")
 
-        currentVisit?.let { visit ->
-            callback {
-                it.pageInvalidated()
-                visit(visit.copy(reload = true))
+            currentVisit?.let { visit ->
+                callback {
+                    it.pageInvalidated()
+                    visit(visit.copy(reload = true))
+                }
             }
         }
     }
@@ -568,27 +608,28 @@ class Session(
      */
     @JavascriptInterface
     fun turboIsReady(isReady: Boolean) {
-        logEvent("turboIsReady", "isReady" to isReady)
+        whenTrustedOrigin("turboIsReady") {
+            logEvent("turboIsReady", "isReady" to isReady)
 
-        currentVisit?.let { visit ->
-            this.isReady = isReady
-            this.isColdBooting = false
+            currentVisit?.let { visit ->
+                this.isReady = isReady
+                this.isColdBooting = false
 
-            if (!isReady) {
-                reset()
+                if (!isReady) {
+                    reset()
 
-                val visitError = LoadError.NotReady
-                logEvent("turboIsNotReady", "error" to visitError)
+                    val visitError = LoadError.NotReady
+                    logEvent("turboIsNotReady", "error" to visitError)
 
-                callback { it.requestFailedWithError(false, visitError) }
-                return
-            }
-
-            // Check if a visit was requested while cold
-            // booting. If so, visit the pending location.
-            when (visitPending) {
-                true -> visitPendingLocation(visit)
-                else -> renderVisitForColdBoot()
+                    callback { it.requestFailedWithError(false, visitError) }
+                } else {
+                    // Check if a visit was requested while cold
+                    // booting. If so, visit the pending location.
+                    when (visitPending) {
+                        true -> visitPendingLocation(visit)
+                        else -> renderVisitForColdBoot()
+                    }
+                }
             }
         }
     }
@@ -601,11 +642,13 @@ class Session(
      */
     @JavascriptInterface
     fun turboFailedToLoad() {
-        val visitError = LoadError.NotPresent
+        whenTrustedOrigin("turboFailedToLoad") {
+            val visitError = LoadError.NotPresent
 
-        logEvent("turboFailedToLoad", "error" to visitError)
-        reset()
-        callback { it.onReceivedError(visitError) }
+            logEvent("turboFailedToLoad", "error" to visitError)
+            reset()
+            callback { it.onReceivedError(visitError) }
+        }
     }
 
     /**
@@ -616,7 +659,9 @@ class Session(
      */
     @JavascriptInterface
     fun elementTouchStarted(preventsPullsToRefresh: Boolean) {
-        webView.elementTouchPreventsPullsToRefresh = preventsPullsToRefresh
+        whenTrustedOrigin("elementTouchStarted") {
+            webView.elementTouchPreventsPullsToRefresh = preventsPullsToRefresh
+        }
     }
 
     /**
@@ -627,7 +672,9 @@ class Session(
      */
     @JavascriptInterface
     fun elementTouchEnded() {
-        webView.elementTouchPreventsPullsToRefresh = false
+        whenTrustedOrigin("elementTouchEnded") {
+            webView.elementTouchPreventsPullsToRefresh = false
+        }
     }
 
     // Private
@@ -768,6 +815,25 @@ class Session(
                 if (callback.visitDestination().isActive()) {
                     action(callback)
                 }
+            }
+        }
+    }
+
+    /**
+     * JavascriptInterface calls can originate from any page loaded in the
+     * WebView, so each one is gated on the page's actual location — read on
+     * the main thread — before it can drive the session.
+     */
+    private fun whenTrustedOrigin(event: String, action: () -> Unit) {
+        context.runOnUiThread {
+            val pageLocation = webView.url
+
+            if (pageLocation != null &&
+                Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation, startLocation)
+            ) {
+                action()
+            } else {
+                logEvent("${event}BlockedForUntrustedOrigin", "location" to pageLocation.orEmpty())
             }
         }
     }

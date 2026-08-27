@@ -8,6 +8,7 @@ import android.os.Build
 import android.webkit.GeolocationPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.turbo.session.Session
@@ -26,7 +27,7 @@ class GeolocationPermissionDelegate(private val session: Session) {
         requestOrigin = origin
         requestCallback = callback
 
-        if (requestOrigin == null || requestCallback == null || permissionToRequest == null) {
+        if (requestOrigin == null || requestCallback == null || permissionToRequest == null || !isTrustedOrigin(origin)) {
             permissionDenied()
         } else if (hasLocationPermission(context)) {
             permissionGranted()
@@ -55,6 +56,11 @@ class GeolocationPermissionDelegate(private val session: Session) {
             logError("startGeolocationPermissionError", e)
             permissionDenied()
         }
+    }
+
+    private fun isTrustedOrigin(origin: String?): Boolean {
+        return origin != null &&
+            Hotwire.config.hostVerifier.isTrustedForBridge(origin, session.startLocation)
     }
 
     private fun hasLocationPermission(context: Context): Boolean {

@@ -2,6 +2,7 @@ package dev.hotwire.core.turbo.session
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
@@ -50,7 +51,8 @@ class SessionTest : BaseRepositoryTest() {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
-        session = Session("test", activity, webView, "https://37signals.com")
+        session = Session("test", activity, webView, baseUrl())
+        whenever(webView.url).thenReturn(baseUrl())
         visit = Visit(
             location = baseUrl(),
             destinationIdentifier = 1,
@@ -87,6 +89,35 @@ class SessionTest : BaseRepositoryTest() {
         session.visitProposedToLocation(newLocation, options.toJson())
 
         verify(callback).visitProposedToLocation(newLocation, options)
+    }
+
+    @Test
+    fun `javascript interface calls from an untrusted origin are dropped`() {
+        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
+        session.currentVisit = visit
+
+        session.visitProposedToLocation("${visit.location}/page", VisitOptions().toJson())
+        session.turboIsReady(true)
+        session.visitStarted(
+            visitIdentifier = "12345",
+            visitHasCachedSnapshot = true,
+            visitIsPageRefresh = false,
+            location = visit.location
+        )
+
+        verify(callback, never()).visitProposedToLocation(any(), any())
+        assertThat(session.isReady).isFalse()
+        assertThat(session.currentVisit?.identifier).isEmpty()
+    }
+
+    @Test
+    fun `javascript interface calls with no page loaded are dropped`() {
+        whenever(webView.url).thenReturn(null)
+        session.currentVisit = visit
+
+        session.visitProposedToLocation("${visit.location}/page", VisitOptions().toJson())
+
+        verify(callback, never()).visitProposedToLocation(any(), any())
     }
 
     @Test

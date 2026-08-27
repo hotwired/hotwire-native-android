@@ -51,6 +51,11 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     fun replyWith(message: Message): Boolean {
+        if (!originIsTrustedForBridge()) {
+            logWarning("bridgeMessageReplyBlocked", resolvedLocation)
+            return false
+        }
+
         bridge?.replyWith(message) ?: run {
             logWarning("bridgeMessageFailedToReply", "bridge is not available")
             return false

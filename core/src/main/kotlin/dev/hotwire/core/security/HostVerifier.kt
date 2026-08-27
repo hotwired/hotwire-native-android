@@ -25,8 +25,9 @@ interface HostVerifier {
 
     /**
      * Determines whether the library may inject its JavaScript into a page at
-     * [location], register bridge components with it, and dispatch bridge
-     * messages received from it.
+     * [location], register bridge components with it, dispatch bridge and
+     * Turbo messages received from it, and grant it native capabilities
+     * (geolocation, media capture).
      *
      * Keep this at least as strict as [isTrustedForNavigation]: a page that
      * passes this check can exchange messages with the app's native bridge

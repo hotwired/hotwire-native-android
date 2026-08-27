@@ -218,6 +218,22 @@ class BridgeDelegateTest {
     }
 
     @Test
+    fun replyWithBlockedForUntrustedOrigin() {
+        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
+
+        val message = Message(
+            id = "1",
+            component = "page",
+            event = "connect",
+            metadata = Metadata("https://37signals.com"),
+            jsonData = """{"title":"Page-title","subtitle":"Page-subtitle"}"""
+        )
+
+        assertEquals(false, delegate.replyWith(message))
+        verify(bridge, never()).replyWith(any())
+    }
+
+    @Test
     fun replyWithFailsWithoutBridge() {
         val message = Message(
             id = "1",

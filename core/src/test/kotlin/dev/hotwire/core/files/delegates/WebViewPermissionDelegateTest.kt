@@ -5,6 +5,7 @@ import android.Manifest.permission.MODIFY_AUDIO_SETTINGS
 import android.Manifest.permission.RECORD_AUDIO
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultLauncher
@@ -49,6 +50,28 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         activity = buildActivity(TurboTestActivity::class.java).get()
         context = ApplicationProvider.getApplicationContext()
         session = Session("test", activity, webView, "https://37signals.com")
+    }
+
+    @Test
+    fun `denies request from an untrusted origin before any permission checks`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        whenever(request.origin).thenReturn(Uri.parse("https://evil.attacker.com"))
+
+        session.webViewPermissionDelegate.onRequest(request)
+
+        verify(request).deny()
+    }
+
+    @Test
+    fun `denies request with no origin`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        whenever(request.origin).thenReturn(null)
+
+        session.webViewPermissionDelegate.onRequest(request)
+
+        verify(request).deny()
     }
 
     @Test
@@ -242,6 +265,7 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
 
     private fun mockRequest(vararg resources: String): PermissionRequest {
         val request = mock(PermissionRequest::class.java)
+        whenever(request.origin).thenReturn(Uri.parse("https://37signals.com"))
         whenever(request.resources).thenReturn(resources)
         return request
     }
