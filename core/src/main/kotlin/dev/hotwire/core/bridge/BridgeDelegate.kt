@@ -3,12 +3,14 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logWarning
 
 @Suppress("unused")
 class BridgeDelegate<D : BridgeDestination>(
     val location: String,
+    val startLocation: String,
     val destination: D,
     private val componentFactories: List<BridgeComponentFactory<D, BridgeComponent<D>>>
 ) : DefaultLifecycleObserver {
@@ -22,7 +24,7 @@ class BridgeDelegate<D : BridgeDestination>(
         get() = initializedComponents.map { it.value }.takeIf { destinationIsActive }.orEmpty()
 
     fun onColdBootPageCompleted() {
-        bridge?.load()
+        loadBridge()
     }
 
     fun onColdBootPageStarted() {
@@ -36,7 +38,7 @@ class BridgeDelegate<D : BridgeDestination>(
 
         if (bridge != null) {
             if (shouldReloadBridge()) {
-                bridge?.load()
+                loadBridge()
             }
         } else {
             logWarning("bridgeNotInitializedForWebView", resolvedLocation)
@@ -58,11 +60,19 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     internal fun bridgeDidInitialize() {
+        if (!originIsTrustedForBridge()) {
+            logWarning("bridgeComponentRegistrationBlocked", resolvedLocation)
+            return
+        }
+
         bridge?.register(componentFactories.map { it.name })
     }
 
     internal fun bridgeDidReceiveMessage(message: Message): Boolean {
-        return if (destinationIsActive && resolvedLocation == message.metadata?.url) {
+        return if (destinationIsActive &&
+            resolvedLocation == message.metadata?.url &&
+            originIsTrustedForBridge()
+        ) {
             logDebug("bridgeDidReceiveMessage", message.toString())
             getOrCreateComponent(message.component)?.didReceive(message)
             true
@@ -72,8 +82,21 @@ class BridgeDelegate<D : BridgeDestination>(
         }
     }
 
+    private fun loadBridge() {
+        if (!originIsTrustedForBridge()) {
+            logWarning("bridgeLoadBlocked", resolvedLocation)
+            return
+        }
+
+        bridge?.load()
+    }
+
     private fun shouldReloadBridge(): Boolean {
         return destination.bridgeWebViewIsReady() && bridge?.isReady() == false
+    }
+
+    private fun originIsTrustedForBridge(): Boolean {
+        return Hotwire.config.hostVerifier.isTrustedForBridge(resolvedLocation, startLocation)
     }
 
     // Lifecycle events

@@ -36,6 +36,7 @@ open class HotwireWebFragment : HotwireFragment(), HotwireWebFragmentCallback {
     private val bridgeDelegate by lazy {
         BridgeDelegate(
             location = location,
+            startLocation = navigator.configuration.startLocation,
             destination = this,
             componentFactories = HotwireNavigation.registeredBridgeComponentFactories
         )

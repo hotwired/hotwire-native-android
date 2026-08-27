@@ -1,5 +1,8 @@
 package dev.hotwire.navigation.routing
 
+import androidx.core.net.toUri
+import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.security.HostVerifier
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.visit.VisitProposal
@@ -52,6 +55,37 @@ class AppNavigationRouteDecisionHandlerTest {
     fun `masqueraded url does not match`() {
         val url = "https://app.my.com@fake.domain"
         assertFalse(route.matches(proposal(url), config))
+    }
+
+    @Test
+    fun `http url on the app domain does not match`() {
+        val url = "http://my.app.com/page"
+        assertFalse(route.matches(proposal(url), config))
+    }
+
+    @Test
+    fun `url on another port does not match`() {
+        val url = "https://my.app.com:8443/page"
+        assertFalse(route.matches(proposal(url), config))
+    }
+
+    @Test
+    fun `a custom host verifier decides the match`() {
+        val previousVerifier = Hotwire.config.hostVerifier
+
+        Hotwire.config.hostVerifier = object : HostVerifier {
+            override fun isTrustedForNavigation(location: String, startLocation: String) =
+                location.toUri().host == "asset.cdn.com"
+
+            override fun isTrustedForBridge(location: String, startLocation: String) = false
+        }
+
+        try {
+            assertTrue(route.matches(proposal("https://asset.cdn.com/image.png"), config))
+            assertFalse(route.matches(proposal(config.startLocation), config))
+        } finally {
+            Hotwire.config.hostVerifier = previousVerifier
+        }
     }
 
     private fun proposal(location: String) = VisitProposal(

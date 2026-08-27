@@ -1,6 +1,6 @@
 package dev.hotwire.navigation.routing
 
-import androidx.core.net.toUri
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.visit.VisitProposal
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
@@ -15,7 +15,10 @@ class AppNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
         proposal: VisitProposal,
         configuration: NavigatorConfiguration
     ): Boolean {
-        return configuration.startLocation.toUri().host == proposal.location.toUri().host
+        return Hotwire.config.hostVerifier.isTrustedForNavigation(
+            location = proposal.location,
+            startLocation = configuration.startLocation
+        )
     }
 
     override fun handle(

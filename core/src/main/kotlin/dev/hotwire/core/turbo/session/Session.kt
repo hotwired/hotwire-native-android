@@ -55,12 +55,15 @@ import java.util.Date
  * @property sessionName An arbitrary name to be used as an identifier for a given session.
  * @property activity The activity to which the session will be bound to.
  * @property webView An instance of a [HotwireWebView] to be shared/managed.
+ * @property startLocation The start location of the navigator that owns this session,
+ *  used as the trust anchor for host verification.
  */
 @Suppress("unused")
 class Session(
     internal val sessionName: String,
     private val activity: AppCompatActivity,
-    val webView: HotwireWebView
+    val webView: HotwireWebView,
+    internal val startLocation: String
 ) {
     internal var coldBootVisitIdentifier = ""
     internal var previousOverrideUrlTime = 0L
@@ -743,6 +746,11 @@ class Session(
     }
 
     private fun installBridge(location: String) {
+        if (!Hotwire.config.hostVerifier.isTrustedForBridge(location, startLocation)) {
+            logEvent("bridgeInstallationBlocked", "location" to location)
+            return
+        }
+
         logEvent("installBridge", "location" to location)
 
         webView.installBridge {

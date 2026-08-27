@@ -50,7 +50,7 @@ class SessionTest : BaseRepositoryTest() {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
-        session = Session("test", activity, webView)
+        session = Session("test", activity, webView, "https://37signals.com")
         visit = Visit(
             location = baseUrl(),
             destinationIdentifier = 1,
@@ -72,8 +72,8 @@ class SessionTest : BaseRepositoryTest() {
 
     @Test
     fun `session is always new instance`() {
-        val session = Session("test", activity, webView)
-        val newSession = Session("test", activity, webView)
+        val session = Session("test", activity, webView, "https://37signals.com")
+        val newSession = Session("test", activity, webView, "https://37signals.com")
 
         assertThat(session).isNotEqualTo(newSession)
     }
