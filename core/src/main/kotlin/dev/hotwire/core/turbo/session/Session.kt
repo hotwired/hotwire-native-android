@@ -794,7 +794,8 @@ class Session(
 
     private fun installBridge(location: String) {
         if (!Hotwire.config.hostVerifier.isTrustedForBridge(location, startLocation)) {
-            logEvent("bridgeInstallationBlocked", "location" to location)
+            logWarningEvent("bridgeInstallationBlockedForUntrustedOrigin",
+                "location" to location, "startLocation" to startLocation)
             return
         }
 
@@ -833,7 +834,8 @@ class Session(
             ) {
                 action()
             } else {
-                logEvent("${event}BlockedForUntrustedOrigin", "location" to pageLocation.orEmpty())
+                logWarningEvent("${event}BlockedForUntrustedOrigin",
+                    "location" to pageLocation.orEmpty(), "startLocation" to startLocation)
             }
         }
     }
@@ -841,6 +843,11 @@ class Session(
     private fun logEvent(event: String, vararg params: Pair<String, Any>) {
         val attributes = params.toMutableList().apply { add(0, "session" to sessionName) }
         logDebug(event, attributes)
+    }
+
+    private fun logWarningEvent(event: String, vararg params: Pair<String, Any>) {
+        val attributes = params.toMutableList().apply { add(0, "session" to sessionName) }
+        logWarning(event, attributes)
     }
 
 
@@ -956,7 +963,8 @@ class Session(
             if (pageLocation == null ||
                 !Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation, startLocation)
             ) {
-                logEvent("onReceivedHttpAuthRequestBlocked", "host" to host, "location" to pageLocation.orEmpty())
+                logWarningEvent("httpAuthRequestBlockedForUntrustedOrigin",
+                    "host" to host, "location" to pageLocation.orEmpty(), "startLocation" to startLocation)
                 handler.cancel()
                 return
             }

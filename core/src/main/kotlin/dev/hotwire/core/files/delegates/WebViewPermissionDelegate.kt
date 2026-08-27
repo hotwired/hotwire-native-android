@@ -42,7 +42,8 @@ class WebViewPermissionDelegate(private val session: Session) {
     fun onRequest(request: PermissionRequest) {
         val origin = request.origin?.toString()
         if (origin == null || !Hotwire.config.hostVerifier.isTrustedForBridge(origin, session.startLocation)) {
-            logWarning("webViewPermissionBlockedForUntrustedOrigin", origin.orEmpty())
+            logWarning("webViewPermissionBlockedForUntrustedOrigin",
+                listOf("origin" to origin.orEmpty(), "startLocation" to session.startLocation))
             request.deny()
             return
         }

@@ -52,7 +52,7 @@ class BridgeDelegate<D : BridgeDestination>(
 
     fun replyWith(message: Message): Boolean {
         if (!originIsTrustedForBridge()) {
-            logWarning("bridgeMessageReplyBlocked", resolvedLocation)
+            logBlockedForUntrustedOrigin("bridgeReplyBlockedForUntrustedOrigin")
             return false
         }
 
@@ -66,7 +66,7 @@ class BridgeDelegate<D : BridgeDestination>(
 
     internal fun bridgeDidInitialize() {
         if (!originIsTrustedForBridge()) {
-            logWarning("bridgeComponentRegistrationBlocked", resolvedLocation)
+            logBlockedForUntrustedOrigin("bridgeComponentRegistrationBlockedForUntrustedOrigin")
             return
         }
 
@@ -89,7 +89,7 @@ class BridgeDelegate<D : BridgeDestination>(
 
     private fun loadBridge() {
         if (!originIsTrustedForBridge()) {
-            logWarning("bridgeLoadBlocked", resolvedLocation)
+            logBlockedForUntrustedOrigin("bridgeLoadBlockedForUntrustedOrigin")
             return
         }
 
@@ -102,6 +102,10 @@ class BridgeDelegate<D : BridgeDestination>(
 
     private fun originIsTrustedForBridge(): Boolean {
         return Hotwire.config.hostVerifier.isTrustedForBridge(resolvedLocation, startLocation)
+    }
+
+    private fun logBlockedForUntrustedOrigin(event: String) {
+        logWarning(event, listOf("location" to resolvedLocation, "startLocation" to startLocation))
     }
 
     // Lifecycle events

@@ -11,6 +11,7 @@ import androidx.core.content.PermissionChecker
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.session.Session
 
 class GeolocationPermissionDelegate(private val session: Session) {
@@ -27,7 +28,11 @@ class GeolocationPermissionDelegate(private val session: Session) {
         requestOrigin = origin
         requestCallback = callback
 
-        if (requestOrigin == null || requestCallback == null || permissionToRequest == null || !isTrustedOrigin(origin)) {
+        if (origin != null && !isTrustedOrigin(origin)) {
+            logWarning("geolocationPermissionBlockedForUntrustedOrigin",
+                listOf("origin" to origin, "startLocation" to session.startLocation))
+            permissionDenied()
+        } else if (requestOrigin == null || requestCallback == null || permissionToRequest == null) {
             permissionDenied()
         } else if (hasLocationPermission(context)) {
             permissionGranted()

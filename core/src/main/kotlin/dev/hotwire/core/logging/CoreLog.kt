@@ -40,6 +40,16 @@ internal fun logWarning(event: String, details: String) {
     }
 }
 
+internal fun logWarning(event: String, attributes: List<Pair<String, Any>>) {
+    Hotwire.config.logger.w(DEFAULT_TAG) {
+        val description = attributes.joinToString(prefix = "[", postfix = "]", separator = ", ") {
+            "${it.first}: ${it.second}"
+        }
+
+        "${"$event ".padEnd(PAD_END_LENGTH, '.')} $description"
+    }
+}
+
 internal fun logError(event: String, throwable: Throwable) {
     Hotwire.config.logger.e(DEFAULT_TAG, throwable) {
         "$event: ${throwable.stackTraceToString()}"
