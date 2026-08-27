@@ -951,6 +951,16 @@ class Session(
         }
 
         override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
+            val pageLocation = view.url
+
+            if (pageLocation == null ||
+                !Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation, startLocation)
+            ) {
+                logEvent("onReceivedHttpAuthRequestBlocked", "host" to host, "location" to pageLocation.orEmpty())
+                handler.cancel()
+                return
+            }
+
             callback { it.onReceivedHttpAuthRequest(handler, host, realm) }
         }
 
