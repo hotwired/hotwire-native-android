@@ -7,6 +7,8 @@ import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.logging.DefaultHotwireLogger
 import dev.hotwire.core.logging.HotwireLogger
+import dev.hotwire.core.security.DefaultHostVerifier
+import dev.hotwire.core.security.HostVerifier
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -39,6 +41,18 @@ class HotwireConfig internal constructor() {
      * If you'd like to change this behavior, provide your own implementation of [HotwireLogger].
      */
     var logger: HotwireLogger = DefaultHotwireLogger
+
+    /**
+     * Set a custom host verifier instance to decide which hosts the library
+     * trusts for in-app navigation, for installing its JavaScript into loaded
+     * pages, and for accepting bridge messages from pages.
+     *
+     * The default verifier is [DefaultHostVerifier], which trusts a location
+     * only when its origin (scheme, host, port) is equal to the origin of the
+     * navigator's start location. If your app trusts multiple hosts, provide
+     * your own implementation of [HostVerifier].
+     */
+    var hostVerifier: HostVerifier = DefaultHostVerifier
 
     /**
      * Enables/disables debugging of web contents loaded into WebViews.
