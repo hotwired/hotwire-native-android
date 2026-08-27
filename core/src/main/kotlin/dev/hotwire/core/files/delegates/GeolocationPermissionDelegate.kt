@@ -29,8 +29,7 @@ class GeolocationPermissionDelegate(private val session: Session) {
         requestCallback = callback
 
         if (origin != null && !isTrustedOrigin(origin)) {
-            logWarning("geolocationPermissionBlockedForUntrustedOrigin",
-                listOf("origin" to origin, "startLocation" to session.startLocation))
+            logWarning("geolocationPermissionBlockedForUntrustedOrigin", origin)
             permissionDenied()
         } else if (requestOrigin == null || requestCallback == null || permissionToRequest == null) {
             permissionDenied()
@@ -65,7 +64,7 @@ class GeolocationPermissionDelegate(private val session: Session) {
 
     private fun isTrustedOrigin(origin: String?): Boolean {
         return origin != null &&
-            Hotwire.config.hostVerifier.isTrustedForBridge(origin, session.startLocation)
+            Hotwire.config.hostVerifier.isTrustedForBridge(origin)
     }
 
     private fun hasLocationPermission(context: Context): Boolean {

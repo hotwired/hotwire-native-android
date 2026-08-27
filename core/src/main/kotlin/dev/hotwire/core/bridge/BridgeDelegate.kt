@@ -10,7 +10,6 @@ import dev.hotwire.core.logging.logWarning
 @Suppress("unused")
 class BridgeDelegate<D : BridgeDestination>(
     val location: String,
-    val startLocation: String,
     val destination: D,
     private val componentFactories: List<BridgeComponentFactory<D, BridgeComponent<D>>>
 ) : DefaultLifecycleObserver {
@@ -101,11 +100,11 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     private fun originIsTrustedForBridge(): Boolean {
-        return Hotwire.config.hostVerifier.isTrustedForBridge(resolvedLocation, startLocation)
+        return Hotwire.config.hostVerifier.isTrustedForBridge(resolvedLocation)
     }
 
     private fun logBlockedForUntrustedOrigin(event: String) {
-        logWarning(event, listOf("location" to resolvedLocation, "startLocation" to startLocation))
+        logWarning(event, listOf("location" to resolvedLocation))
     }
 
     // Lifecycle events

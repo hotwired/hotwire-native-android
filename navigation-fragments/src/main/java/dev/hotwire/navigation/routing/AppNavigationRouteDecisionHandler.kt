@@ -15,10 +15,7 @@ class AppNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
         proposal: VisitProposal,
         configuration: NavigatorConfiguration
     ): Boolean {
-        return Hotwire.config.hostVerifier.isTrustedForNavigation(
-            location = proposal.location,
-            startLocation = configuration.startLocation
-        )
+        return Hotwire.config.hostVerifier.isTrustedForNavigation(proposal.location)
     }
 
     override fun handle(

@@ -55,15 +55,12 @@ import java.util.Date
  * @property sessionName An arbitrary name to be used as an identifier for a given session.
  * @property activity The activity to which the session will be bound to.
  * @property webView An instance of a [HotwireWebView] to be shared/managed.
- * @property startLocation The start location of the navigator that owns this session,
- *  used as the trust anchor for host verification.
  */
 @Suppress("unused")
 class Session(
     internal val sessionName: String,
     private val activity: AppCompatActivity,
-    val webView: HotwireWebView,
-    internal val startLocation: String
+    val webView: HotwireWebView
 ) {
     internal var coldBootVisitIdentifier = ""
     internal var previousOverrideUrlTime = 0L
@@ -793,9 +790,8 @@ class Session(
     }
 
     private fun installBridge(location: String) {
-        if (!Hotwire.config.hostVerifier.isTrustedForBridge(location, startLocation)) {
-            logWarningEvent("bridgeInstallationBlockedForUntrustedOrigin",
-                "location" to location, "startLocation" to startLocation)
+        if (!Hotwire.config.hostVerifier.isTrustedForBridge(location)) {
+            logWarningEvent("bridgeInstallationBlockedForUntrustedOrigin", "location" to location)
             return
         }
 
@@ -830,25 +826,23 @@ class Session(
             val pageLocation = webView.url
 
             if (pageLocation != null &&
-                Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation, startLocation)
+                Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
             ) {
                 action()
             } else {
-                logWarningEvent("${event}BlockedForUntrustedOrigin",
-                    "location" to pageLocation.orEmpty(), "startLocation" to startLocation)
+                logWarningEvent("${event}BlockedForUntrustedOrigin", "location" to pageLocation.orEmpty())
             }
         }
     }
 
-    private fun logEvent(event: String, vararg params: Pair<String, Any>) {
-        val attributes = params.toMutableList().apply { add(0, "session" to sessionName) }
-        logDebug(event, attributes)
-    }
+    private fun sessionAttributes(params: Array<out Pair<String, Any>>) =
+        params.toMutableList().apply { add(0, "session" to sessionName) }
 
-    private fun logWarningEvent(event: String, vararg params: Pair<String, Any>) {
-        val attributes = params.toMutableList().apply { add(0, "session" to sessionName) }
-        logWarning(event, attributes)
-    }
+    private fun logEvent(event: String, vararg params: Pair<String, Any>) =
+        logDebug(event, sessionAttributes(params))
+
+    private fun logWarningEvent(event: String, vararg params: Pair<String, Any>) =
+        logWarning(event, sessionAttributes(params))
 
 
     // Classes and objects
@@ -961,10 +955,10 @@ class Session(
             val pageLocation = view.url
 
             if (pageLocation == null ||
-                !Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation, startLocation)
+                !Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
             ) {
                 logWarningEvent("httpAuthRequestBlockedForUntrustedOrigin",
-                    "host" to host, "location" to pageLocation.orEmpty(), "startLocation" to startLocation)
+                    "host" to host, "location" to pageLocation.orEmpty())
                 handler.cancel()
                 return
             }

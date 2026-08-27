@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.session.SessionCallback
@@ -49,7 +50,15 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
 
         activity = buildActivity(TurboTestActivity::class.java).get()
         context = ApplicationProvider.getApplicationContext()
-        session = Session("test", activity, webView, "https://37signals.com")
+        session = Session("test", activity, webView)
+
+        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.registerTrustedLocation("https://37signals.com")
+    }
+
+    @org.junit.After
+    fun teardownTrustedLocations() {
+        Hotwire.config.clearTrustedLocations()
     }
 
     @Test

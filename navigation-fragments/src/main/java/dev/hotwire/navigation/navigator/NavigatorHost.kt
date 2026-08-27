@@ -34,6 +34,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         super.onCreate(savedInstanceState)
 
         activity = requireActivity() as HotwireActivity
+        Hotwire.config.registerTrustedLocation(configuration.startLocation)
         navigator = Navigator(this, configuration, activity)
         childFragmentManager.addFragmentOnAttachListener(this)
     }

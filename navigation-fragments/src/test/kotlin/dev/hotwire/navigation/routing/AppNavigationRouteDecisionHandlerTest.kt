@@ -11,6 +11,7 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +32,13 @@ class AppNavigationRouteDecisionHandlerTest {
     @Before
     fun setup() {
         activity = buildActivity(TestActivity::class.java).get()
+        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.registerTrustedLocation(config.startLocation)
+    }
+
+    @After
+    fun teardown() {
+        Hotwire.config.clearTrustedLocations()
     }
 
     @Test
@@ -74,10 +82,10 @@ class AppNavigationRouteDecisionHandlerTest {
         val previousVerifier = Hotwire.config.hostVerifier
 
         Hotwire.config.hostVerifier = object : HostVerifier {
-            override fun isTrustedForNavigation(location: String, startLocation: String) =
+            override fun isTrustedForNavigation(location: String) =
                 location.toUri().host == "asset.cdn.com"
 
-            override fun isTrustedForBridge(location: String, startLocation: String) = false
+            override fun isTrustedForBridge(location: String) = false
         }
 
         try {

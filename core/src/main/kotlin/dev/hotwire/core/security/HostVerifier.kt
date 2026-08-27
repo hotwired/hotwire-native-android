@@ -5,23 +5,22 @@ package dev.hotwire.core.security
  * a security-sensitive action with it.
  *
  * The default implementation trusts a location only when its origin (scheme,
- * host, port) is equal to the origin of the navigator's start location. This
- * works for apps that run on a single origin.
+ * host, port) is equal to the origin of a location the app has registered as
+ * trusted — every navigator host registers its start location automatically.
+ * This works for apps that run on one or more app-declared origins.
  *
  * Provide your own implementation via [dev.hotwire.core.config.HotwireConfig.hostVerifier]
- * when your app trusts multiple hosts (for example, separate asset/storage
- * hosts) or already has a central host verification facility.
+ * when your app trusts hosts beyond its navigator start locations (for
+ * example, separate asset/storage hosts) or already has a central host
+ * verification facility. A custom implementation can read the registered
+ * start locations from [dev.hotwire.core.config.HotwireConfig.registeredStartLocations].
  */
 interface HostVerifier {
     /**
      * Determines whether the library may route [location] through in-app
      * navigation.
-     *
-     * @param location The location whose host needs verification.
-     * @param startLocation The start location of the navigator this decision
-     * belongs to — the app-authored trust anchor.
      */
-    fun isTrustedForNavigation(location: String, startLocation: String): Boolean
+    fun isTrustedForNavigation(location: String): Boolean
 
     /**
      * Determines whether the library may inject its JavaScript into a page at
@@ -31,13 +30,8 @@ interface HostVerifier {
      *
      * Keep this at least as strict as [isTrustedForNavigation]: a page that
      * passes this check can exchange messages with the app's native bridge
-     * components.
-     *
-     * @param location The location whose host needs verification. The library
-     * passes authoritative values here (the WebView's current URL or a
-     * WebViewClient callback), never page-supplied data.
-     * @param startLocation The start location of the navigator this decision
-     * belongs to — the app-authored trust anchor.
+     * components. The library passes authoritative values here (the WebView's
+     * current URL or a WebViewClient callback), never page-supplied data.
      */
-    fun isTrustedForBridge(location: String, startLocation: String): Boolean
+    fun isTrustedForBridge(location: String): Boolean
 }

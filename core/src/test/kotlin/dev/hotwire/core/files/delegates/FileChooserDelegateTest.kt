@@ -38,7 +38,7 @@ class FileChooserDelegateTest : BaseRepositoryTest() {
 
         activity = buildActivity(TurboTestActivity::class.java).get()
         context = ApplicationProvider.getApplicationContext()
-        session = Session("test", activity, webView, "https://37signals.com")
+        session = Session("test", activity, webView)
     }
 
     @Test

@@ -5,6 +5,7 @@ import android.webkit.GeolocationPermissions
 import androidx.appcompat.app.AppCompatActivity
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -33,7 +34,15 @@ class GeolocationPermissionDelegateTest : BaseRepositoryTest() {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
-        session = Session("test", activity, webView, "https://37signals.com")
+        session = Session("test", activity, webView)
+
+        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.registerTrustedLocation("https://37signals.com")
+    }
+
+    @org.junit.After
+    fun teardownTrustedLocations() {
+        Hotwire.config.clearTrustedLocations()
     }
 
     @Test

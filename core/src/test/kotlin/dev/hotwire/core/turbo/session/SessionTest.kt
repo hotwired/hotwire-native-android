@@ -6,6 +6,7 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.HttpError.ServerError
@@ -51,7 +52,9 @@ class SessionTest : BaseRepositoryTest() {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
-        session = Session("test", activity, webView, baseUrl())
+        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.registerTrustedLocation(baseUrl())
+        session = Session("test", activity, webView)
         whenever(webView.url).thenReturn(baseUrl())
         visit = Visit(
             location = baseUrl(),
@@ -72,10 +75,15 @@ class SessionTest : BaseRepositoryTest() {
         whenever(callback.visitDestination()).thenReturn(visitDestination)
     }
 
+    @org.junit.After
+    fun teardownTrustedLocations() {
+        Hotwire.config.clearTrustedLocations()
+    }
+
     @Test
     fun `session is always new instance`() {
-        val session = Session("test", activity, webView, "https://37signals.com")
-        val newSession = Session("test", activity, webView, "https://37signals.com")
+        val session = Session("test", activity, webView)
+        val newSession = Session("test", activity, webView)
 
         assertThat(session).isNotEqualTo(newSession)
     }

@@ -72,8 +72,7 @@ class Navigator(
     internal fun createNewSession() = Session(
         sessionName = configuration.name,
         activity = activity,
-        webView = Hotwire.config.makeCustomWebView(activity),
-        startLocation = configuration.startLocation
+        webView = Hotwire.config.makeCustomWebView(activity)
     ).also {
         // Initialize bridge with new WebView instance
         if (HotwireNavigation.registeredBridgeComponentFactories.isNotEmpty()) {

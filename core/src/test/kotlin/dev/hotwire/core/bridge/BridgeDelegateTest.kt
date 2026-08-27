@@ -9,6 +9,8 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.config.Hotwire
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -39,9 +41,11 @@ class BridgeDelegateTest {
         whenever(bridge.webView).thenReturn(webView)
         Bridge.initialize(bridge)
 
+        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.registerTrustedLocation("https://37signals.com")
+
         delegate = BridgeDelegate(
             location = "https://37signals.com",
-            startLocation = "https://37signals.com",
             destination = destination,
             componentFactories = factories
         )
@@ -49,6 +53,11 @@ class BridgeDelegateTest {
 
         lifecycleOwner = TestLifecycleOwner(Lifecycle.State.STARTED)
         lifecycleOwner.lifecycle.addObserver(delegate)
+    }
+
+    @After
+    fun teardown() {
+        Hotwire.config.clearTrustedLocations()
     }
 
     @Test

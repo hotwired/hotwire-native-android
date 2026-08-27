@@ -1,20 +1,36 @@
 package dev.hotwire.core.security
 
+import dev.hotwire.core.config.Hotwire
+import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class DefaultHostVerifierTest {
     private val verifier = DefaultHostVerifier
-    private val startLocation = "https://my.app.com/start"
 
     private val checks = listOf<(String) -> Boolean>(
-        { verifier.isTrustedForNavigation(it, startLocation) },
-        { verifier.isTrustedForBridge(it, startLocation) }
+        { verifier.isTrustedForNavigation(it) },
+        { verifier.isTrustedForBridge(it) }
     )
 
+    @Before
+    fun setup() {
+        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.registerTrustedLocation("https://my.app.com/start")
+    }
+
+    @After
+    fun teardown() {
+        Hotwire.config.clearTrustedLocations()
+    }
+
     @Test
-    fun `same origin is trusted for navigation and bridge`() {
+    fun `same origin as a registered start location is trusted`() {
         checks.forEach { isTrusted ->
             assertTrue(isTrusted("https://my.app.com/another/page?q=1"))
         }
@@ -28,6 +44,25 @@ class DefaultHostVerifierTest {
     }
 
     @Test
+    fun `any registered origin is trusted, not just the first`() {
+        Hotwire.config.registerTrustedLocation("https://other.app.com/home")
+
+        checks.forEach { isTrusted ->
+            assertTrue(isTrusted("https://other.app.com/page"))
+            assertTrue(isTrusted("https://my.app.com/page"))
+        }
+    }
+
+    @Test
+    fun `nothing is trusted when no start location is registered`() {
+        Hotwire.config.clearTrustedLocations()
+
+        checks.forEach { isTrusted ->
+            assertFalse(isTrusted("https://my.app.com/page"))
+        }
+    }
+
+    @Test
     fun `different host is not trusted`() {
         checks.forEach { isTrusted ->
             assertFalse(isTrusted("https://evil.com/page"))
@@ -35,14 +70,14 @@ class DefaultHostVerifierTest {
     }
 
     @Test
-    fun `subdomain of the app host is not trusted`() {
+    fun `subdomain of a registered host is not trusted`() {
         checks.forEach { isTrusted ->
             assertFalse(isTrusted("https://sub.my.app.com/page"))
         }
     }
 
     @Test
-    fun `parent domain of the app host is not trusted`() {
+    fun `parent domain of a registered host is not trusted`() {
         checks.forEach { isTrusted ->
             assertFalse(isTrusted("https://app.com/page"))
         }
@@ -84,11 +119,5 @@ class DefaultHostVerifierTest {
             assertFalse(isTrusted("not a url"))
             assertFalse(isTrusted(""))
         }
-    }
-
-    @Test
-    fun `an unparseable start location trusts nothing`() {
-        assertFalse(verifier.isTrustedForNavigation("https://my.app.com/page", ""))
-        assertFalse(verifier.isTrustedForBridge("https://my.app.com/page", ""))
     }
 }

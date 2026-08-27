@@ -7,8 +7,10 @@ import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.logging.DefaultHotwireLogger
 import dev.hotwire.core.logging.HotwireLogger
+import androidx.annotation.RestrictTo
 import dev.hotwire.core.security.DefaultHostVerifier
 import dev.hotwire.core.security.HostVerifier
+import dev.hotwire.core.security.TrustedLocations
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -42,15 +44,37 @@ class HotwireConfig internal constructor() {
      */
     var logger: HotwireLogger = DefaultHotwireLogger
 
+    internal val trustedLocations = TrustedLocations()
+
+    /**
+     * A snapshot of the start locations registered by navigator hosts, for
+     * use by a custom [HostVerifier] implementation.
+     */
+    val registeredStartLocations: Set<String>
+        get() = trustedLocations.snapshot
+
+    /**
+     * Registers a navigator host's start location as trusted. Called by the
+     * library when a navigator host initializes; not intended for app use.
+     * An app that trusts hosts beyond its navigator start locations provides
+     * a custom [hostVerifier] instead of registering additional locations.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun registerTrustedLocation(startLocation: String) = trustedLocations.register(startLocation)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun clearTrustedLocations() = trustedLocations.clear()
+
     /**
      * Set a custom host verifier instance to decide which hosts the library
      * trusts for in-app navigation, for installing its JavaScript into loaded
      * pages, and for accepting bridge messages from pages.
      *
      * The default verifier is [DefaultHostVerifier], which trusts a location
-     * only when its origin (scheme, host, port) is equal to the origin of the
-     * navigator's start location. If your app trusts multiple hosts, provide
-     * your own implementation of [HostVerifier].
+     * only when its origin (scheme, host, port) is equal to the origin of a
+     * registered start location ([registeredStartLocations]). If your app
+     * trusts hosts beyond its navigator start locations, provide your own
+     * implementation of [HostVerifier].
      */
     var hostVerifier: HostVerifier = DefaultHostVerifier
 

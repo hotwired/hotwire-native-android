@@ -8,7 +8,6 @@ object TestData {
 
     val bridgeDelegate = BridgeDelegate(
         location = "https://37signals.com",
-        startLocation = "https://37signals.com",
         destination = AppBridgeDestination(),
         componentFactories = componentFactories
     )
