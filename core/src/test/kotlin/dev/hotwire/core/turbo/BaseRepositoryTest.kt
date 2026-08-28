@@ -1,6 +1,7 @@
 package dev.hotwire.core.turbo
 
 import dev.hotwire.core.turbo.http.HotwireHttpClient
+import dev.hotwire.core.turbo.http.WebViewCookieJar
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,6 +64,7 @@ open class BaseRepositoryTest : BaseUnitTest() {
 
     private fun client(): OkHttpClient {
         return OkHttpClient.Builder()
+            .cookieJar(WebViewCookieJar())
             .dispatcher(Dispatcher(SynchronousExecutorService()))
             .build()
     }
