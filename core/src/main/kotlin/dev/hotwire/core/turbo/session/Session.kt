@@ -390,8 +390,10 @@ class Session(
         activity.lifecycleScope.launch {
             val result = httpRepository.fetch(location)
 
-            if (result != null && result.response.isSuccessful &&
-                result.redirect?.isCrossOrigin == true) {
+            // The verification fetch does not follow redirects, so a cross-origin redirect is
+            // reported as an unfollowed 3xx response. Detecting one is sufficient to propose the
+            // cross-origin redirect visit; credentials are never forwarded to the destination.
+            if (result != null && result.redirect?.isCrossOrigin == true) {
                 visitProposedToCrossOriginRedirect(
                     location = location,
                     redirectLocation = result.redirect.location,
