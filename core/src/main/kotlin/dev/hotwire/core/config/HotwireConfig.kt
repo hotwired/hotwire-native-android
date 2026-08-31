@@ -56,8 +56,6 @@ class HotwireConfig internal constructor() {
     /**
      * Registers a navigator host's start location as trusted. Called by the
      * library when a navigator host initializes; not intended for app use.
-     * An app that trusts hosts beyond its navigator start locations provides
-     * a custom [hostVerifier] instead of registering additional locations.
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     fun registerTrustedLocation(startLocation: String) = trustedLocations.register(startLocation)
@@ -70,11 +68,9 @@ class HotwireConfig internal constructor() {
      * trusts for in-app navigation, for installing its JavaScript into loaded
      * pages, and for accepting bridge messages from pages.
      *
-     * The default verifier is [DefaultHostVerifier], which trusts a location
-     * only when its origin (scheme, host, port) is equal to the origin of a
-     * registered start location ([registeredStartLocations]). If your app
-     * trusts hosts beyond its navigator start locations, provide your own
-     * implementation of [HostVerifier].
+     * The default is [DefaultHostVerifier], which trusts only the origins of
+     * the registered start locations ([registeredStartLocations]). If your app
+     * trusts hosts beyond those, provide your own implementation.
      */
     var hostVerifier: HostVerifier = DefaultHostVerifier
 

@@ -3,10 +3,8 @@ package dev.hotwire.core.security
 import java.util.concurrent.CopyOnWriteArraySet
 
 /**
- * Owns the set of start locations registered by navigator hosts. The public
- * surface lives on [dev.hotwire.core.config.HotwireConfig]: a read-only
- * snapshot for custom [HostVerifier] implementations and library-restricted
- * registration functions.
+ * Owns the registered start locations; the public surface lives on
+ * [dev.hotwire.core.config.HotwireConfig].
  */
 internal class TrustedLocations {
     private val startLocations = CopyOnWriteArraySet<String>()
