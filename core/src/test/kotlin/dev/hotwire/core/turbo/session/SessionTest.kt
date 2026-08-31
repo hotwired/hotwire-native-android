@@ -1,8 +1,10 @@
 package dev.hotwire.core.turbo.session
 
 import android.os.Build
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
@@ -126,6 +128,34 @@ class SessionTest : BaseRepositoryTest() {
         session.visitProposedToLocation("${visit.location}/page", VisitOptions().toJson())
 
         verify(callback, never()).visitProposedToLocation(any(), any())
+    }
+
+    @Test
+    fun `cold boot page finished on an untrusted origin surfaces an error and resets`() {
+        session.currentVisit = visit
+        session.isColdBooting = true
+
+        webViewClient().onPageFinished(webView, "https://evil.attacker.com/page")
+
+        verify(callback).onReceivedError(LoadError.UntrustedOrigin)
+        assertThat(session.isColdBooting).isFalse()
+        assertThat(session.coldBootVisitIdentifier).isEmpty()
+    }
+
+    @Test
+    fun `cold boot page finished on a trusted origin does not surface an error`() {
+        session.currentVisit = visit
+        session.isColdBooting = true
+
+        webViewClient().onPageFinished(webView, "${visit.location}/page")
+
+        verify(callback, never()).onReceivedError(any())
+    }
+
+    private fun webViewClient(): WebViewClient {
+        val captor = argumentCaptor<WebViewClient>()
+        verify(webView).webViewClient = captor.capture()
+        return captor.lastValue
     }
 
     @Test

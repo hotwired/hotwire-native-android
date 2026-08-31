@@ -792,6 +792,8 @@ class Session(
     private fun installBridge(location: String) {
         if (!Hotwire.config.hostVerifier.isTrustedForBridge(location)) {
             logWarningEvent("bridgeInstallationBlockedForUntrustedOrigin", "location" to location)
+            reset()
+            callback { it.onReceivedError(LoadError.UntrustedOrigin) }
             return
         }
 
