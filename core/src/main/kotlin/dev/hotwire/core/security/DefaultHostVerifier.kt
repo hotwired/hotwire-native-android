@@ -1,8 +1,6 @@
 package dev.hotwire.core.security
 
 import dev.hotwire.core.config.Hotwire
-import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /**
  * Trusts a location only when its origin (scheme, host, port) is equal to the
@@ -20,16 +18,8 @@ internal object DefaultHostVerifier : HostVerifier {
     }
 
     private fun isTrustedOrigin(location: String): Boolean {
-        val url = location.toHttpUrlOrNull() ?: return false
-
         return Hotwire.config.trustedLocations.anyRegistered { startLocation ->
-            startLocation.toHttpUrlOrNull()?.let { url.hasSameOriginAs(it) } == true
+            location.hasSameOriginAs(startLocation)
         }
-    }
-
-    private fun HttpUrl.hasSameOriginAs(other: HttpUrl): Boolean {
-        return scheme == other.scheme &&
-            host == other.host &&
-            port == other.port
     }
 }

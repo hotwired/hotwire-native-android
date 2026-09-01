@@ -50,6 +50,48 @@ class NavigatorHostTest {
             .isEqualTo("https://example.com/path")
     }
 
+    @Test
+    fun `reverts to config start location when deep link downgrades the scheme`() {
+        val intent = Intent().apply {
+            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf(LOCATION_KEY to "http://example.com/path"))
+        }
+        activity = Robolectric.buildActivity(TestActivity::class.java, intent).get()
+
+        host.activity = activity
+        host.ensureDeeplinkStartLocationValid()
+
+        assertThat(activity.intent.getBundleExtra(DEEPLINK_EXTRAS_KEY)?.getString(LOCATION_KEY))
+            .isEqualTo("https://example.com/start")
+    }
+
+    @Test
+    fun `reverts to config start location when deep link uses another port`() {
+        val intent = Intent().apply {
+            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf(LOCATION_KEY to "https://example.com:8443/path"))
+        }
+        activity = Robolectric.buildActivity(TestActivity::class.java, intent).get()
+
+        host.activity = activity
+        host.ensureDeeplinkStartLocationValid()
+
+        assertThat(activity.intent.getBundleExtra(DEEPLINK_EXTRAS_KEY)?.getString(LOCATION_KEY))
+            .isEqualTo("https://example.com/start")
+    }
+
+    @Test
+    fun `reverts to config start location when deep link does not parse as a web URL`() {
+        val intent = Intent().apply {
+            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf(LOCATION_KEY to "javascript:alert(1)"))
+        }
+        activity = Robolectric.buildActivity(TestActivity::class.java, intent).get()
+
+        host.activity = activity
+        host.ensureDeeplinkStartLocationValid()
+
+        assertThat(activity.intent.getBundleExtra(DEEPLINK_EXTRAS_KEY)?.getString(LOCATION_KEY))
+            .isEqualTo("https://example.com/start")
+    }
+
     // NavController merges deepLinkArgs over deepLinkExtras (last write wins); the intent's args
     // must not survive to override the validated start location.
     @Test
