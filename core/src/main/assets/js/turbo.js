@@ -1,9 +1,7 @@
 (() => {
   const TURBO_LOAD_TIMEOUT = 4000
 
-  // TurboSessionChannel is the native message channel injected by
-  // WebViewCompat.addWebMessageListener(). Calls are relayed to the
-  // native side as {name, args} envelopes.
+  // TurboSessionChannel is injected by the native side via WebViewCompat.addWebMessageListener().
   const TurboSession = new Proxy({}, {
     get: (_, name) => (...args) =>
       window.TurboSessionChannel.postMessage(JSON.stringify({ name, args }))

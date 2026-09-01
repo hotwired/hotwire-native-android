@@ -686,8 +686,8 @@ class Session(
 
         turboSessionChannelInstalled = true
 
-        // "*" injects the channel into every frame. Each message is gated on
-        // its browser-reported source origin instead, which a page can't forge.
+        // "*" injects the channel into every frame; each message is gated on
+        // its browser-reported source origin instead.
         WebViewCompat.addWebMessageListener(this, "TurboSessionChannel", setOf("*")) {
             _, message, sourceOrigin, isMainFrame, _ ->
             onTurboSessionMessage(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
@@ -702,9 +702,8 @@ class Session(
     }
 
     private fun installBridge(location: String) {
-        // Without the message channel, the injected scripts can never reach
-        // native code — fail the visit loudly instead of hanging on a page
-        // whose Turbo adapter can't report readiness.
+        // Without the channel the injected scripts can never reach native
+        // code — fail the visit loudly instead of hanging.
         if (!turboSessionChannelInstalled) {
             logWarningEvent("bridgeInstallationBlockedForUnsupportedWebView")
             reset()
@@ -741,10 +740,9 @@ class Session(
     }
 
     /**
-     * Handles a message posted through the TurboSessionChannel. Messages can
-     * originate from any frame of any page loaded in the WebView, so each one
-     * is gated on its source origin before it is even decoded. Runs on the
-     * main thread — the message listener delivers there.
+     * Messages can arrive from any frame of any page loaded in the WebView,
+     * so each one is gated on its source origin before it is decoded. Runs
+     * on the main thread — the message listener delivers there.
      */
     internal fun onTurboSessionMessage(data: String, sourceOrigin: String, isMainFrame: Boolean) {
         if (!isMainFrame || !Hotwire.config.hostVerifier.isTrustedForBridge(sourceOrigin)) {

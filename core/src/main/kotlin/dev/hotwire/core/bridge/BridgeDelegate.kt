@@ -94,8 +94,8 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     private fun originIsTrustedForBridge(): Boolean {
-        // Gate on the WebView's actual document. No document — no bridge
-        // operations; the destination's intended location is not evidence.
+        // No document — no bridge operations; the destination's intended
+        // location is not evidence of what is actually loaded.
         val pageLocation = currentLocation ?: return false
         return Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
     }

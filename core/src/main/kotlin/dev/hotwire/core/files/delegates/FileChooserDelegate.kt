@@ -42,8 +42,8 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
             return true
         }
 
-        // Answer any previously-held request before replacing it so the WebView
-        // always gets a verdict — never an orphaned callback.
+        // Answer any held request before replacing it — the WebView must
+        // always get a verdict.
         handleCancellation()
         uploadCallback = filePathCallback
 
@@ -99,8 +99,8 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
     }
 
     internal fun sendResult(results: Array<Uri>?) {
-        // The picker is asynchronous — re-verify the page before handing it the
-        // user's files, in case the WebView navigated while the picker was open.
+        // Re-verify the page — the WebView may have navigated while the
+        // picker was open.
         val pageLocation = session.webView.url
         val pageIsTrusted = pageLocation != null &&
             Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)

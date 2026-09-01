@@ -86,8 +86,8 @@ class Bridge internal constructor(webView: WebView) {
             return
         }
 
-        // "*" injects the channel into every frame. Each message is gated on
-        // its browser-reported source origin instead, which a page can't forge.
+        // "*" injects the channel into every frame; each message is gated on
+        // its browser-reported source origin instead.
         WebViewCompat.addWebMessageListener(webView, bridgeChannelName, setOf("*")) {
             _, message, sourceOrigin, isMainFrame, _ ->
             onBridgeMessage(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
@@ -95,10 +95,9 @@ class Bridge internal constructor(webView: WebView) {
     }
 
     /**
-     * Handles a message posted through the BridgeComponentsChannel. Messages
-     * can originate from any frame of any page loaded in the WebView, so each
-     * one is gated on its source origin before it is even decoded. Runs on
-     * the main thread — the message listener delivers there.
+     * Messages can arrive from any frame of any page loaded in the WebView,
+     * so each one is gated on its source origin before it is decoded. Runs
+     * on the main thread — the message listener delivers there.
      */
     internal fun onBridgeMessage(data: String, sourceOrigin: String, isMainFrame: Boolean) {
         if (!isMainFrame || !Hotwire.config.hostVerifier.isTrustedForBridge(sourceOrigin)) {

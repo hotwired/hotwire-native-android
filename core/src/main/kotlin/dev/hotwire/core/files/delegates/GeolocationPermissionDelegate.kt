@@ -25,8 +25,8 @@ class GeolocationPermissionDelegate(private val session: Session) {
         origin: String?,
         callback: GeolocationPermissions.Callback?
     ) {
-        // Answer any previously-held request before replacing it so the
-        // WebView always gets a verdict — never an orphaned callback.
+        // Answer any held request before replacing it — the WebView must
+        // always get a verdict.
         permissionDenied()
 
         requestOrigin = origin
