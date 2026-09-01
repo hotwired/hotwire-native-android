@@ -108,7 +108,12 @@ class WebViewPermissionDelegate(private val session: Session) {
             grantResults[permission] == true || isGranted(permission)
         }
 
-        if (allGranted) {
+        // The runtime permission dialog is asynchronous — re-verify the origin
+        // in case the verifier's answer changed while the dialog was up.
+        val origin = request.origin?.toString()
+        val originIsTrusted = origin != null && Hotwire.config.hostVerifier.isTrustedForBridge(origin)
+
+        if (allGranted && originIsTrusted) {
             request.grant(resources.toTypedArray())
         } else {
             request.deny()

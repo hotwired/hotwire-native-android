@@ -8,9 +8,11 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import androidx.activity.result.ActivityResult
 import dev.hotwire.core.R
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +33,15 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         filePathCallback: ValueCallback<Array<Uri>>,
         params: FileChooserParams
     ): Boolean {
+        // FileChooserParams carries no origin, so the page's location is the
+        // best available authority for this gate.
+        val pageLocation = session.webView.url
+        if (pageLocation == null || !Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)) {
+            logWarning("fileChooserBlockedForUntrustedOrigin", pageLocation.orEmpty())
+            filePathCallback.onReceiveValue(null)
+            return true
+        }
+
         uploadCallback = filePathCallback
 
         return openChooser(params).also { success ->

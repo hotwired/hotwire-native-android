@@ -216,6 +216,21 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
     }
 
     @Test
+    fun `re-verifies the origin when the permission dialog resolves`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        grantRuntimePermissions(MODIFY_AUDIO_SETTINGS)
+        wireDestinationWithLauncher()
+        val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+
+        session.webViewPermissionDelegate.onRequest(request)
+        Hotwire.config.clearTrustedLocations()
+        session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
+
+        verify(request, org.mockito.Mockito.never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        verify(request).deny()
+    }
+
+    @Test
     fun `onCancel ignores a request that is not currently pending`() {
         declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
         // In production MODIFY_AUDIO_SETTINGS is auto-granted at install since
