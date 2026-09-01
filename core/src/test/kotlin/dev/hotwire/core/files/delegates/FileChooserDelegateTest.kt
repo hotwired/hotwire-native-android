@@ -26,6 +26,7 @@ import dev.hotwire.core.turbo.webview.HotwireWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,7 +60,7 @@ class FileChooserDelegateTest : BaseRepositoryTest() {
         Hotwire.config.registerTrustedLocation("https://37signals.com")
     }
 
-    @org.junit.After
+    @After
     fun teardownTrustedLocations() {
         Hotwire.config.clearTrustedLocations()
     }
@@ -143,16 +144,14 @@ class FileChooserDelegateTest : BaseRepositoryTest() {
         whenever(it.isCaptureEnabled).thenReturn(false)
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun wireDestinationWithLauncher() {
-        val launcher = org.mockito.Mockito.mock(ActivityResultLauncher::class.java)
-            as ActivityResultLauncher<Intent>
+        val launcher = mock<ActivityResultLauncher<Intent>>()
         val visitDestination = object : VisitDestination {
             override fun isActive() = true
             override fun activityResultLauncher(requestCode: Int) = launcher
             override fun activityPermissionResultLauncher(requestCode: Int) = null
         }
-        val callback = org.mockito.Mockito.mock(SessionCallback::class.java)
+        val callback = mock<SessionCallback>()
         whenever(callback.visitDestination()).thenReturn(visitDestination)
         session.currentVisit = Visit(
             location = "https://37signals.com",

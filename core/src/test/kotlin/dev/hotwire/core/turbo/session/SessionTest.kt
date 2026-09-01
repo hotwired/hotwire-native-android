@@ -28,6 +28,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -86,7 +87,7 @@ class SessionTest : BaseRepositoryTest() {
         whenever(callback.visitDestination()).thenReturn(visitDestination)
     }
 
-    @org.junit.After
+    @After
     fun teardownTrustedLocations() {
         Hotwire.config.clearTrustedLocations()
     }

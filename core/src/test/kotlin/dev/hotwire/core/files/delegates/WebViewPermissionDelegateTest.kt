@@ -21,11 +21,13 @@ import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.robolectric.Robolectric.buildActivity
@@ -56,7 +58,7 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         Hotwire.config.registerTrustedLocation("https://37signals.com")
     }
 
-    @org.junit.After
+    @After
     fun teardownTrustedLocations() {
         Hotwire.config.clearTrustedLocations()
     }
@@ -211,8 +213,8 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         // request.
         session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
 
-        verify(request, org.mockito.Mockito.never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
-        verify(request, org.mockito.Mockito.never()).deny()
+        verify(request, never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        verify(request, never()).deny()
     }
 
     @Test
@@ -226,7 +228,7 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         Hotwire.config.clearTrustedLocations()
         session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
 
-        verify(request, org.mockito.Mockito.never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        verify(request, never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
         verify(request).deny()
     }
 

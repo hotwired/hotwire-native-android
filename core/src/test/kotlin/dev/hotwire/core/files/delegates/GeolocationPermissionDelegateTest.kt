@@ -15,6 +15,7 @@ import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,7 +51,7 @@ class GeolocationPermissionDelegateTest : BaseRepositoryTest() {
         Hotwire.config.registerTrustedLocation("https://37signals.com")
     }
 
-    @org.junit.After
+    @After
     fun teardownTrustedLocations() {
         Hotwire.config.clearTrustedLocations()
     }
