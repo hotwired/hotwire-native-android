@@ -42,6 +42,9 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
             return true
         }
 
+        // Answer any previously-held request before replacing it so the WebView
+        // always gets a verdict — never an orphaned callback.
+        handleCancellation()
         uploadCallback = filePathCallback
 
         return openChooser(params).also { success ->
@@ -95,8 +98,19 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         }
     }
 
-    private fun sendResult(results: Array<Uri>?) {
-        uploadCallback?.onReceiveValue(results)
+    internal fun sendResult(results: Array<Uri>?) {
+        // The picker is asynchronous — re-verify the page before handing it the
+        // user's files, in case the WebView navigated while the picker was open.
+        val pageLocation = session.webView.url
+        val pageIsTrusted = pageLocation != null &&
+            Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
+
+        if (results != null && !pageIsTrusted) {
+            logWarning("fileChooserResultBlockedForUntrustedOrigin", pageLocation.orEmpty())
+            uploadCallback?.onReceiveValue(null)
+        } else {
+            uploadCallback?.onReceiveValue(results)
+        }
         uploadCallback = null
     }
 
