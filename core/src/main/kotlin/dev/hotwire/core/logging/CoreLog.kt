@@ -50,6 +50,12 @@ internal fun logWarning(event: String, attributes: List<Pair<String, Any>>) {
     }
 }
 
+internal fun logError(event: String, details: String) {
+    Hotwire.config.logger.e(DEFAULT_TAG, null) {
+        "${"$event ".padEnd(PAD_END_LENGTH, '.')} [$details]"
+    }
+}
+
 internal fun logError(event: String, throwable: Throwable) {
     Hotwire.config.logger.e(DEFAULT_TAG, throwable) {
         "$event: ${throwable.stackTraceToString()}"

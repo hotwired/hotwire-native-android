@@ -143,39 +143,6 @@ class BridgeDelegateTest {
     }
 
     @Test
-    fun bridgeDidReceiveMessageBlockedForUntrustedOrigin() {
-        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
-
-        // The metadata url matches the page's actual url, so the location
-        // equality check alone would let this through.
-        val message = Message(
-            id = "1",
-            component = "one",
-            event = "connect",
-            metadata = Metadata("https://evil.attacker.com/page"),
-            jsonData = """{"title":"Page-title","subtitle":"Page-subtitle"}"""
-        )
-
-        assertEquals(false, delegate.bridgeDidReceiveMessage(message))
-        assertNull(delegate.component<TestData.OneBridgeComponent>())
-    }
-
-    @Test
-    fun bridgeDidReceiveMessageBlockedForSchemeDowngrade() {
-        whenever(webView.url).thenReturn("http://37signals.com")
-
-        val message = Message(
-            id = "1",
-            component = "one",
-            event = "connect",
-            metadata = Metadata("http://37signals.com"),
-            jsonData = """{"title":"Page-title","subtitle":"Page-subtitle"}"""
-        )
-
-        assertEquals(false, delegate.bridgeDidReceiveMessage(message))
-    }
-
-    @Test
     fun onColdBootPageCompletedBlockedForUntrustedOrigin() {
         whenever(webView.url).thenReturn("https://evil.attacker.com/page")
 
@@ -190,14 +157,6 @@ class BridgeDelegateTest {
 
         delegate.onWebViewAttached(webView)
         verify(bridge, never()).load()
-    }
-
-    @Test
-    fun bridgeDidInitializeBlockedForUntrustedOrigin() {
-        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
-
-        delegate.bridgeDidInitialize()
-        verify(bridge, never()).register(any<List<String>>())
     }
 
     @Test

@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.net.http.SslError
 import android.util.SparseArray
 import android.webkit.HttpAuthHandler
-import android.webkit.JavascriptInterface
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
 import android.webkit.WebChromeClient
@@ -19,12 +18,14 @@ import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.VISUAL_STATE_CALLBACK
+import androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER
 import androidx.webkit.WebViewFeature.isFeatureSupported
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.files.delegates.GeolocationPermissionDelegate
 import dev.hotwire.core.files.delegates.WebViewPermissionDelegate
 import dev.hotwire.core.logging.logDebug
+import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
@@ -36,8 +37,13 @@ import dev.hotwire.core.turbo.offline.OfflineHttpRepository
 import dev.hotwire.core.turbo.offline.OfflinePreCacheRequest
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.offline.OfflineWebViewRequestInterceptor
+import dev.hotwire.core.turbo.util.JavascriptMessage
+import dev.hotwire.core.turbo.util.boolean
+import dev.hotwire.core.turbo.util.int
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 import dev.hotwire.core.turbo.util.runOnUiThread
+import dev.hotwire.core.turbo.util.string
+import dev.hotwire.core.turbo.util.toJavascriptMessageOrNull
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
@@ -222,19 +228,13 @@ class Session(
     /**
      * Called by Turbo bridge when a new visit is proposed.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param location The location to visit.
      * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
-    @JavascriptInterface
-    fun visitProposedToLocation(location: String, optionsJson: String) {
-        whenTrustedOrigin("visitProposedToLocation") {
-            VisitOptions.fromJSON(optionsJson)?.let { options ->
-                logEvent("visitProposedToLocation", "location" to location, "options" to options)
-                callback { it.visitProposedToLocation(location, options) }
-            }
+    internal fun visitProposedToLocation(location: String, optionsJson: String) {
+        VisitOptions.fromJSON(optionsJson)?.let { options ->
+            logEvent("visitProposedToLocation", "location" to location, "options" to options)
+            callback { it.visitProposedToLocation(location, options) }
         }
     }
 
@@ -258,18 +258,12 @@ class Session(
      * Called by Turbo bridge when a new visit proposal will refresh the
      * current page.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param location The location to visit.
      * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
-    @JavascriptInterface
-    fun visitProposalRefreshingPage(location: String, optionsJson: String) {
-        whenTrustedOrigin("visitProposalRefreshingPage") {
-            VisitOptions.fromJSON(optionsJson)?.let { options ->
-                logEvent("visitProposalRefreshingPage", "location" to location, "options" to options)
-            }
+    internal fun visitProposalRefreshingPage(location: String, optionsJson: String) {
+        VisitOptions.fromJSON(optionsJson)?.let { options ->
+            logEvent("visitProposalRefreshingPage", "location" to location, "options" to options)
         }
     }
 
@@ -277,45 +271,33 @@ class Session(
      * Called by Turbo bridge when a new visit proposal will scroll to an anchor
      * on the same page.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param location The location to visit.
      * @param optionsJson A JSON block to be serialized into [VisitOptions].
      */
-    @JavascriptInterface
-    fun visitProposalScrollingToAnchor(location: String, optionsJson: String) {
-        whenTrustedOrigin("visitProposalScrollingToAnchor") {
-            VisitOptions.fromJSON(optionsJson)?.let { options ->
-                logEvent("visitProposalScrollingToAnchor", "location" to location, "options" to options)
-            }
+    internal fun visitProposalScrollingToAnchor(location: String, optionsJson: String) {
+        VisitOptions.fromJSON(optionsJson)?.let { options ->
+            logEvent("visitProposalScrollingToAnchor", "location" to location, "options" to options)
         }
     }
 
     /**
      * Called by Turbo bridge when a new visit has just started.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param visitIdentifier A unique identifier for the visit.
      * @param visitHasCachedSnapshot Whether the visit has a cached snapshot available.
      * @param location The location being visited.
      */
-    @JavascriptInterface
-    fun visitStarted(visitIdentifier: String, visitHasCachedSnapshot: Boolean,
+    internal fun visitStarted(visitIdentifier: String, visitHasCachedSnapshot: Boolean,
                      visitIsPageRefresh: Boolean, location: String
     ) {
-        whenTrustedOrigin("visitStarted") {
-            logEvent(
-                "visitStarted", "location" to location,
-                "visitIdentifier" to visitIdentifier,
-                "visitHasCachedSnapshot" to visitHasCachedSnapshot,
-                "visitIsPageRefresh" to visitIsPageRefresh
-            )
+        logEvent(
+            "visitStarted", "location" to location,
+            "visitIdentifier" to visitIdentifier,
+            "visitHasCachedSnapshot" to visitHasCachedSnapshot,
+            "visitIsPageRefresh" to visitIsPageRefresh
+        )
 
-            currentVisit?.identifier = visitIdentifier
-        }
+        currentVisit?.identifier = visitIdentifier
     }
 
     /**
@@ -323,11 +305,8 @@ class Session(
      *
      * @param visitIdentifier A unique identifier for the visit.
      */
-    @JavascriptInterface
-    fun visitRequestStarted(visitIdentifier: String) {
-        whenTrustedOrigin("visitRequestStarted") {
-            logEvent("visitRequestStarted", "visitIdentifier" to visitIdentifier)
-        }
+    internal fun visitRequestStarted(visitIdentifier: String) {
+        logEvent("visitRequestStarted", "visitIdentifier" to visitIdentifier)
     }
 
     /**
@@ -335,45 +314,36 @@ class Session(
      *
      * @param visitIdentifier A unique identifier for the visit.
      */
-    @JavascriptInterface
-    fun visitRequestCompleted(visitIdentifier: String) {
-        whenTrustedOrigin("visitRequestCompleted") {
-            logEvent("visitRequestCompleted", "visitIdentifier" to visitIdentifier)
-        }
+    internal fun visitRequestCompleted(visitIdentifier: String) {
+        logEvent("visitRequestCompleted", "visitIdentifier" to visitIdentifier)
     }
 
     /**
      * Called by Turbo bridge when the HTTP request has failed.
-     *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
      *
      * @param location The location of the failed visit.
      * @param visitIdentifier A unique identifier for the visit.
      * @param visitHasCachedSnapshot Whether the visit has a cached snapshot available.
      * @param statusCode The HTTP status code that caused the failure.
      */
-    @JavascriptInterface
-    fun visitRequestFailedWithStatusCode(
+    internal fun visitRequestFailedWithStatusCode(
         location: String,
         visitIdentifier: String,
         visitHasCachedSnapshot: Boolean,
         statusCode: Int
     ) {
-        whenTrustedOrigin("visitRequestFailedWithStatusCode") {
-            val visitError = HttpError.from(statusCode)
+        val visitError = HttpError.from(statusCode)
 
-            logEvent(
-                "visitRequestFailedWithStatusCode",
-                "location" to location,
-                "visitIdentifier" to visitIdentifier,
-                "visitHasCachedSnapshot" to visitHasCachedSnapshot,
-                "error" to visitError
-            )
+        logEvent(
+            "visitRequestFailedWithStatusCode",
+            "location" to location,
+            "visitIdentifier" to visitIdentifier,
+            "visitHasCachedSnapshot" to visitHasCachedSnapshot,
+            "error" to visitError
+        )
 
-            if (visitIdentifier == currentVisit?.identifier) {
-                callback { it.requestFailedWithError(visitHasCachedSnapshot, visitError) }
-            }
+        if (visitIdentifier == currentVisit?.identifier) {
+            callback { it.requestFailedWithError(visitHasCachedSnapshot, visitError) }
         }
     }
 
@@ -384,25 +354,11 @@ class Session(
      * the native side. Propose a cross-origin redirect visit if a redirect is found, otherwise
      * fail the visit.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param location The original visit location requested.
      * @param visitIdentifier A unique identifier for the visit.
      * @param visitHasCachedSnapshot Whether the visit has a cached snapshot available.
      */
-    @JavascriptInterface
-    fun visitRequestFailedWithNonHttpStatusCode(
-        location: String,
-        visitIdentifier: String,
-        visitHasCachedSnapshot: Boolean
-    ) {
-        whenTrustedOrigin("visitRequestFailedWithNonHttpStatusCode") {
-            visitRequestFailedWithNonHttpStatusCodeTrusted(location, visitIdentifier, visitHasCachedSnapshot)
-        }
-    }
-
-    private fun visitRequestFailedWithNonHttpStatusCodeTrusted(
+    internal fun visitRequestFailedWithNonHttpStatusCode(
         location: String,
         visitIdentifier: String,
         visitHasCachedSnapshot: Boolean
@@ -437,20 +393,14 @@ class Session(
     /**
      * Called by Turbo bridge when the HTTP request has been completed.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param visitIdentifier A unique identifier for the visit.
      */
-    @JavascriptInterface
-    fun visitRequestFinished(visitIdentifier: String) {
-        whenTrustedOrigin("visitRequestFinished") {
-            logEvent("visitRequestFinished", "visitIdentifier" to visitIdentifier)
+    internal fun visitRequestFinished(visitIdentifier: String) {
+        logEvent("visitRequestFinished", "visitIdentifier" to visitIdentifier)
 
-            currentVisit?.let { visit ->
-                if (visitIdentifier == visit.identifier) {
-                    callback { it.visitRequestFinished() }
-                }
+        currentVisit?.let { visit ->
+            if (visitIdentifier == visit.identifier) {
+                callback { it.visitRequestFinished() }
             }
         }
     }
@@ -458,43 +408,31 @@ class Session(
     /**
      * Called by Turbo bridge once the page has been fully loaded by the WebView.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param restorationIdentifier A unique identifier for restoring the page and scroll position
      * from cache.
      */
-    @JavascriptInterface
-    fun pageLoaded(restorationIdentifier: String) {
-        whenTrustedOrigin("pageLoaded") {
-            logEvent("pageLoaded", "restorationIdentifier" to restorationIdentifier)
+    internal fun pageLoaded(restorationIdentifier: String) {
+        logEvent("pageLoaded", "restorationIdentifier" to restorationIdentifier)
 
-            currentVisit?.let { visit ->
-                restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
-            }
+        currentVisit?.let { visit ->
+            restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
         }
     }
 
     /**
      * Called by Turbo bridge once the page has been fully rendered in the webView.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param visitIdentifier A unique identifier for the visit.
      */
-    @JavascriptInterface
-    fun visitRendered(visitIdentifier: String) {
-        whenTrustedOrigin("visitRendered") {
-            logEvent("visitRendered", "visitIdentifier" to visitIdentifier)
+    internal fun visitRendered(visitIdentifier: String) {
+        logEvent("visitRendered", "visitIdentifier" to visitIdentifier)
 
-            currentVisit?.let { visit ->
-                if (visitIdentifier == coldBootVisitIdentifier || visitIdentifier == visit.identifier) {
-                    if (isFeatureSupported(VISUAL_STATE_CALLBACK)) {
-                        postVisitVisualStateCallback(visitIdentifier)
-                    } else {
-                        callback { it.visitRendered() }
-                    }
+        currentVisit?.let { visit ->
+            if (visitIdentifier == coldBootVisitIdentifier || visitIdentifier == visit.identifier) {
+                if (isFeatureSupported(VISUAL_STATE_CALLBACK)) {
+                    postVisitVisualStateCallback(visitIdentifier)
+                } else {
+                    callback { it.visitRendered() }
                 }
             }
         }
@@ -504,27 +442,21 @@ class Session(
      * Called by Turbo bridge when the visit is fully completed (request successful and
      * page rendered).
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param visitIdentifier  A unique identifier for the visit.
      * @param restorationIdentifier A unique identifier for restoring the page and scroll position
      * from cache.
      */
-    @JavascriptInterface
-    fun visitCompleted(visitIdentifier: String, restorationIdentifier: String) {
-        whenTrustedOrigin("visitCompleted") {
-            logEvent(
-                "visitCompleted",
-                "visitIdentifier" to visitIdentifier,
-                "restorationIdentifier" to restorationIdentifier
-            )
+    internal fun visitCompleted(visitIdentifier: String, restorationIdentifier: String) {
+        logEvent(
+            "visitCompleted",
+            "visitIdentifier" to visitIdentifier,
+            "restorationIdentifier" to restorationIdentifier
+        )
 
-            currentVisit?.let { visit ->
-                if (visitIdentifier == visit.identifier) {
-                    restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
-                    callback { it.visitCompleted(visit.completedOffline) }
-                }
+        currentVisit?.let { visit ->
+            if (visitIdentifier == visit.identifier) {
+                restorationIdentifiers.put(visit.destinationIdentifier, restorationIdentifier)
+                callback { it.visitCompleted(visit.completedOffline) }
             }
         }
     }
@@ -532,65 +464,46 @@ class Session(
     /**
      * Called by Turbo bridge when a form submission has started.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param location The location of the form submission.
      */
-    @JavascriptInterface
-    fun formSubmissionStarted(location: String) {
-        whenTrustedOrigin("formSubmissionStarted") {
-            logEvent(
-                "formSubmissionStarted",
-                "location" to location
-            )
+    internal fun formSubmissionStarted(location: String) {
+        logEvent(
+            "formSubmissionStarted",
+            "location" to location
+        )
 
-            currentVisit?.let {
-                callback { it.formSubmissionStarted(location) }
-            }
+        currentVisit?.let {
+            callback { it.formSubmissionStarted(location) }
         }
     }
 
     /**
      * Called by Turbo bridge when a form submission has finished.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param location The location of the form submission.
      */
-    @JavascriptInterface
-    fun formSubmissionFinished(location: String) {
-        whenTrustedOrigin("formSubmissionFinished") {
-            logEvent(
-                "formSubmissionFinished",
-                "location" to location
-            )
+    internal fun formSubmissionFinished(location: String) {
+        logEvent(
+            "formSubmissionFinished",
+            "location" to location
+        )
 
-            currentVisit?.let {
-                callback { it.formSubmissionFinished(location) }
-            }
+        currentVisit?.let {
+            callback { it.formSubmissionFinished(location) }
         }
     }
 
     /**
      * Called when Turbo bridge detects that the page being visited has been invalidated,
      * typically by new resources in the the page HEAD.
-     *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      */
-    @JavascriptInterface
-    fun pageInvalidated() {
-        whenTrustedOrigin("pageInvalidated") {
-            logEvent("pageInvalidated")
+    internal fun pageInvalidated() {
+        logEvent("pageInvalidated")
 
-            currentVisit?.let { visit ->
-                callback {
-                    it.pageInvalidated()
-                    visit(visit.copy(reload = true))
-                }
+        currentVisit?.let { visit ->
+            callback {
+                it.pageInvalidated()
+                visit(visit.copy(reload = true))
             }
         }
     }
@@ -598,34 +511,28 @@ class Session(
     /**
      * Sets internal flags that indicate whether Turbo in the WebView is ready for use.
      *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
-     *
      * @param isReady
      */
-    @JavascriptInterface
-    fun turboIsReady(isReady: Boolean) {
-        whenTrustedOrigin("turboIsReady") {
-            logEvent("turboIsReady", "isReady" to isReady)
+    internal fun turboIsReady(isReady: Boolean) {
+        logEvent("turboIsReady", "isReady" to isReady)
 
-            currentVisit?.let { visit ->
-                this.isReady = isReady
-                this.isColdBooting = false
+        currentVisit?.let { visit ->
+            this.isReady = isReady
+            this.isColdBooting = false
 
-                if (!isReady) {
-                    reset()
+            if (!isReady) {
+                reset()
 
-                    val visitError = LoadError.NotReady
-                    logEvent("turboIsNotReady", "error" to visitError)
+                val visitError = LoadError.NotReady
+                logEvent("turboIsNotReady", "error" to visitError)
 
-                    callback { it.requestFailedWithError(false, visitError) }
-                } else {
-                    // Check if a visit was requested while cold
-                    // booting. If so, visit the pending location.
-                    when (visitPending) {
-                        true -> visitPendingLocation(visit)
-                        else -> renderVisitForColdBoot()
-                    }
+                callback { it.requestFailedWithError(false, visitError) }
+            } else {
+                // Check if a visit was requested while cold
+                // booting. If so, visit the pending location.
+                when (visitPending) {
+                    true -> visitPendingLocation(visit)
+                    else -> renderVisitForColdBoot()
                 }
             }
         }
@@ -633,45 +540,27 @@ class Session(
 
     /**
      * Sets internal flags indicating that Turbo did not properly initialize.
-     *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
      */
-    @JavascriptInterface
-    fun turboFailedToLoad() {
-        whenTrustedOrigin("turboFailedToLoad") {
-            val visitError = LoadError.NotPresent
+    internal fun turboFailedToLoad() {
+        val visitError = LoadError.NotPresent
 
-            logEvent("turboFailedToLoad", "error" to visitError)
-            reset()
-            callback { it.onReceivedError(visitError) }
-        }
+        logEvent("turboFailedToLoad", "error" to visitError)
+        reset()
+        callback { it.onReceivedError(visitError) }
     }
 
     /**
      * Called when a touched element event has started.
-     *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
      */
-    @JavascriptInterface
-    fun elementTouchStarted(preventsPullsToRefresh: Boolean) {
-        whenTrustedOrigin("elementTouchStarted") {
-            webView.elementTouchPreventsPullsToRefresh = preventsPullsToRefresh
-        }
+    internal fun elementTouchStarted(preventsPullsToRefresh: Boolean) {
+        webView.elementTouchPreventsPullsToRefresh = preventsPullsToRefresh
     }
 
     /**
      * Called when a touched element event has ended.
-     *
-     * Warning: This method is public so it can be used as a Javascript Interface.
-     * You should never call this directly as it could lead to unintended behavior.
      */
-    @JavascriptInterface
-    fun elementTouchEnded() {
-        whenTrustedOrigin("elementTouchEnded") {
-            webView.elementTouchPreventsPullsToRefresh = false
-        }
+    internal fun elementTouchEnded() {
+        webView.elementTouchPreventsPullsToRefresh = false
     }
 
     // Private
@@ -775,10 +664,27 @@ class Session(
         }
 
         webView.apply {
-            addJavascriptInterface(this@Session, "TurboSession")
+            initTurboSessionChannel()
             webChromeClient = WebChromeClient()
             webViewClient = TurboWebViewClient()
             initDownloadListener()
+        }
+    }
+
+    private fun WebView.initTurboSessionChannel() {
+        if (!isFeatureSupported(WEB_MESSAGE_LISTENER)) {
+            logError(
+                "webMessageListenerNotSupported",
+                "The WebView version on this device is not supported"
+            )
+            return
+        }
+
+        // "*" injects the channel into every frame. Each message is gated on
+        // its browser-reported source origin instead, which a page can't forge.
+        WebViewCompat.addWebMessageListener(this, "TurboSessionChannel", setOf("*")) {
+            _, message, sourceOrigin, isMainFrame, _ ->
+            onTurboSessionMessage(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
         }
     }
 
@@ -819,21 +725,51 @@ class Session(
     }
 
     /**
-     * JavascriptInterface calls can originate from any page loaded in the
-     * WebView, so each one is gated on the page's actual location — read on
-     * the main thread — before it can drive the session.
+     * Handles a message posted through the TurboSessionChannel. Messages can
+     * originate from any frame of any page loaded in the WebView, so each one
+     * is gated on its source origin before it is even decoded. Runs on the
+     * main thread — the message listener delivers there.
      */
-    private fun whenTrustedOrigin(event: String, action: () -> Unit) {
-        context.runOnUiThread {
-            val pageLocation = webView.url
+    internal fun onTurboSessionMessage(data: String, sourceOrigin: String, isMainFrame: Boolean) {
+        if (!isMainFrame || !Hotwire.config.hostVerifier.isTrustedForBridge(sourceOrigin)) {
+            logWarningEvent("turboSessionMessageBlockedForUntrustedOrigin", "origin" to sourceOrigin)
+            return
+        }
 
-            if (pageLocation != null &&
-                Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
-            ) {
-                action()
-            } else {
-                logWarningEvent("${event}BlockedForUntrustedOrigin", "location" to pageLocation.orEmpty())
-            }
+        val message = data.toJavascriptMessageOrNull() ?: run {
+            logWarningEvent("turboSessionMessageMalformed")
+            return
+        }
+
+        try {
+            dispatchTurboSessionMessage(message)
+        } catch (e: RuntimeException) {
+            logError("turboSessionMessageFailed", e)
+        }
+    }
+
+    private fun dispatchTurboSessionMessage(message: JavascriptMessage) = with(message.args) {
+        when (message.name) {
+            "visitProposedToLocation" -> visitProposedToLocation(string(0), string(1))
+            "visitProposalRefreshingPage" -> visitProposalRefreshingPage(string(0), string(1))
+            "visitProposalScrollingToAnchor" -> visitProposalScrollingToAnchor(string(0), string(1))
+            "visitStarted" -> visitStarted(string(0), boolean(1), boolean(2), string(3))
+            "visitRequestStarted" -> visitRequestStarted(string(0))
+            "visitRequestCompleted" -> visitRequestCompleted(string(0))
+            "visitRequestFailedWithStatusCode" -> visitRequestFailedWithStatusCode(string(0), string(1), boolean(2), int(3))
+            "visitRequestFailedWithNonHttpStatusCode" -> visitRequestFailedWithNonHttpStatusCode(string(0), string(1), boolean(2))
+            "visitRequestFinished" -> visitRequestFinished(string(0))
+            "pageLoaded" -> pageLoaded(string(0))
+            "visitRendered" -> visitRendered(string(0))
+            "visitCompleted" -> visitCompleted(string(0), string(1))
+            "formSubmissionStarted" -> formSubmissionStarted(string(0))
+            "formSubmissionFinished" -> formSubmissionFinished(string(0))
+            "pageInvalidated" -> pageInvalidated()
+            "turboIsReady" -> turboIsReady(boolean(0))
+            "turboFailedToLoad" -> turboFailedToLoad()
+            "elementTouchStarted" -> elementTouchStarted(boolean(0))
+            "elementTouchEnded" -> elementTouchEnded()
+            else -> logWarningEvent("turboSessionMessageUnknown", "name" to message.name)
         }
     }
 

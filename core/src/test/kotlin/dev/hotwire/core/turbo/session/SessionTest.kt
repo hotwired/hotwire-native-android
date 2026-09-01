@@ -21,6 +21,10 @@ import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -102,18 +106,16 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `javascript interface calls from an untrusted origin are dropped`() {
-        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
+    fun `turbo session messages from an untrusted origin are dropped`() {
         session.currentVisit = visit
 
-        session.visitProposedToLocation("${visit.location}/page", VisitOptions().toJson())
-        session.turboIsReady(true)
-        session.visitStarted(
-            visitIdentifier = "12345",
-            visitHasCachedSnapshot = true,
-            visitIsPageRefresh = false,
-            location = visit.location
-        )
+        listOf(
+            envelope("visitProposedToLocation", "${visit.location}/page", VisitOptions().toJson()),
+            envelope("turboIsReady", true),
+            envelope("visitStarted", "12345", true, false, visit.location)
+        ).forEach {
+            session.onTurboSessionMessage(it, sourceOrigin = "https://evil.attacker.com", isMainFrame = true)
+        }
 
         verify(callback, never()).visitProposedToLocation(any(), any())
         assertThat(session.isReady).isFalse()
@@ -121,13 +123,62 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `javascript interface calls with no page loaded are dropped`() {
-        whenever(webView.url).thenReturn(null)
+    fun `turbo session messages from a sub frame are dropped`() {
         session.currentVisit = visit
 
-        session.visitProposedToLocation("${visit.location}/page", VisitOptions().toJson())
+        session.onTurboSessionMessage(
+            envelope("visitProposedToLocation", "${visit.location}/page", VisitOptions().toJson()),
+            sourceOrigin = baseUrl(),
+            isMainFrame = false
+        )
 
         verify(callback, never()).visitProposedToLocation(any(), any())
+    }
+
+    @Test
+    fun `turbo session messages from a trusted main frame are dispatched`() {
+        val options = VisitOptions()
+        val newLocation = "${visit.location}/page"
+        session.currentVisit = visit
+
+        session.onTurboSessionMessage(
+            envelope("visitProposedToLocation", newLocation, options.toJson()),
+            sourceOrigin = baseUrl(),
+            isMainFrame = true
+        )
+
+        verify(callback).visitProposedToLocation(newLocation, options)
+    }
+
+    @Test
+    fun `malformed turbo session messages are dropped`() {
+        session.currentVisit = visit
+
+        listOf(
+            "not json",
+            """{"args":[]}""",
+            envelope("noSuchMethod"),
+            envelope("visitProposedToLocation")
+        ).forEach {
+            session.onTurboSessionMessage(it, sourceOrigin = baseUrl(), isMainFrame = true)
+        }
+
+        verify(callback, never()).visitProposedToLocation(any(), any())
+    }
+
+    private fun envelope(name: String, vararg args: Any): String {
+        return buildJsonObject {
+            put("name", name)
+            putJsonArray("args") {
+                args.forEach {
+                    when (it) {
+                        is Boolean -> add(it)
+                        is Number -> add(it)
+                        else -> add(it.toString())
+                    }
+                }
+            }
+        }.toString()
     }
 
     @Test

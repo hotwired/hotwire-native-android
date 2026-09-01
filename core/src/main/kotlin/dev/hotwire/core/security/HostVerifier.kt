@@ -21,7 +21,10 @@ interface HostVerifier {
      * Keep this at least as strict as [isTrustedForNavigation]: a page that
      * passes this check can exchange messages with the app's native bridge
      * components. The library passes authoritative values here (the WebView's
-     * current URL or a WebViewClient callback), never page-supplied data.
+     * current URL, a WebViewClient callback, or the browser-reported origin
+     * of the frame that posted a message), never page-supplied data. Note the
+     * frame origin arrives as a bare origin (`https://host:port`), not a
+     * full URL.
      */
     fun isTrustedForBridge(location: String): Boolean
 }

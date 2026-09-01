@@ -64,19 +64,11 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     internal fun bridgeDidInitialize() {
-        if (!originIsTrustedForBridge()) {
-            logBlockedForUntrustedOrigin("bridgeComponentRegistrationBlockedForUntrustedOrigin")
-            return
-        }
-
         bridge?.register(componentFactories.map { it.name })
     }
 
     internal fun bridgeDidReceiveMessage(message: Message): Boolean {
-        return if (destinationIsActive &&
-            resolvedLocation == message.metadata?.url &&
-            originIsTrustedForBridge()
-        ) {
+        return if (destinationIsActive && resolvedLocation == message.metadata?.url) {
             logDebug("bridgeDidReceiveMessage", message.toString())
             getOrCreateComponent(message.component)?.didReceive(message)
             true
