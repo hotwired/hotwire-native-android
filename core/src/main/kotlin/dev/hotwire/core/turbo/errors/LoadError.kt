@@ -18,4 +18,8 @@ sealed interface LoadError : VisitError {
     data object UntrustedOrigin : LoadError {
         override val description = "Untrusted Origin"
     }
+
+    data object WebViewNotSupported : LoadError {
+        override val description = "WebView Not Supported"
+    }
 }

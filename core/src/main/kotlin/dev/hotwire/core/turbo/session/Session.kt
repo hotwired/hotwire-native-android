@@ -671,6 +671,10 @@ class Session(
         }
     }
 
+    // Robolectric reports WebMessageListener as unsupported, so tests set
+    // this directly to exercise the paths behind the cold-boot gate.
+    internal var turboSessionChannelInstalled = false
+
     private fun WebView.initTurboSessionChannel() {
         if (!isFeatureSupported(WEB_MESSAGE_LISTENER)) {
             logError(
@@ -679,6 +683,8 @@ class Session(
             )
             return
         }
+
+        turboSessionChannelInstalled = true
 
         // "*" injects the channel into every frame. Each message is gated on
         // its browser-reported source origin instead, which a page can't forge.
@@ -696,6 +702,16 @@ class Session(
     }
 
     private fun installBridge(location: String) {
+        // Without the message channel, the injected scripts can never reach
+        // native code — fail the visit loudly instead of hanging on a page
+        // whose Turbo adapter can't report readiness.
+        if (!turboSessionChannelInstalled) {
+            logWarningEvent("bridgeInstallationBlockedForUnsupportedWebView")
+            reset()
+            callback { it.onReceivedError(LoadError.WebViewNotSupported) }
+            return
+        }
+
         if (!Hotwire.config.hostVerifier.isTrustedForBridge(location)) {
             logWarningEvent("bridgeInstallationBlockedForUntrustedOrigin", "location" to location)
             reset()

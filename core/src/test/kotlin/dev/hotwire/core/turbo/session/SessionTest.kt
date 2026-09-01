@@ -63,6 +63,9 @@ class SessionTest : BaseRepositoryTest() {
         Hotwire.config.clearTrustedLocations()
         Hotwire.config.registerTrustedLocation(baseUrl())
         session = Session("test", activity, webView)
+        // Robolectric reports WebMessageListener as unsupported; the channel
+        // is considered installed so tests reach the trust gates behind it.
+        session.turboSessionChannelInstalled = true
         whenever(webView.url).thenReturn(baseUrl())
         visit = Visit(
             location = baseUrl(),
@@ -193,6 +196,18 @@ class SessionTest : BaseRepositoryTest() {
         verify(callback).onReceivedError(LoadError.UntrustedOrigin)
         assertThat(session.isColdBooting).isFalse()
         assertThat(session.coldBootVisitIdentifier).isEmpty()
+    }
+
+    @Test
+    fun `cold boot without the message channel surfaces an unsupported error`() {
+        session.turboSessionChannelInstalled = false
+        session.currentVisit = visit
+        session.isColdBooting = true
+
+        webViewClient().onPageFinished(webView, "${visit.location}/page")
+
+        verify(callback).onReceivedError(LoadError.WebViewNotSupported)
+        assertThat(session.isColdBooting).isFalse()
     }
 
     @Test
