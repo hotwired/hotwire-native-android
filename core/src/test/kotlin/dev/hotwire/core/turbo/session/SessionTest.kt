@@ -1,10 +1,12 @@
 package dev.hotwire.core.turbo.session
 
 import android.os.Build
+import android.webkit.HttpAuthHandler
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
@@ -207,6 +209,30 @@ class SessionTest : BaseRepositoryTest() {
         val captor = argumentCaptor<WebViewClient>()
         verify(webView).webViewClient = captor.capture()
         return captor.lastValue
+    }
+
+    @Test
+    fun `http auth challenges from an untrusted host are cancelled`() {
+        val handler: HttpAuthHandler = mock()
+        session.currentVisit = visit
+
+        webViewClient().onReceivedHttpAuthRequest(webView, handler, "evil.attacker.com", "realm")
+
+        verify(handler).cancel()
+        verify(callback, never()).onReceivedHttpAuthRequest(any(), any(), any())
+    }
+
+    @Test
+    fun `http auth challenges from a trusted host are forwarded before the page commits`() {
+        Hotwire.config.registerTrustedLocation("https://37signals.com")
+        val handler: HttpAuthHandler = mock()
+        session.currentVisit = visit
+        whenever(webView.url).thenReturn(null)
+
+        webViewClient().onReceivedHttpAuthRequest(webView, handler, "37signals.com", "realm")
+
+        verify(callback).onReceivedHttpAuthRequest(handler, "37signals.com", "realm")
+        verify(handler, never()).cancel()
     }
 
     @Test

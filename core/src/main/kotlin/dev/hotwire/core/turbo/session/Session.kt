@@ -890,13 +890,12 @@ class Session(
         }
 
         override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
-            val pageLocation = view.url
-
-            if (pageLocation == null ||
-                !Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
-            ) {
-                logWarningEvent("httpAuthRequestBlockedForUntrustedOrigin",
-                    "host" to host, "location" to pageLocation.orEmpty())
+            // The challenge names the server that receives any credentials the
+            // app supplies — page trust is irrelevant, since a trusted page can
+            // embed a subresource from a hostile server. The callback carries
+            // no scheme or port, so the host is verified as an https origin.
+            if (!Hotwire.config.hostVerifier.isTrustedForBridge("https://$host")) {
+                logWarningEvent("httpAuthRequestBlockedForUntrustedHost", "host" to host)
                 handler.cancel()
                 return
             }
