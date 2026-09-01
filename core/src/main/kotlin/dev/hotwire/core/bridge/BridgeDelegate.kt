@@ -15,8 +15,10 @@ class BridgeDelegate<D : BridgeDestination>(
 ) : DefaultLifecycleObserver {
     internal var bridge: Bridge? = null
     private var destinationIsActive: Boolean = false
+    private val currentLocation: String?
+        get() = bridge?.webView?.url
     private val resolvedLocation: String
-        get() = bridge?.webView?.url ?: location
+        get() = currentLocation ?: location
 
     val initializedComponents = hashMapOf<String, BridgeComponent<D>>()
     val activeComponents: List<BridgeComponent<D>>
@@ -92,7 +94,10 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     private fun originIsTrustedForBridge(): Boolean {
-        return Hotwire.config.hostVerifier.isTrustedForBridge(resolvedLocation)
+        // Gate on the WebView's actual document. No document — no bridge
+        // operations; the destination's intended location is not evidence.
+        val pageLocation = currentLocation ?: return false
+        return Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
     }
 
     private fun logBlockedForUntrustedOrigin(event: String) {

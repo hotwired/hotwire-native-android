@@ -39,6 +39,7 @@ class BridgeDelegateTest {
     fun setup() {
         whenever(destination.bridgeWebViewIsReady()).thenReturn(true)
         whenever(bridge.webView).thenReturn(webView)
+        whenever(webView.url).thenReturn("https://37signals.com")
         Bridge.initialize(bridge)
 
         Hotwire.config.clearTrustedLocations()
@@ -140,6 +141,30 @@ class BridgeDelegateTest {
         assertNull(delegate.component<TestData.OneBridgeComponent>())
         assertEquals(true, delegate.bridgeDidReceiveMessage(message))
         assertNotNull(delegate.component<TestData.OneBridgeComponent>())
+    }
+
+    @Test
+    fun onColdBootPageCompletedBlockedWithNoPageLoaded() {
+        whenever(webView.url).thenReturn(null)
+
+        delegate.onColdBootPageCompleted()
+        verify(bridge, never()).load()
+    }
+
+    @Test
+    fun replyWithBlockedWithNoPageLoaded() {
+        whenever(webView.url).thenReturn(null)
+
+        val message = Message(
+            id = "1",
+            component = "page",
+            event = "connect",
+            metadata = Metadata("https://37signals.com"),
+            jsonData = """{"title":"Page-title","subtitle":"Page-subtitle"}"""
+        )
+
+        assertEquals(false, delegate.replyWith(message))
+        verify(bridge, never()).replyWith(any())
     }
 
     @Test
