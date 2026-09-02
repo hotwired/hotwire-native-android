@@ -8,6 +8,7 @@ import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.logging.DefaultHotwireLogger
 import dev.hotwire.core.logging.HotwireLogger
 import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import dev.hotwire.core.security.DefaultHostVerifier
 import dev.hotwire.core.security.HostVerifier
 import dev.hotwire.core.security.TrustedLocations
@@ -47,8 +48,8 @@ class HotwireConfig internal constructor() {
     internal val trustedLocations = TrustedLocations()
 
     /**
-     * A snapshot of the start locations registered by navigator hosts, for
-     * use by a custom [HostVerifier] implementation.
+     * A snapshot of the origins of the start locations registered by live
+     * navigator hosts, for use by a custom [HostVerifier] implementation.
      */
     val registeredStartLocations: Set<String>
         get() = trustedLocations.snapshot
@@ -60,6 +61,15 @@ class HotwireConfig internal constructor() {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     fun registerTrustedLocation(startLocation: String) = trustedLocations.register(startLocation)
 
+    /**
+     * Withdraws one registration of a start location. Called by the library
+     * when a navigator host is destroyed; a shared start location stays
+     * trusted until its last host is gone.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun unregisterTrustedLocation(startLocation: String) = trustedLocations.unregister(startLocation)
+
+    @VisibleForTesting
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     fun clearTrustedLocations() = trustedLocations.clear()
 

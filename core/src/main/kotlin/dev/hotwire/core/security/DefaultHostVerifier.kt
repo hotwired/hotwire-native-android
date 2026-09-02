@@ -18,8 +18,6 @@ internal object DefaultHostVerifier : HostVerifier {
     }
 
     private fun isTrustedOrigin(location: String): Boolean {
-        return Hotwire.config.trustedLocations.anyRegistered { startLocation ->
-            location.hasSameOriginAs(startLocation)
-        }
+        return Hotwire.config.trustedLocations.isTrustedOrigin(location)
     }
 }
