@@ -7,6 +7,11 @@ import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.logging.DefaultHotwireLogger
 import dev.hotwire.core.logging.HotwireLogger
+import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
+import dev.hotwire.core.security.DefaultHostVerifier
+import dev.hotwire.core.security.HostVerifier
+import dev.hotwire.core.security.TrustedLocations
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -39,6 +44,45 @@ class HotwireConfig internal constructor() {
      * If you'd like to change this behavior, provide your own implementation of [HotwireLogger].
      */
     var logger: HotwireLogger = DefaultHotwireLogger
+
+    internal val trustedLocations = TrustedLocations()
+
+    /**
+     * A snapshot of the origins of the start locations registered by live
+     * navigator hosts, for use by a custom [HostVerifier] implementation.
+     */
+    val registeredStartLocations: Set<String>
+        get() = trustedLocations.snapshot
+
+    /**
+     * Registers a navigator host's start location as trusted. Called by the
+     * library when a navigator host initializes; not intended for app use.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun registerTrustedLocation(startLocation: String) = trustedLocations.register(startLocation)
+
+    /**
+     * Withdraws one registration of a start location. Called by the library
+     * when a navigator host is destroyed; a shared start location stays
+     * trusted until its last host is gone.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun unregisterTrustedLocation(startLocation: String) = trustedLocations.unregister(startLocation)
+
+    @VisibleForTesting
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun clearTrustedLocations() = trustedLocations.clear()
+
+    /**
+     * Set a custom host verifier instance to decide which hosts the library
+     * trusts for in-app navigation, for installing its JavaScript into loaded
+     * pages, and for accepting bridge messages from pages.
+     *
+     * The default is [DefaultHostVerifier], which trusts only the origins of
+     * the registered start locations ([registeredStartLocations]). If your app
+     * trusts hosts beyond those, provide your own implementation.
+     */
+    var hostVerifier: HostVerifier = DefaultHostVerifier
 
     /**
      * Enables/disables debugging of web contents loaded into WebViews.

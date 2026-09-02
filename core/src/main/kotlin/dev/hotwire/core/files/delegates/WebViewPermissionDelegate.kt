@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.webkit.PermissionRequest
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_WEBVIEW_PERMISSION
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logWarning
@@ -39,6 +40,13 @@ class WebViewPermissionDelegate(private val session: Session) {
     private var pendingRequest: PermissionRequest? = null
 
     fun onRequest(request: PermissionRequest) {
+        val origin = request.origin?.toString()
+        if (origin == null || !Hotwire.config.hostVerifier.isTrustedForBridge(origin)) {
+            logWarning("webViewPermissionBlockedForUntrustedOrigin", origin.orEmpty())
+            request.deny()
+            return
+        }
+
         val requestedResources = request.resources?.toList().orEmpty()
         val supportedResources = requestedResources.filter { it in SUPPORTED_RESOURCES }
 
@@ -100,7 +108,12 @@ class WebViewPermissionDelegate(private val session: Session) {
             grantResults[permission] == true || isGranted(permission)
         }
 
-        if (allGranted) {
+        // The runtime permission dialog is asynchronous — re-verify the origin
+        // in case the verifier's answer changed while the dialog was up.
+        val origin = request.origin?.toString()
+        val originIsTrusted = origin != null && Hotwire.config.hostVerifier.isTrustedForBridge(origin)
+
+        if (allGranted && originIsTrusted) {
             request.grant(resources.toTypedArray())
         } else {
             request.deny()

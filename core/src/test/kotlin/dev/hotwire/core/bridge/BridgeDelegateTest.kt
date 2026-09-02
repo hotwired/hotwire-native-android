@@ -9,6 +9,8 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.config.Hotwire
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -37,7 +39,11 @@ class BridgeDelegateTest {
     fun setup() {
         whenever(destination.bridgeWebViewIsReady()).thenReturn(true)
         whenever(bridge.webView).thenReturn(webView)
+        whenever(webView.url).thenReturn("https://37signals.com")
         Bridge.initialize(bridge)
+
+        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.registerTrustedLocation("https://37signals.com")
 
         delegate = BridgeDelegate(
             location = "https://37signals.com",
@@ -48,6 +54,11 @@ class BridgeDelegateTest {
 
         lifecycleOwner = TestLifecycleOwner(Lifecycle.State.STARTED)
         lifecycleOwner.lifecycle.addObserver(delegate)
+    }
+
+    @After
+    fun teardown() {
+        Hotwire.config.clearTrustedLocations()
     }
 
     @Test
@@ -133,6 +144,47 @@ class BridgeDelegateTest {
     }
 
     @Test
+    fun onColdBootPageCompletedBlockedWithNoPageLoaded() {
+        whenever(webView.url).thenReturn(null)
+
+        delegate.onColdBootPageCompleted()
+        verify(bridge, never()).load()
+    }
+
+    @Test
+    fun replyWithBlockedWithNoPageLoaded() {
+        whenever(webView.url).thenReturn(null)
+
+        val message = Message(
+            id = "1",
+            component = "page",
+            event = "connect",
+            metadata = Metadata("https://37signals.com"),
+            jsonData = """{"title":"Page-title","subtitle":"Page-subtitle"}"""
+        )
+
+        assertEquals(false, delegate.replyWith(message))
+        verify(bridge, never()).replyWith(any())
+    }
+
+    @Test
+    fun onColdBootPageCompletedBlockedForUntrustedOrigin() {
+        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
+
+        delegate.onColdBootPageCompleted()
+        verify(bridge, never()).load()
+    }
+
+    @Test
+    fun onWebViewAttachedBlockedForUntrustedOrigin() {
+        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
+        whenever(bridge.isReady()).thenReturn(false)
+
+        delegate.onWebViewAttached(webView)
+        verify(bridge, never()).load()
+    }
+
+    @Test
     fun bridgeDidReceiveMessageIgnored() {
         val message = Message(
             id = "1",
@@ -156,6 +208,22 @@ class BridgeDelegateTest {
         )
 
         assertEquals(true, delegate.replyWith(message))
+    }
+
+    @Test
+    fun replyWithBlockedForUntrustedOrigin() {
+        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
+
+        val message = Message(
+            id = "1",
+            component = "page",
+            event = "connect",
+            metadata = Metadata("https://37signals.com"),
+            jsonData = """{"title":"Page-title","subtitle":"Page-subtitle"}"""
+        )
+
+        assertEquals(false, delegate.replyWith(message))
+        verify(bridge, never()).replyWith(any())
     }
 
     @Test

@@ -98,6 +98,10 @@ open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
         session.geolocationPermissionDelegate.onRequestPermission(origin, callback)
     }
 
+    override fun onGeolocationPermissionsHidePrompt() {
+        session.geolocationPermissionDelegate.onHidePrompt()
+    }
+
     override fun onPermissionRequest(request: PermissionRequest) {
         if (request.requestsMediaCapture()) {
             session.webViewPermissionDelegate.onRequest(request)

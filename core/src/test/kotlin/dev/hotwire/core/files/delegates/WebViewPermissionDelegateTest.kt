@@ -5,12 +5,14 @@ import android.Manifest.permission.MODIFY_AUDIO_SETTINGS
 import android.Manifest.permission.RECORD_AUDIO
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.session.SessionCallback
@@ -19,11 +21,13 @@ import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.robolectric.Robolectric.buildActivity
@@ -49,6 +53,36 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         activity = buildActivity(TurboTestActivity::class.java).get()
         context = ApplicationProvider.getApplicationContext()
         session = Session("test", activity, webView)
+
+        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.registerTrustedLocation("https://37signals.com")
+    }
+
+    @After
+    fun teardownTrustedLocations() {
+        Hotwire.config.clearTrustedLocations()
+    }
+
+    @Test
+    fun `denies request from an untrusted origin before any permission checks`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        whenever(request.origin).thenReturn(Uri.parse("https://evil.attacker.com"))
+
+        session.webViewPermissionDelegate.onRequest(request)
+
+        verify(request).deny()
+    }
+
+    @Test
+    fun `denies request with no origin`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        whenever(request.origin).thenReturn(null)
+
+        session.webViewPermissionDelegate.onRequest(request)
+
+        verify(request).deny()
     }
 
     @Test
@@ -179,8 +213,23 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         // request.
         session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
 
-        verify(request, org.mockito.Mockito.never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
-        verify(request, org.mockito.Mockito.never()).deny()
+        verify(request, never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        verify(request, never()).deny()
+    }
+
+    @Test
+    fun `re-verifies the origin when the permission dialog resolves`() {
+        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
+        grantRuntimePermissions(MODIFY_AUDIO_SETTINGS)
+        wireDestinationWithLauncher()
+        val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+
+        session.webViewPermissionDelegate.onRequest(request)
+        Hotwire.config.clearTrustedLocations()
+        session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
+
+        verify(request, never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        verify(request).deny()
     }
 
     @Test
@@ -242,6 +291,7 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
 
     private fun mockRequest(vararg resources: String): PermissionRequest {
         val request = mock(PermissionRequest::class.java)
+        whenever(request.origin).thenReturn(Uri.parse("https://37signals.com"))
         whenever(request.resources).thenReturn(resources)
         return request
     }

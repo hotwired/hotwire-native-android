@@ -3,6 +3,7 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logWarning
 
@@ -14,15 +15,17 @@ class BridgeDelegate<D : BridgeDestination>(
 ) : DefaultLifecycleObserver {
     internal var bridge: Bridge? = null
     private var destinationIsActive: Boolean = false
+    private val currentLocation: String?
+        get() = bridge?.webView?.url
     private val resolvedLocation: String
-        get() = bridge?.webView?.url ?: location
+        get() = currentLocation ?: location
 
     val initializedComponents = hashMapOf<String, BridgeComponent<D>>()
     val activeComponents: List<BridgeComponent<D>>
         get() = initializedComponents.map { it.value }.takeIf { destinationIsActive }.orEmpty()
 
     fun onColdBootPageCompleted() {
-        bridge?.load()
+        loadBridge()
     }
 
     fun onColdBootPageStarted() {
@@ -36,7 +39,7 @@ class BridgeDelegate<D : BridgeDestination>(
 
         if (bridge != null) {
             if (shouldReloadBridge()) {
-                bridge?.load()
+                loadBridge()
             }
         } else {
             logWarning("bridgeNotInitializedForWebView", resolvedLocation)
@@ -49,6 +52,11 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     fun replyWith(message: Message): Boolean {
+        if (!originIsTrustedForBridge()) {
+            logBlockedForUntrustedOrigin("bridgeReplyBlockedForUntrustedOrigin")
+            return false
+        }
+
         bridge?.replyWith(message) ?: run {
             logWarning("bridgeMessageFailedToReply", "bridge is not available")
             return false
@@ -72,8 +80,28 @@ class BridgeDelegate<D : BridgeDestination>(
         }
     }
 
+    private fun loadBridge() {
+        if (!originIsTrustedForBridge()) {
+            logBlockedForUntrustedOrigin("bridgeLoadBlockedForUntrustedOrigin")
+            return
+        }
+
+        bridge?.load()
+    }
+
     private fun shouldReloadBridge(): Boolean {
         return destination.bridgeWebViewIsReady() && bridge?.isReady() == false
+    }
+
+    private fun originIsTrustedForBridge(): Boolean {
+        // No document — no bridge operations; the destination's intended
+        // location is not evidence of what is actually loaded.
+        val pageLocation = currentLocation ?: return false
+        return Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
+    }
+
+    private fun logBlockedForUntrustedOrigin(event: String) {
+        logWarning(event, listOf("location" to resolvedLocation))
     }
 
     // Lifecycle events

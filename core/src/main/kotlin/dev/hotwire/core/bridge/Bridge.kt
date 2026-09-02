@@ -1,16 +1,24 @@
 package dev.hotwire.core.bridge
 
-import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
+import androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logDebug
+import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logVerbose
+import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.turbo.util.JavascriptMessage
+import dev.hotwire.core.turbo.util.string
+import dev.hotwire.core.turbo.util.toJavascriptMessageOrNull
 import kotlinx.serialization.json.JsonElement
 import java.lang.ref.WeakReference
 
 // These need to match whatever is set in bridge_components.js
 private const val bridgeGlobal = "window.nativeBridge"
-private const val bridgeJavascriptInterface = "BridgeComponentsNative"
+private const val bridgeChannelName = "BridgeComponentsChannel"
 
 @Suppress("unused")
 class Bridge internal constructor(webView: WebView) {
@@ -26,8 +34,8 @@ class Bridge internal constructor(webView: WebView) {
         // used by the app, such as when the render process is gone.
         webViewRef = WeakReference(webView)
 
-        // The JavascriptInterface must be added before the page is loaded
-        webView.addJavascriptInterface(this, bridgeJavascriptInterface)
+        // The channel must be added before the page is loaded
+        initBridgeChannel(webView)
     }
 
     internal fun register(component: String) {
@@ -69,26 +77,68 @@ class Bridge internal constructor(webView: WebView) {
         return componentsAreRegistered
     }
 
-    @JavascriptInterface
-    fun bridgeDidInitialize() {
-        logDebug("bridgeDidInitialize", "success")
-        runOnUiThread {
-            delegate?.bridgeDidInitialize()
+    private fun initBridgeChannel(webView: WebView) {
+        if (!WebViewFeature.isFeatureSupported(WEB_MESSAGE_LISTENER)) {
+            logError(
+                "webMessageListenerNotSupported",
+                "The WebView version on this device is not supported"
+            )
+            return
+        }
+
+        // "*" injects the channel into every frame; each message is gated on
+        // its browser-reported source origin instead.
+        WebViewCompat.addWebMessageListener(webView, bridgeChannelName, setOf("*")) {
+            _, message, sourceOrigin, isMainFrame, _ ->
+            onBridgeMessage(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
         }
     }
 
-    @JavascriptInterface
-    fun bridgeDidUpdateSupportedComponents() {
+    /**
+     * Messages can arrive from any frame of any page loaded in the WebView,
+     * so each one is gated on its source origin before it is decoded. Runs
+     * on the main thread — the message listener delivers there.
+     */
+    internal fun onBridgeMessage(data: String, sourceOrigin: String, isMainFrame: Boolean) {
+        if (!isMainFrame || !Hotwire.config.hostVerifier.isTrustedForBridge(sourceOrigin)) {
+            logWarning("bridgeMessageBlockedForUntrustedOrigin", listOf("origin" to sourceOrigin))
+            return
+        }
+
+        val message = data.toJavascriptMessageOrNull() ?: run {
+            logWarning("bridgeMessageMalformed", "")
+            return
+        }
+
+        try {
+            dispatchBridgeMessage(message)
+        } catch (e: RuntimeException) {
+            logError("bridgeMessageFailed", e)
+        }
+    }
+
+    private fun dispatchBridgeMessage(message: JavascriptMessage) {
+        when (message.name) {
+            "bridgeDidInitialize" -> bridgeDidInitialize()
+            "bridgeDidUpdateSupportedComponents" -> bridgeDidUpdateSupportedComponents()
+            "bridgeDidReceiveMessage" -> bridgeDidReceiveMessage(message.args.string(0))
+            else -> logWarning("bridgeMessageUnknown", listOf("name" to message.name))
+        }
+    }
+
+    private fun bridgeDidInitialize() {
+        logDebug("bridgeDidInitialize", "success")
+        delegate?.bridgeDidInitialize()
+    }
+
+    private fun bridgeDidUpdateSupportedComponents() {
         logDebug("bridgeDidUpdateSupportedComponents", "success")
         componentsAreRegistered = true
     }
 
-    @JavascriptInterface
-    fun bridgeDidReceiveMessage(message: String?) {
-        runOnUiThread {
-            InternalMessage.fromJson(message)?.let {
-                delegate?.bridgeDidReceiveMessage(it.toMessage())
-            }
+    private fun bridgeDidReceiveMessage(message: String) {
+        InternalMessage.fromJson(message)?.let {
+            delegate?.bridgeDidReceiveMessage(it.toMessage())
         }
     }
 

@@ -8,9 +8,11 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import androidx.activity.result.ActivityResult
 import dev.hotwire.core.R
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +33,18 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         filePathCallback: ValueCallback<Array<Uri>>,
         params: FileChooserParams
     ): Boolean {
+        // FileChooserParams carries no origin, so the page's location is the
+        // best available authority for this gate.
+        val pageLocation = session.webView.url
+        if (pageLocation == null || !Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)) {
+            logWarning("fileChooserBlockedForUntrustedOrigin", pageLocation.orEmpty())
+            filePathCallback.onReceiveValue(null)
+            return true
+        }
+
+        // Answer any held request before replacing it — the WebView must
+        // always get a verdict.
+        handleCancellation()
         uploadCallback = filePathCallback
 
         return openChooser(params).also { success ->
@@ -84,8 +98,19 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         }
     }
 
-    private fun sendResult(results: Array<Uri>?) {
-        uploadCallback?.onReceiveValue(results)
+    internal fun sendResult(results: Array<Uri>?) {
+        // Re-verify the page — the WebView may have navigated while the
+        // picker was open.
+        val pageLocation = session.webView.url
+        val pageIsTrusted = pageLocation != null &&
+            Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
+
+        if (results != null && !pageIsTrusted) {
+            logWarning("fileChooserResultBlockedForUntrustedOrigin", pageLocation.orEmpty())
+            uploadCallback?.onReceiveValue(null)
+        } else {
+            uploadCallback?.onReceiveValue(results)
+        }
         uploadCallback = null
     }
 
