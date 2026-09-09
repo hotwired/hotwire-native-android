@@ -36,14 +36,8 @@ internal class HttpRepository {
     }
 
     /**
-     * Inspects a response for a redirect and, when present, resolves the destination and whether
-     * it is cross-origin.
-     *
-     * The verification request deliberately does not follow redirects (see [verificationClient]),
-     * so the destination is determined solely from the `Location` header of the first response.
-     * This guarantees no credentials (e.g. `Cookie`, `Authorization`) are ever forwarded to a
-     * cross-origin redirect destination, while still giving the caller everything it needs to
-     * detect and propose a cross-origin redirect visit.
+     * Resolves an unfollowed redirect from its `Location` header, so the caller can detect a
+     * cross-origin destination without a credentialed request ever reaching it.
      */
     private fun redirectFrom(response: Response): HttpRedirect? {
         if (!response.isRedirect) return null
@@ -73,10 +67,8 @@ internal class HttpRepository {
     }
 
     /**
-     * A client dedicated to the native redirect-verification fetch, derived from the shared
-     * client so it inherits its cache, timeouts, and interceptors. Redirects are disabled so a
-     * cross-origin redirect can be detected from the `Location` header without ever sending the
-     * credential-bearing request (`Cookie`/`Authorization`) on to the redirect destination.
+     * Derived from the shared client on each call, so it picks up a cache or timeout change, and
+     * built without redirect following: this fetch only needs to see where a redirect points.
      */
     private fun verificationClient(): OkHttpClient {
         return HotwireHttpClient.instance.newBuilder()
@@ -86,11 +78,6 @@ internal class HttpRepository {
     }
 }
 
-/**
- * Two URLs share an origin only when their scheme, host, and (effective) port all match. Comparing
- * the full origin — not just the host — ensures a scheme downgrade (e.g. https → http) or a port
- * change is correctly treated as cross-origin.
- */
 private fun HttpUrl.isSameOriginAs(other: HttpUrl): Boolean {
     return scheme == other.scheme && host == other.host && port == other.port
 }
