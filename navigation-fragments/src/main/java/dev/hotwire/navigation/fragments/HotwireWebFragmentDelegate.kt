@@ -6,6 +6,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -444,7 +445,8 @@ internal class HotwireWebFragmentDelegate(
 
     private suspend fun screenshotView() {
         hotwireView?.let {
-            screenshotHolder.captureScreenshot(it)
+            val window = (navDestination.fragment as? DialogFragment)?.dialog?.window
+            screenshotHolder.captureScreenshot(it, window)
             screenshotHolder.showScreenshotIfAvailable(it)
         }
     }
