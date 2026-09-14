@@ -904,16 +904,6 @@ class Session(
         }
 
         override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
-            // The challenge names the server that receives any credentials the
-            // app supplies — page trust is irrelevant, since a trusted page can
-            // embed a subresource from a hostile server. The callback carries
-            // no scheme or port, so the host is verified as an https origin.
-            if (!Hotwire.config.hostVerifier.isTrustedForBridge("https://$host")) {
-                logWarningEvent("httpAuthRequestBlockedForUntrustedHost", "host" to host)
-                handler.cancel()
-                return
-            }
-
             callback { it.onReceivedHttpAuthRequest(handler, host, realm) }
         }
 

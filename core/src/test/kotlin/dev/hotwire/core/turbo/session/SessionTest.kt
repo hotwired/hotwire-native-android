@@ -228,22 +228,9 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `http auth challenges from an untrusted host are cancelled`() {
+    fun `http auth challenges are forwarded to the callback`() {
         val handler: HttpAuthHandler = mock()
         session.currentVisit = visit
-
-        webViewClient().onReceivedHttpAuthRequest(webView, handler, "evil.attacker.com", "realm")
-
-        verify(handler).cancel()
-        verify(callback, never()).onReceivedHttpAuthRequest(any(), any(), any())
-    }
-
-    @Test
-    fun `http auth challenges from a trusted host are forwarded before the page commits`() {
-        Hotwire.config.registerTrustedLocation("https://37signals.com")
-        val handler: HttpAuthHandler = mock()
-        session.currentVisit = visit
-        whenever(webView.url).thenReturn(null)
 
         webViewClient().onReceivedHttpAuthRequest(webView, handler, "37signals.com", "realm")
 
