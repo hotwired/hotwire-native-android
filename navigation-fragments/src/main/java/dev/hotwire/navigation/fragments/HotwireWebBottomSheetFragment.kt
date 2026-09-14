@@ -15,7 +15,6 @@ import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_WEBVIEW_PERMISSION
-import dev.hotwire.core.turbo.errors.description
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -158,7 +157,7 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
     @SuppressLint("InflateParams")
     override fun createErrorView(error: VisitError): View {
         return layoutInflater.inflate(R.layout.hotwire_error, null).apply {
-            findViewById<TextView>(R.id.hotwire_error_description).text = error.description()
+            findViewById<TextView>(R.id.hotwire_error_description).text = error.description
         }
     }
 
