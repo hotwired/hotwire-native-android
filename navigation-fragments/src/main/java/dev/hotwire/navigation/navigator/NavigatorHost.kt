@@ -39,7 +39,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
 
         activity = requireActivity() as HotwireActivity
         trustedLocation = configuration.startLocation.also {
-            Hotwire.config.registerTrustedLocation(it)
+            Hotwire.config.trustedOrigins.register(it)
         }
         navigator = Navigator(this, configuration, activity)
         childFragmentManager.addFragmentOnAttachListener(this)
@@ -56,7 +56,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     }
 
     override fun onDestroy() {
-        trustedLocation?.let { Hotwire.config.unregisterTrustedLocation(it) }
+        trustedLocation?.let { Hotwire.config.trustedOrigins.unregister(it) }
         trustedLocation = null
         activity.delegate.unregisterNavigatorHost(this)
         super.onDestroy()

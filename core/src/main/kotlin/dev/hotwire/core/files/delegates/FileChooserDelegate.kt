@@ -8,11 +8,11 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import androidx.activity.result.ActivityResult
 import dev.hotwire.core.R
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +36,7 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         // FileChooserParams carries no origin, so the page's location is the
         // best available authority for this gate.
         val pageLocation = session.webView.url
-        if (pageLocation == null || !Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)) {
+        if (pageLocation == null || !isTrustedForNativeAccess(pageLocation)) {
             logWarning("fileChooserBlockedForUntrustedOrigin", pageLocation.orEmpty())
             filePathCallback.onReceiveValue(null)
             return true
@@ -103,7 +103,7 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         // picker was open.
         val pageLocation = session.webView.url
         val pageIsTrusted = pageLocation != null &&
-            Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
+            isTrustedForNativeAccess(pageLocation)
 
         if (results != null && !pageIsTrusted) {
             logWarning("fileChooserResultBlockedForUntrustedOrigin", pageLocation.orEmpty())

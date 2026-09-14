@@ -1,29 +1,25 @@
 package dev.hotwire.core.security
 
 import androidx.annotation.RestrictTo
-import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import dev.hotwire.core.config.Hotwire
 
-/**
- * The bare origin (scheme, host, effective port) of an http(s) URL, or null
- * when the string doesn't parse as one.
- */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-fun String.toOriginOrNull(): HttpUrl? {
-    val url = toHttpUrlOrNull() ?: return null
-    return HttpUrl.Builder()
-        .scheme(url.scheme)
-        .host(url.host)
-        .port(url.port)
-        .build()
-}
+fun String.toOriginOrNull(): Origin? = Origin.parseOrNull(this)
 
-/**
- * True when both strings parse as http(s) URLs with an equal origin —
- * scheme, host, and effective port.
- */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun String.hasSameOriginAs(other: String): Boolean {
     val origin = toOriginOrNull() ?: return false
     return origin == other.toOriginOrNull()
+}
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun isTrustedForNavigation(location: String): Boolean {
+    val origin = location.toOriginOrNull() ?: return false
+    return Hotwire.config.originTrustPolicy.isTrustedForNavigation(origin)
+}
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun isTrustedForNativeAccess(location: String): Boolean {
+    val origin = location.toOriginOrNull() ?: return false
+    return Hotwire.config.originTrustPolicy.isTrustedForNativeAccess(origin)
 }

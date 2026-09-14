@@ -5,11 +5,11 @@ import androidx.annotation.VisibleForTesting
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logVerbose
 import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.util.JavascriptMessage
 import dev.hotwire.core.turbo.util.string
 import dev.hotwire.core.turbo.util.toJavascriptMessageOrNull
@@ -100,7 +100,7 @@ class Bridge internal constructor(webView: WebView) {
      * on the main thread — the message listener delivers there.
      */
     internal fun onBridgeMessage(data: String, sourceOrigin: String, isMainFrame: Boolean) {
-        if (!isMainFrame || !Hotwire.config.hostVerifier.isTrustedForBridge(sourceOrigin)) {
+        if (!isMainFrame || !isTrustedForNativeAccess(sourceOrigin)) {
             logWarning("bridgeMessageBlockedForUntrustedOrigin", listOf("origin" to sourceOrigin))
             return
         }

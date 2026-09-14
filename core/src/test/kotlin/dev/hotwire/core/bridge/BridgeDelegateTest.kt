@@ -42,8 +42,8 @@ class BridgeDelegateTest {
         whenever(webView.url).thenReturn("https://37signals.com")
         Bridge.initialize(bridge)
 
-        Hotwire.config.clearTrustedLocations()
-        Hotwire.config.registerTrustedLocation("https://37signals.com")
+        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.trustedOrigins.register("https://37signals.com")
 
         delegate = BridgeDelegate(
             location = "https://37signals.com",
@@ -58,7 +58,7 @@ class BridgeDelegateTest {
 
     @After
     fun teardown() {
-        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.trustedOrigins.clear()
     }
 
     @Test

@@ -1,18 +1,17 @@
 package dev.hotwire.core.security
 
+import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import dev.hotwire.core.logging.logError
-import okhttp3.HttpUrl
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Owns the origins of the registered start locations; the public surface
- * lives on [dev.hotwire.core.config.HotwireConfig].
- *
- * Registrations are counted so one host's teardown cannot drop an origin
- * another host still uses.
+ * Registrations are counted so one navigator host's teardown cannot drop an
+ * origin another host still uses.
  */
-internal class TrustedLocations {
-    private val origins = ConcurrentHashMap<HttpUrl, Int>()
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+class TrustedOrigins {
+    private val origins = ConcurrentHashMap<Origin, Int>()
 
     fun register(startLocation: String) {
         val origin = startLocation.toOriginOrNull() ?: run {
@@ -27,14 +26,12 @@ internal class TrustedLocations {
         origins.computeIfPresent(origin) { _, count -> (count - 1).takeIf { it > 0 } }
     }
 
+    @VisibleForTesting
     fun clear() {
         origins.clear()
     }
 
-    val snapshot: Set<String> get() = origins.keys.mapTo(mutableSetOf()) { it.toString() }
+    val snapshot: Set<Origin> get() = origins.keys.toSet()
 
-    fun isTrustedOrigin(location: String): Boolean {
-        val origin = location.toOriginOrNull() ?: return false
-        return origins.containsKey(origin)
-    }
+    fun contains(origin: Origin): Boolean = origins.containsKey(origin)
 }

@@ -27,6 +27,7 @@ import dev.hotwire.core.files.delegates.WebViewPermissionDelegate
 import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
@@ -711,7 +712,7 @@ class Session(
             return
         }
 
-        if (!Hotwire.config.hostVerifier.isTrustedForBridge(location)) {
+        if (!isTrustedForNativeAccess(location)) {
             logWarningEvent("bridgeInstallationBlockedForUntrustedOrigin", "location" to location)
             reset()
             callback { it.onReceivedError(LoadError.UntrustedOrigin) }
@@ -745,7 +746,7 @@ class Session(
      * on the main thread — the message listener delivers there.
      */
     internal fun onTurboSessionMessage(data: String, sourceOrigin: String, isMainFrame: Boolean) {
-        if (!isMainFrame || !Hotwire.config.hostVerifier.isTrustedForBridge(sourceOrigin)) {
+        if (!isMainFrame || !isTrustedForNativeAccess(sourceOrigin)) {
             logWarningEvent("turboSessionMessageBlockedForUntrustedOrigin", "origin" to sourceOrigin)
             return
         }

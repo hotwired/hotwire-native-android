@@ -8,10 +8,10 @@ import android.os.Build
 import android.webkit.GeolocationPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.session.Session
 
 class GeolocationPermissionDelegate(private val session: Session) {
@@ -78,7 +78,7 @@ class GeolocationPermissionDelegate(private val session: Session) {
 
     private fun isTrustedOrigin(origin: String?): Boolean {
         return origin != null &&
-            Hotwire.config.hostVerifier.isTrustedForBridge(origin)
+            isTrustedForNativeAccess(origin)
     }
 
     private fun hasLocationPermission(context: Context): Boolean {

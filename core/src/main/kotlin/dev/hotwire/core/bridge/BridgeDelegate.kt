@@ -3,9 +3,9 @@ package dev.hotwire.core.bridge
 import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.logDebug
 import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 
 @Suppress("unused")
 class BridgeDelegate<D : BridgeDestination>(
@@ -97,7 +97,7 @@ class BridgeDelegate<D : BridgeDestination>(
         // No document — no bridge operations; the destination's intended
         // location is not evidence of what is actually loaded.
         val pageLocation = currentLocation ?: return false
-        return Hotwire.config.hostVerifier.isTrustedForBridge(pageLocation)
+        return isTrustedForNativeAccess(pageLocation)
     }
 
     private fun logBlockedForUntrustedOrigin(event: String) {

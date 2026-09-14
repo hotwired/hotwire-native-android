@@ -56,13 +56,13 @@ class FileChooserDelegateTest : BaseRepositoryTest() {
         context = ApplicationProvider.getApplicationContext()
         session = Session("test", activity, webView)
 
-        Hotwire.config.clearTrustedLocations()
-        Hotwire.config.registerTrustedLocation("https://37signals.com")
+        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.trustedOrigins.register("https://37signals.com")
     }
 
     @After
-    fun teardownTrustedLocations() {
-        Hotwire.config.clearTrustedLocations()
+    fun teardownTrustedOrigins() {
+        Hotwire.config.trustedOrigins.clear()
     }
 
     @Test

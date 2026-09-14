@@ -11,6 +11,7 @@ import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.security.DefaultOriginTrustPolicy
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.HttpError.ServerError
@@ -61,8 +62,8 @@ class SessionTest : BaseRepositoryTest() {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
-        Hotwire.config.clearTrustedLocations()
-        Hotwire.config.registerTrustedLocation(baseUrl())
+        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.trustedOrigins.register(baseUrl())
         session = Session("test", activity, webView)
         // Robolectric reports WebMessageListener as unsupported; the channel
         // is considered installed so tests reach the trust gates behind it.
@@ -88,8 +89,9 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @After
-    fun teardownTrustedLocations() {
-        Hotwire.config.clearTrustedLocations()
+    fun teardownTrustedOrigins() {
+        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.originTrustPolicy = DefaultOriginTrustPolicy
     }
 
     @Test

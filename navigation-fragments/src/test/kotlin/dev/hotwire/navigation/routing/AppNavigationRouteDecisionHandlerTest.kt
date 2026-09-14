@@ -1,8 +1,9 @@
 package dev.hotwire.navigation.routing
 
-import androidx.core.net.toUri
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.security.HostVerifier
+import dev.hotwire.core.security.DefaultOriginTrustPolicy
+import dev.hotwire.core.security.Origin
+import dev.hotwire.core.security.OriginTrustPolicy
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.visit.VisitProposal
@@ -32,13 +33,14 @@ class AppNavigationRouteDecisionHandlerTest {
     @Before
     fun setup() {
         activity = buildActivity(TestActivity::class.java).get()
-        Hotwire.config.clearTrustedLocations()
-        Hotwire.config.registerTrustedLocation(config.startLocation)
+        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.trustedOrigins.register(config.startLocation)
     }
 
     @After
     fun teardown() {
-        Hotwire.config.clearTrustedLocations()
+        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.originTrustPolicy = DefaultOriginTrustPolicy
     }
 
     @Test
@@ -78,22 +80,14 @@ class AppNavigationRouteDecisionHandlerTest {
     }
 
     @Test
-    fun `a custom host verifier decides the match`() {
-        val previousVerifier = Hotwire.config.hostVerifier
-
-        Hotwire.config.hostVerifier = object : HostVerifier {
-            override fun isTrustedForNavigation(location: String) =
-                location.toUri().host == "asset.cdn.com"
-
-            override fun isTrustedForBridge(location: String) = false
+    fun `a custom origin trust policy decides the match`() {
+        Hotwire.config.originTrustPolicy = object : OriginTrustPolicy {
+            override fun isTrustedForNavigation(origin: Origin) = origin.host == "asset.cdn.com"
+            override fun isTrustedForNativeAccess(origin: Origin) = false
         }
 
-        try {
-            assertTrue(route.matches(proposal("https://asset.cdn.com/image.png"), config))
-            assertFalse(route.matches(proposal(config.startLocation), config))
-        } finally {
-            Hotwire.config.hostVerifier = previousVerifier
-        }
+        assertTrue(route.matches(proposal("https://asset.cdn.com/image.png"), config))
+        assertFalse(route.matches(proposal(config.startLocation), config))
     }
 
     private fun proposal(location: String) = VisitProposal(
