@@ -715,7 +715,7 @@ class Session(
         if (!isTrustedForNativeAccess(location)) {
             logWarningEvent("bridgeInstallationBlockedForUntrustedOrigin", "location" to location)
             reset()
-            callback { it.onReceivedError(LoadError.UntrustedOrigin) }
+            callback { it.onReceivedError(LoadError.UntrustedOrigin(location)) }
             return
         }
 

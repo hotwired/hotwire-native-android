@@ -15,7 +15,7 @@ sealed interface LoadError : VisitError {
         override val description = "Turbo Not Ready"
     }
 
-    data object UntrustedOrigin : LoadError {
+    data class UntrustedOrigin(val location: String) : LoadError {
         override val description = "Untrusted Origin"
     }
 

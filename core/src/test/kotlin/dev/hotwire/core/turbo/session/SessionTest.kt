@@ -196,7 +196,7 @@ class SessionTest : BaseRepositoryTest() {
 
         webViewClient().onPageFinished(webView, "https://evil.attacker.com/page")
 
-        verify(callback).onReceivedError(LoadError.UntrustedOrigin)
+        verify(callback).onReceivedError(LoadError.UntrustedOrigin("https://evil.attacker.com/page"))
         assertThat(session.isColdBooting).isFalse()
         assertThat(session.coldBootVisitIdentifier).isEmpty()
     }
