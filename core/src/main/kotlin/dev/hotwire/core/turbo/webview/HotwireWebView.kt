@@ -42,6 +42,7 @@ open class HotwireWebView @JvmOverloads constructor(
         settings.setSupportMultipleWindows(true)
         layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
         initDayNightTheming()
+        initWebAuthentication()
     }
 
     /**
@@ -102,6 +103,17 @@ open class HotwireWebView @JvmOverloads constructor(
 
     private fun encodeArguments(vararg args: Any): String? {
         return args.joinToString(",") { gson.toJson(it) }
+    }
+
+    private fun initWebAuthentication() {
+        if (!Hotwire.config.webAuthenticationEnabled) return
+
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+            WebSettingsCompat.setWebAuthenticationSupport(
+                settings,
+                WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
+            )
+        }
     }
 
     @Suppress("DEPRECATION")
