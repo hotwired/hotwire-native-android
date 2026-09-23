@@ -68,9 +68,9 @@ class HotwireConfig internal constructor() {
     }
 
     /**
-     * Decides which origins the library trusts. The default trusts only
-     * [registeredOrigins]; provide your own policy or delegate to
-     * [DefaultOriginTrustPolicy] if your app trusts more.
+     * Decides which origins the library trusts. The default,
+     * [DefaultOriginTrustPolicy], trusts only [registeredOrigins]. Subclass
+     * [OriginTrustPolicy] if your app trusts more.
      */
     var originTrustPolicy: OriginTrustPolicy = DefaultOriginTrustPolicy
 

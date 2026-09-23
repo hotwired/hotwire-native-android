@@ -42,11 +42,13 @@ class OriginsTest {
     }
 
     @Test
-    fun `isTrustedForNativeAccess reflects the policy's native access answer, not its navigation answer`() {
-        Hotwire.config.originTrustPolicy = recordingPolicy(navigation = false, nativeAccess = true)
-
-        assertFalse(isTrustedForNavigation("https://a.com"))
+    fun `isTrustedForNativeAccess needs both of the policy's answers`() {
+        Hotwire.config.originTrustPolicy = recordingPolicy(navigation = true, nativeAccess = true)
         assertTrue(isTrustedForNativeAccess("https://a.com"))
+
+        Hotwire.config.originTrustPolicy = recordingPolicy(navigation = false, nativeAccess = true)
+        assertFalse(isTrustedForNavigation("https://a.com"))
+        assertFalse(isTrustedForNativeAccess("https://a.com"))
     }
 
     @Test
@@ -59,12 +61,12 @@ class OriginsTest {
         assertFalse(isTrustedForNativeAccess("javascript:alert(1)"))
     }
 
-    private fun recordingPolicy(navigation: Boolean, nativeAccess: Boolean) = object : OriginTrustPolicy {
+    private fun recordingPolicy(navigation: Boolean, nativeAccess: Boolean) = object : OriginTrustPolicy() {
         override fun isTrustedForNavigation(origin: Origin) = navigation
         override fun isTrustedForNativeAccess(origin: Origin) = nativeAccess
     }
 
-    private fun throwingPolicy() = object : OriginTrustPolicy {
+    private fun throwingPolicy() = object : OriginTrustPolicy() {
         override fun isTrustedForNavigation(origin: Origin): Boolean = error("policy should not be consulted")
         override fun isTrustedForNativeAccess(origin: Origin): Boolean = error("policy should not be consulted")
     }

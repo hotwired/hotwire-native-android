@@ -109,6 +109,21 @@ class DefaultOriginTrustPolicyTest {
     }
 
     @Test
+    fun `a subclass that trusts a partner for navigation keeps the defaults for the rest`() {
+        val partner = Origin.parse("https://partner.example.com")
+        val policy = object : OriginTrustPolicy() {
+            override fun isTrustedForNavigation(origin: Origin) =
+                origin == partner || super.isTrustedForNavigation(origin)
+        }
+
+        assertTrue(policy.isTrustedForNavigation(partner))
+        assertFalse(policy.isTrustedForNativeAccess(partner))
+        assertFalse(policy.isTrustedForNavigation(Origin.parse("http://partner.example.com")))
+        assertTrue(policy.isTrustedForNavigation(Origin.parse("https://my.app.com")))
+        assertTrue(policy.isTrustedForNativeAccess(Origin.parse("https://my.app.com")))
+    }
+
+    @Test
     fun `unparseable locations are not trusted`() {
         assertFalse(isTrustedForNavigation("not a url"))
         assertFalse(isTrustedForNativeAccess("not a url"))

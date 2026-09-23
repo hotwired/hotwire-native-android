@@ -18,5 +18,6 @@ fun isTrustedForNavigation(location: String): Boolean {
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun isTrustedForNativeAccess(location: String): Boolean {
     val origin = Origin.parseOrNull(location) ?: return false
-    return Hotwire.config.originTrustPolicy.isTrustedForNativeAccess(origin)
+    val policy = Hotwire.config.originTrustPolicy
+    return policy.isTrustedForNavigation(origin) && policy.isTrustedForNativeAccess(origin)
 }

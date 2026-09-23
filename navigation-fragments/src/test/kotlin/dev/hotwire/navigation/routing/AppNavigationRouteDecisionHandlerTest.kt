@@ -80,7 +80,7 @@ class AppNavigationRouteDecisionHandlerTest {
 
     @Test
     fun `a custom origin trust policy decides the match`() {
-        Hotwire.config.originTrustPolicy = object : OriginTrustPolicy {
+        Hotwire.config.originTrustPolicy = object : OriginTrustPolicy() {
             override fun isTrustedForNavigation(origin: Origin) = origin.host == "asset.cdn.com"
             override fun isTrustedForNativeAccess(origin: Origin) = false
         }
