@@ -2,6 +2,7 @@ package dev.hotwire.core.config
 
 import android.content.Context
 import android.webkit.WebView
+import androidx.annotation.RestrictTo
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
@@ -47,31 +48,29 @@ class HotwireConfig internal constructor() {
     internal val startLocationRegistry = StartLocationRegistry()
 
     /**
-     * A live, read-only view of the origins of the registered start locations.
+     * A live, read-only view of the origins of the start locations that
+     * `NavigatorHost` registers. [DefaultOriginTrustPolicy] trusts only these.
      */
     val registeredOrigins: Set<Origin>
         get() = startLocationRegistry.origins
 
-    /**
-     * Adds the origin of [startLocation] to [registeredOrigins], which
-     * [OriginTrustPolicy] trusts by default. `NavigatorHost` registers its
-     * start location for you; call this only if you drive a
-     * [dev.hotwire.core.turbo.session.Session] without it.
-     * Registrations are counted, so balance each call with
-     * [unregisterStartLocation].
-     */
+    // Library-only: a public way to add origins would let an app on the
+    // default policy grant native access to a host by mistake.
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     fun registerStartLocation(startLocation: String) {
         startLocationRegistry.register(startLocation)
     }
 
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     fun unregisterStartLocation(startLocation: String) {
         startLocationRegistry.unregister(startLocation)
     }
 
     /**
      * Decides which origins the library trusts. The default,
-     * [DefaultOriginTrustPolicy], trusts only [registeredOrigins]. Subclass
-     * [OriginTrustPolicy] if your app trusts more.
+     * [DefaultOriginTrustPolicy], trusts only [registeredOrigins]. Set your
+     * own [OriginTrustPolicy] if your app trusts more, or if it does not use
+     * `NavigatorHost`.
      */
     var originTrustPolicy: OriginTrustPolicy = DefaultOriginTrustPolicy
 

@@ -109,11 +109,14 @@ class DefaultOriginTrustPolicyTest {
     }
 
     @Test
-    fun `a subclass that trusts a partner for navigation keeps the defaults for the rest`() {
+    fun `a policy that adds a partner for navigation keeps the defaults for the rest`() {
         val partner = Origin.parse("https://partner.example.com")
         val policy = object : OriginTrustPolicy() {
             override fun isTrustedForNavigation(origin: Origin) =
-                origin == partner || super.isTrustedForNavigation(origin)
+                origin == partner || DefaultOriginTrustPolicy.isTrustedForNavigation(origin)
+
+            override fun isTrustedForNativeAccess(origin: Origin) =
+                DefaultOriginTrustPolicy.isTrustedForNativeAccess(origin)
         }
 
         assertTrue(policy.isTrustedForNavigation(partner))
