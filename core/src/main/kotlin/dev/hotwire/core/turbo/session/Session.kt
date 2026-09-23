@@ -18,16 +18,19 @@ import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.VISUAL_STATE_CALLBACK
-import androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER
 import androidx.webkit.WebViewFeature.isFeatureSupported
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.files.delegates.FileChooserDelegate
 import dev.hotwire.core.files.delegates.GeolocationPermissionDelegate
 import dev.hotwire.core.files.delegates.WebViewPermissionDelegate
 import dev.hotwire.core.logging.logDebug
-import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.JavascriptChannel
+import dev.hotwire.core.security.JavascriptMessage
+import dev.hotwire.core.security.booleanAt
+import dev.hotwire.core.security.intAt
 import dev.hotwire.core.security.isTrustedForNativeAccess
+import dev.hotwire.core.security.stringAt
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.LoadError
 import dev.hotwire.core.turbo.errors.WebError
@@ -38,13 +41,8 @@ import dev.hotwire.core.turbo.offline.OfflineHttpRepository
 import dev.hotwire.core.turbo.offline.OfflinePreCacheRequest
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.offline.OfflineWebViewRequestInterceptor
-import dev.hotwire.core.turbo.util.JavascriptMessage
-import dev.hotwire.core.turbo.util.boolean
-import dev.hotwire.core.turbo.util.int
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 import dev.hotwire.core.turbo.util.runOnUiThread
-import dev.hotwire.core.turbo.util.string
-import dev.hotwire.core.turbo.util.toJavascriptMessageOrNull
 import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
@@ -54,6 +52,9 @@ import dev.hotwire.core.turbo.webview.WebViewInfo
 import dev.hotwire.core.turbo.webview.WebViewVersionCompatibility
 import kotlinx.coroutines.launch
 import java.util.Date
+
+// This needs to match whatever is set in turbo.js
+private const val turboSessionChannelName = "TurboSessionChannel"
 
 /**
  * This class is primarily responsible for managing an instance of an Android WebView that will
@@ -78,6 +79,7 @@ class Session(
     internal val httpRepository = HttpRepository()
     internal val offlineHttpRepository = OfflineHttpRepository(activity.lifecycleScope)
     internal val offlineRequestInterceptor = OfflineWebViewRequestInterceptor(this)
+    internal val turboSessionChannel = JavascriptChannel(turboSessionChannelName, ::dispatchTurboSessionMessage)
 
     // User accessible
 
@@ -665,33 +667,10 @@ class Session(
         }
 
         webView.apply {
-            initTurboSessionChannel()
+            turboSessionChannel.install(this)
             webChromeClient = WebChromeClient()
             webViewClient = TurboWebViewClient()
             initDownloadListener()
-        }
-    }
-
-    // Robolectric reports WebMessageListener as unsupported, so tests set
-    // this directly to exercise the paths behind the cold-boot gate.
-    internal var turboSessionChannelInstalled = false
-
-    private fun WebView.initTurboSessionChannel() {
-        if (!isFeatureSupported(WEB_MESSAGE_LISTENER)) {
-            logError(
-                "webMessageListenerNotSupported",
-                "The WebView version on this device is not supported"
-            )
-            return
-        }
-
-        turboSessionChannelInstalled = true
-
-        // "*" injects the channel into every frame; each message is gated on
-        // its browser-reported source origin instead.
-        WebViewCompat.addWebMessageListener(this, "TurboSessionChannel", setOf("*")) {
-            _, message, sourceOrigin, isMainFrame, _ ->
-            onTurboSessionMessage(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
         }
     }
 
@@ -705,7 +684,7 @@ class Session(
     private fun installBridge(location: String) {
         // Without the channel the injected scripts can never reach native
         // code — fail the visit loudly instead of hanging.
-        if (!turboSessionChannelInstalled) {
+        if (!turboSessionChannel.isInstalled) {
             logWarningEvent("bridgeInstallationBlockedForUnsupportedWebView")
             reset()
             callback { it.onReceivedError(LoadError.WebViewNotSupported) }
@@ -740,51 +719,32 @@ class Session(
         }
     }
 
-    /**
-     * Messages can arrive from any frame of any page loaded in the WebView,
-     * so each one is gated on its source origin before it is decoded. Runs
-     * on the main thread — the message listener delivers there.
-     */
-    internal fun onTurboSessionMessage(data: String, sourceOrigin: String, isMainFrame: Boolean) {
-        if (!isMainFrame || !isTrustedForNativeAccess(sourceOrigin)) {
-            logWarningEvent("turboSessionMessageBlockedForUntrustedOrigin", "origin" to sourceOrigin)
-            return
-        }
-
-        val message = data.toJavascriptMessageOrNull() ?: run {
-            logWarningEvent("turboSessionMessageMalformed")
-            return
-        }
-
-        try {
-            dispatchTurboSessionMessage(message)
-        } catch (e: RuntimeException) {
-            logError("turboSessionMessageFailed", e)
-        }
-    }
-
     private fun dispatchTurboSessionMessage(message: JavascriptMessage) = with(message.args) {
         when (message.name) {
-            "visitProposedToLocation" -> visitProposedToLocation(string(0), string(1))
-            "visitProposalRefreshingPage" -> visitProposalRefreshingPage(string(0), string(1))
-            "visitProposalScrollingToAnchor" -> visitProposalScrollingToAnchor(string(0), string(1))
-            "visitStarted" -> visitStarted(string(0), boolean(1), boolean(2), string(3))
-            "visitRequestStarted" -> visitRequestStarted(string(0))
-            "visitRequestCompleted" -> visitRequestCompleted(string(0))
-            "visitRequestFailedWithStatusCode" -> visitRequestFailedWithStatusCode(string(0), string(1), boolean(2), int(3))
-            "visitRequestFailedWithNonHttpStatusCode" -> visitRequestFailedWithNonHttpStatusCode(string(0), string(1), boolean(2))
-            "visitRequestFinished" -> visitRequestFinished(string(0))
-            "pageLoaded" -> pageLoaded(string(0))
-            "visitRendered" -> visitRendered(string(0))
-            "visitCompleted" -> visitCompleted(string(0), string(1))
-            "formSubmissionStarted" -> formSubmissionStarted(string(0))
-            "formSubmissionFinished" -> formSubmissionFinished(string(0))
+            "visitProposedToLocation" -> visitProposedToLocation(stringAt(0), stringAt(1))
+            "visitProposalRefreshingPage" -> visitProposalRefreshingPage(stringAt(0), stringAt(1))
+            "visitProposalScrollingToAnchor" -> visitProposalScrollingToAnchor(stringAt(0), stringAt(1))
+            "visitStarted" -> visitStarted(stringAt(0), booleanAt(1), booleanAt(2), stringAt(3))
+            "visitRequestStarted" -> visitRequestStarted(stringAt(0))
+            "visitRequestCompleted" -> visitRequestCompleted(stringAt(0))
+            "visitRequestFailedWithStatusCode" -> visitRequestFailedWithStatusCode(stringAt(0), stringAt(1), booleanAt(2), intAt(3))
+            "visitRequestFailedWithNonHttpStatusCode" -> visitRequestFailedWithNonHttpStatusCode(stringAt(0), stringAt(1), booleanAt(2))
+            "visitRequestFinished" -> visitRequestFinished(stringAt(0))
+            "pageLoaded" -> pageLoaded(stringAt(0))
+            "visitRendered" -> visitRendered(stringAt(0))
+            "visitCompleted" -> visitCompleted(stringAt(0), stringAt(1))
+            "formSubmissionStarted" -> formSubmissionStarted(stringAt(0))
+            "formSubmissionFinished" -> formSubmissionFinished(stringAt(0))
             "pageInvalidated" -> pageInvalidated()
-            "turboIsReady" -> turboIsReady(boolean(0))
+            "turboIsReady" -> turboIsReady(booleanAt(0))
             "turboFailedToLoad" -> turboFailedToLoad()
-            "elementTouchStarted" -> elementTouchStarted(boolean(0))
+            "elementTouchStarted" -> elementTouchStarted(booleanAt(0))
             "elementTouchEnded" -> elementTouchEnded()
-            else -> logWarningEvent("turboSessionMessageUnknown", "name" to message.name)
+            else -> logWarningEvent(
+                "javascriptMessageUnknown",
+                "channel" to turboSessionChannelName,
+                "name" to message.name
+            )
         }
     }
 

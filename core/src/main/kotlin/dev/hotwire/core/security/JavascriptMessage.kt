@@ -1,4 +1,4 @@
-package dev.hotwire.core.turbo.util
+package dev.hotwire.core.security
 
 import dev.hotwire.core.bridge.decode
 import kotlinx.serialization.Serializable
@@ -9,7 +9,7 @@ import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * A `{name, args}` envelope posted by the library's bundled JavaScript
- * through a `WebViewCompat.addWebMessageListener()` channel.
+ * through a [JavascriptChannel].
  */
 @Serializable
 internal data class JavascriptMessage(
@@ -19,6 +19,6 @@ internal data class JavascriptMessage(
 
 internal fun String.toJavascriptMessageOrNull(): JavascriptMessage? = decode<JavascriptMessage>()
 
-internal fun JsonArray.string(index: Int): String = this[index].jsonPrimitive.content
-internal fun JsonArray.boolean(index: Int): Boolean = this[index].jsonPrimitive.boolean
-internal fun JsonArray.int(index: Int): Int = this[index].jsonPrimitive.int
+internal fun JsonArray.stringAt(index: Int): String = this[index].jsonPrimitive.content
+internal fun JsonArray.booleanAt(index: Int): Boolean = this[index].jsonPrimitive.boolean
+internal fun JsonArray.intAt(index: Int): Int = this[index].jsonPrimitive.int

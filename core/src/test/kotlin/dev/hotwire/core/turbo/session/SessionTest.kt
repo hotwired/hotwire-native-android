@@ -67,7 +67,7 @@ class SessionTest : BaseRepositoryTest() {
         session = Session("test", activity, webView)
         // Robolectric reports WebMessageListener as unsupported; the channel
         // is considered installed so tests reach the trust gates behind it.
-        session.turboSessionChannelInstalled = true
+        session.turboSessionChannel.isInstalled = true
         whenever(webView.url).thenReturn(baseUrl())
         visit = Visit(
             location = baseUrl(),
@@ -122,7 +122,7 @@ class SessionTest : BaseRepositoryTest() {
             envelope("turboIsReady", true),
             envelope("visitStarted", "12345", true, false, visit.location)
         ).forEach {
-            session.onTurboSessionMessage(it, sourceOrigin = "https://evil.attacker.com", isMainFrame = true)
+            session.turboSessionChannel.receive(it, sourceOrigin = "https://evil.attacker.com", isMainFrame = true)
         }
 
         verify(callback, never()).visitProposedToLocation(any(), any())
@@ -134,7 +134,7 @@ class SessionTest : BaseRepositoryTest() {
     fun `turbo session messages from a sub frame are dropped`() {
         session.currentVisit = visit
 
-        session.onTurboSessionMessage(
+        session.turboSessionChannel.receive(
             envelope("visitProposedToLocation", "${visit.location}/page", VisitOptions().toJson()),
             sourceOrigin = baseUrl(),
             isMainFrame = false
@@ -149,7 +149,7 @@ class SessionTest : BaseRepositoryTest() {
         val newLocation = "${visit.location}/page"
         session.currentVisit = visit
 
-        session.onTurboSessionMessage(
+        session.turboSessionChannel.receive(
             envelope("visitProposedToLocation", newLocation, options.toJson()),
             sourceOrigin = baseUrl(),
             isMainFrame = true
@@ -168,7 +168,7 @@ class SessionTest : BaseRepositoryTest() {
             envelope("noSuchMethod"),
             envelope("visitProposedToLocation")
         ).forEach {
-            session.onTurboSessionMessage(it, sourceOrigin = baseUrl(), isMainFrame = true)
+            session.turboSessionChannel.receive(it, sourceOrigin = baseUrl(), isMainFrame = true)
         }
 
         verify(callback, never()).visitProposedToLocation(any(), any())
@@ -203,7 +203,7 @@ class SessionTest : BaseRepositoryTest() {
 
     @Test
     fun `cold boot without the message channel surfaces an unsupported error`() {
-        session.turboSessionChannelInstalled = false
+        session.turboSessionChannel.isInstalled = false
         session.currentVisit = visit
         session.isColdBooting = true
 

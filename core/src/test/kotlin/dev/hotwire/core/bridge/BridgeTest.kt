@@ -102,7 +102,7 @@ class BridgeTest {
 
     @Test
     fun bridgeDidInitialize() {
-        bridge.onBridgeMessage(
+        bridge.channel.receive(
             data = """{"name":"bridgeDidInitialize","args":[]}""",
             sourceOrigin = "https://37signals.com",
             isMainFrame = true
@@ -122,7 +122,7 @@ class BridgeTest {
             jsonData = data
         )
 
-        bridge.onBridgeMessage(
+        bridge.channel.receive(
             data = bridgeDidReceiveMessageEnvelope,
             sourceOrigin = "https://37signals.com",
             isMainFrame = true
@@ -133,12 +133,12 @@ class BridgeTest {
 
     @Test
     fun bridgeMessagesFromAnUntrustedOriginAreDropped() {
-        bridge.onBridgeMessage(
+        bridge.channel.receive(
             data = bridgeDidReceiveMessageEnvelope,
             sourceOrigin = "https://evil.attacker.com",
             isMainFrame = true
         )
-        bridge.onBridgeMessage(
+        bridge.channel.receive(
             data = """{"name":"bridgeDidInitialize","args":[]}""",
             sourceOrigin = "https://evil.attacker.com",
             isMainFrame = true
@@ -150,7 +150,7 @@ class BridgeTest {
 
     @Test
     fun bridgeMessagesFromASubFrameAreDropped() {
-        bridge.onBridgeMessage(
+        bridge.channel.receive(
             data = bridgeDidReceiveMessageEnvelope,
             sourceOrigin = "https://37signals.com",
             isMainFrame = false
@@ -167,7 +167,7 @@ class BridgeTest {
             """{"name":"noSuchMethod","args":[]}""",
             """{"name":"bridgeDidReceiveMessage","args":[]}"""
         ).forEach {
-            bridge.onBridgeMessage(it, sourceOrigin = "https://37signals.com", isMainFrame = true)
+            bridge.channel.receive(it, sourceOrigin = "https://37signals.com", isMainFrame = true)
         }
 
         verify(delegate, never()).bridgeDidReceiveMessage(any())

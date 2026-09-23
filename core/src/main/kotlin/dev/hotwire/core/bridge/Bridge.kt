@@ -2,17 +2,12 @@ package dev.hotwire.core.bridge
 
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
-import androidx.webkit.WebViewCompat
-import androidx.webkit.WebViewFeature
-import androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER
 import dev.hotwire.core.logging.logDebug
-import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logVerbose
 import dev.hotwire.core.logging.logWarning
-import dev.hotwire.core.security.isTrustedForNativeAccess
-import dev.hotwire.core.turbo.util.JavascriptMessage
-import dev.hotwire.core.turbo.util.string
-import dev.hotwire.core.turbo.util.toJavascriptMessageOrNull
+import dev.hotwire.core.security.JavascriptChannel
+import dev.hotwire.core.security.JavascriptMessage
+import dev.hotwire.core.security.stringAt
 import kotlinx.serialization.json.JsonElement
 import java.lang.ref.WeakReference
 
@@ -28,14 +23,14 @@ class Bridge internal constructor(webView: WebView) {
     internal val webView: WebView? get() = webViewRef.get()
     internal var repository = Repository()
     internal var delegate: BridgeDelegate<*>? = null
+    internal val channel = JavascriptChannel(bridgeChannelName, ::dispatchBridgeMessage)
 
     init {
         // Use a weak reference in case the WebView is no longer being
         // used by the app, such as when the render process is gone.
         webViewRef = WeakReference(webView)
 
-        // The channel must be added before the page is loaded
-        initBridgeChannel(webView)
+        channel.install(webView)
     }
 
     internal fun register(component: String) {
@@ -77,52 +72,15 @@ class Bridge internal constructor(webView: WebView) {
         return componentsAreRegistered
     }
 
-    private fun initBridgeChannel(webView: WebView) {
-        if (!WebViewFeature.isFeatureSupported(WEB_MESSAGE_LISTENER)) {
-            logError(
-                "webMessageListenerNotSupported",
-                "The WebView version on this device is not supported"
-            )
-            return
-        }
-
-        // "*" injects the channel into every frame; each message is gated on
-        // its browser-reported source origin instead.
-        WebViewCompat.addWebMessageListener(webView, bridgeChannelName, setOf("*")) {
-            _, message, sourceOrigin, isMainFrame, _ ->
-            onBridgeMessage(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
-        }
-    }
-
-    /**
-     * Messages can arrive from any frame of any page loaded in the WebView,
-     * so each one is gated on its source origin before it is decoded. Runs
-     * on the main thread — the message listener delivers there.
-     */
-    internal fun onBridgeMessage(data: String, sourceOrigin: String, isMainFrame: Boolean) {
-        if (!isMainFrame || !isTrustedForNativeAccess(sourceOrigin)) {
-            logWarning("bridgeMessageBlockedForUntrustedOrigin", listOf("origin" to sourceOrigin))
-            return
-        }
-
-        val message = data.toJavascriptMessageOrNull() ?: run {
-            logWarning("bridgeMessageMalformed", "")
-            return
-        }
-
-        try {
-            dispatchBridgeMessage(message)
-        } catch (e: RuntimeException) {
-            logError("bridgeMessageFailed", e)
-        }
-    }
-
     private fun dispatchBridgeMessage(message: JavascriptMessage) {
         when (message.name) {
             "bridgeDidInitialize" -> bridgeDidInitialize()
             "bridgeDidUpdateSupportedComponents" -> bridgeDidUpdateSupportedComponents()
-            "bridgeDidReceiveMessage" -> bridgeDidReceiveMessage(message.args.string(0))
-            else -> logWarning("bridgeMessageUnknown", listOf("name" to message.name))
+            "bridgeDidReceiveMessage" -> bridgeDidReceiveMessage(message.args.stringAt(0))
+            else -> logWarning(
+                "javascriptMessageUnknown",
+                listOf("channel" to bridgeChannelName, "name" to message.name)
+            )
         }
     }
 
