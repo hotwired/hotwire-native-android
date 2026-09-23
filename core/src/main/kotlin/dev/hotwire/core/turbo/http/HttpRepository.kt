@@ -28,9 +28,11 @@ internal class HttpRepository {
     private fun redirectFrom(response: Response): HttpRedirect? {
         if (!response.isRedirect) return null
 
-        val locationHeader = response.header("Location") ?: return null
         val requestUrl = response.request.url
-        val redirectLocation = requestUrl.resolve(locationHeader)?.toString() ?: return null
+        val redirectLocation = response.header("Location")
+            ?.let { requestUrl.resolve(it) }
+            ?.toString()
+            ?: return null
 
         return HttpRedirect(
             location = redirectLocation,
@@ -40,23 +42,17 @@ internal class HttpRepository {
 
     private fun issueRequest(location: String): Response? {
         return try {
-            val request = buildRequest(location)
-            verificationClient().newCall(request).execute()
+            val request = Request.Builder().url(location).build()
+            redirectClient().newCall(request).execute()
         } catch (e: Exception) {
             logError("httpRequestError", e)
             null
         }
     }
 
-    private fun buildRequest(location: String): Request {
-        return Request.Builder().url(location).build()
-    }
-
-    /**
-     * Derived from the shared client on each call, so it picks up a cache or timeout change, and
-     * built without redirect following: this fetch only needs to see where a redirect points.
-     */
-    private fun verificationClient(): OkHttpClient {
+    // Derived on each call: Session replaces the shared client with a caching one after it
+    // constructs this repository.
+    private fun redirectClient(): OkHttpClient {
         return HotwireHttpClient.instance.newBuilder()
             .followRedirects(false)
             .followSslRedirects(false)
