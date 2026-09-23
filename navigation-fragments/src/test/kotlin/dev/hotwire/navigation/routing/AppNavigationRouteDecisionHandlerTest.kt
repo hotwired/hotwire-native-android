@@ -79,6 +79,18 @@ class AppNavigationRouteDecisionHandlerTest {
     }
 
     @Test
+    fun `url on another navigator's start origin matches`() {
+        val otherStartLocation = "https://other.app.com/start"
+        Hotwire.config.registerStartLocation(otherStartLocation)
+
+        try {
+            assertTrue(route.matches(proposal("https://other.app.com/page"), config))
+        } finally {
+            Hotwire.config.unregisterStartLocation(otherStartLocation)
+        }
+    }
+
+    @Test
     fun `a custom origin trust policy decides the match`() {
         Hotwire.config.originTrustPolicy = object : OriginTrustPolicy() {
             override fun isTrustedForNavigation(origin: Origin) = origin.host == "asset.cdn.com"
