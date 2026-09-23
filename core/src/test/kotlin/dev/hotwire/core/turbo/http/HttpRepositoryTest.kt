@@ -71,6 +71,20 @@ class HttpRepositoryTest : BaseRepositoryTest() {
     }
 
     @Test
+    fun `flags a redirect that changes only the scheme as cross-origin`() {
+        val otherSchemeUrl = server.url("/redirected").newBuilder().scheme("https").build().toString()
+
+        server.enqueue(redirectResponse(otherSchemeUrl))
+
+        val result = runBlocking { repository.fetch(baseUrl()) }
+
+        assertThat(result).isNotNull
+        assertThat(result!!.redirect).isNotNull
+        assertThat(result.redirect!!.isCrossOrigin).isTrue
+        assertThat(result.redirect.location).isEqualTo(otherSchemeUrl)
+    }
+
+    @Test
     fun `detects a same-origin redirect without flagging it cross-origin`() {
         server.enqueue(redirectResponse(server.url("/redirected").toString()))
 
