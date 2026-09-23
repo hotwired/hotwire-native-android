@@ -108,7 +108,7 @@ class SessionTest : BaseRepositoryTest() {
         val newLocation = "${visit.location}/page"
 
         session.currentVisit = visit
-        session.visitProposedToLocation(newLocation, options.toJson())
+        session.visitProposedToLocation(newLocation, options)
 
         verify(callback).visitProposedToLocation(newLocation, options)
     }

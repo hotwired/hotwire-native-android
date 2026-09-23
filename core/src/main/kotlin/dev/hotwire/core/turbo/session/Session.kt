@@ -43,7 +43,6 @@ import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.offline.OfflineWebViewRequestInterceptor
 import dev.hotwire.core.turbo.util.isHttpGetRequest
 import dev.hotwire.core.turbo.util.runOnUiThread
-import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitAction
 import dev.hotwire.core.turbo.visit.VisitOptions
@@ -51,6 +50,7 @@ import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.core.turbo.webview.WebViewInfo
 import dev.hotwire.core.turbo.webview.WebViewVersionCompatibility
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonArray
 import java.util.Date
 
 // This needs to match whatever is set in turbo.js
@@ -232,13 +232,11 @@ class Session(
      * Called by Turbo bridge when a new visit is proposed.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [VisitOptions].
+     * @param options The options of the proposed visit.
      */
-    internal fun visitProposedToLocation(location: String, optionsJson: String) {
-        VisitOptions.fromJSON(optionsJson)?.let { options ->
-            logEvent("visitProposedToLocation", "location" to location, "options" to options)
-            callback { it.visitProposedToLocation(location, options) }
-        }
+    internal fun visitProposedToLocation(location: String, options: VisitOptions) {
+        logEvent("visitProposedToLocation", "location" to location, "options" to options)
+        callback { it.visitProposedToLocation(location, options) }
     }
 
     private fun visitProposedToCrossOriginRedirect(
@@ -262,12 +260,10 @@ class Session(
      * current page.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [VisitOptions].
+     * @param options The options of the proposed visit.
      */
-    internal fun visitProposalRefreshingPage(location: String, optionsJson: String) {
-        VisitOptions.fromJSON(optionsJson)?.let { options ->
-            logEvent("visitProposalRefreshingPage", "location" to location, "options" to options)
-        }
+    internal fun visitProposalRefreshingPage(location: String, options: VisitOptions) {
+        logEvent("visitProposalRefreshingPage", "location" to location, "options" to options)
     }
 
     /**
@@ -275,12 +271,10 @@ class Session(
      * on the same page.
      *
      * @param location The location to visit.
-     * @param optionsJson A JSON block to be serialized into [VisitOptions].
+     * @param options The options of the proposed visit.
      */
-    internal fun visitProposalScrollingToAnchor(location: String, optionsJson: String) {
-        VisitOptions.fromJSON(optionsJson)?.let { options ->
-            logEvent("visitProposalScrollingToAnchor", "location" to location, "options" to options)
-        }
+    internal fun visitProposalScrollingToAnchor(location: String, options: VisitOptions) {
+        logEvent("visitProposalScrollingToAnchor", "location" to location, "options" to options)
     }
 
     /**
@@ -530,13 +524,14 @@ class Session(
                 logEvent("turboIsNotReady", "error" to visitError)
 
                 callback { it.requestFailedWithError(false, visitError) }
-            } else {
-                // Check if a visit was requested while cold
-                // booting. If so, visit the pending location.
-                when (visitPending) {
-                    true -> visitPendingLocation(visit)
-                    else -> renderVisitForColdBoot()
-                }
+                return
+            }
+
+            // Check if a visit was requested while cold
+            // booting. If so, visit the pending location.
+            when (visitPending) {
+                true -> visitPendingLocation(visit)
+                else -> renderVisitForColdBoot()
             }
         }
     }
@@ -677,7 +672,7 @@ class Session(
     private fun WebView.initDownloadListener() {
         setDownloadListener { url, _, _, _, _ ->
             logEvent("downloadListener", "location" to url)
-            visitProposedToLocation(url, VisitOptions().toJson())
+            visitProposedToLocation(url, VisitOptions())
         }
     }
 
@@ -721,9 +716,9 @@ class Session(
 
     private fun dispatchTurboSessionMessage(message: JavascriptMessage) = with(message.args) {
         when (message.name) {
-            "visitProposedToLocation" -> visitProposedToLocation(stringAt(0), stringAt(1))
-            "visitProposalRefreshingPage" -> visitProposalRefreshingPage(stringAt(0), stringAt(1))
-            "visitProposalScrollingToAnchor" -> visitProposalScrollingToAnchor(stringAt(0), stringAt(1))
+            "visitProposedToLocation" -> visitOptionsAt(1)?.let { visitProposedToLocation(stringAt(0), it) }
+            "visitProposalRefreshingPage" -> visitOptionsAt(1)?.let { visitProposalRefreshingPage(stringAt(0), it) }
+            "visitProposalScrollingToAnchor" -> visitOptionsAt(1)?.let { visitProposalScrollingToAnchor(stringAt(0), it) }
             "visitStarted" -> visitStarted(stringAt(0), booleanAt(1), booleanAt(2), stringAt(3))
             "visitRequestStarted" -> visitRequestStarted(stringAt(0))
             "visitRequestCompleted" -> visitRequestCompleted(stringAt(0))
@@ -747,6 +742,8 @@ class Session(
             )
         }
     }
+
+    private fun JsonArray.visitOptionsAt(index: Int) = VisitOptions.fromJSON(stringAt(index))
 
     private fun sessionAttributes(params: Array<out Pair<String, Any>>) =
         params.toMutableList().apply { add(0, "session" to sessionName) }
@@ -850,7 +847,7 @@ class Session(
                     true -> VisitOptions(action = VisitAction.REPLACE)
                     else -> VisitOptions(action = VisitAction.ADVANCE)
                 }
-                visitProposedToLocation(location, options.toJson())
+                visitProposedToLocation(location, options)
             }
 
             logEvent(
