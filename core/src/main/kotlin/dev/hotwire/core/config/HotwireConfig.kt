@@ -53,9 +53,10 @@ class HotwireConfig internal constructor() {
         get() = startLocationRegistry.origins
 
     /**
-     * Registers the origin of [startLocation] for [DefaultOriginTrustPolicy].
-     * `NavigatorHost` registers its start location for you; call this only if
-     * you drive a [dev.hotwire.core.turbo.session.Session] without it.
+     * Adds the origin of [startLocation] to [registeredOrigins], which
+     * [OriginTrustPolicy] trusts by default. `NavigatorHost` registers its
+     * start location for you; call this only if you drive a
+     * [dev.hotwire.core.turbo.session.Session] without it.
      * Registrations are counted, so balance each call with
      * [unregisterStartLocation].
      */

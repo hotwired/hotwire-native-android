@@ -714,32 +714,34 @@ class Session(
         }
     }
 
-    private fun dispatchTurboSessionMessage(message: JavascriptMessage) = with(message.args) {
-        when (message.name) {
-            "visitProposedToLocation" -> visitOptionsAt(1)?.let { visitProposedToLocation(stringAt(0), it) }
-            "visitProposalRefreshingPage" -> visitOptionsAt(1)?.let { visitProposalRefreshingPage(stringAt(0), it) }
-            "visitProposalScrollingToAnchor" -> visitOptionsAt(1)?.let { visitProposalScrollingToAnchor(stringAt(0), it) }
-            "visitStarted" -> visitStarted(stringAt(0), booleanAt(1), booleanAt(2), stringAt(3))
-            "visitRequestStarted" -> visitRequestStarted(stringAt(0))
-            "visitRequestCompleted" -> visitRequestCompleted(stringAt(0))
-            "visitRequestFailedWithStatusCode" -> visitRequestFailedWithStatusCode(stringAt(0), stringAt(1), booleanAt(2), intAt(3))
-            "visitRequestFailedWithNonHttpStatusCode" -> visitRequestFailedWithNonHttpStatusCode(stringAt(0), stringAt(1), booleanAt(2))
-            "visitRequestFinished" -> visitRequestFinished(stringAt(0))
-            "pageLoaded" -> pageLoaded(stringAt(0))
-            "visitRendered" -> visitRendered(stringAt(0))
-            "visitCompleted" -> visitCompleted(stringAt(0), stringAt(1))
-            "formSubmissionStarted" -> formSubmissionStarted(stringAt(0))
-            "formSubmissionFinished" -> formSubmissionFinished(stringAt(0))
-            "pageInvalidated" -> pageInvalidated()
-            "turboIsReady" -> turboIsReady(booleanAt(0))
-            "turboFailedToLoad" -> turboFailedToLoad()
-            "elementTouchStarted" -> elementTouchStarted(booleanAt(0))
-            "elementTouchEnded" -> elementTouchEnded()
-            else -> logWarningEvent(
-                "javascriptMessageUnknown",
-                "channel" to turboSessionChannelName,
-                "name" to message.name
-            )
+    private fun dispatchTurboSessionMessage(message: JavascriptMessage) {
+        with(message.args) {
+            when (message.name) {
+                "visitProposedToLocation" -> visitOptionsAt(1)?.let { visitProposedToLocation(stringAt(0), it) }
+                "visitProposalRefreshingPage" -> visitOptionsAt(1)?.let { visitProposalRefreshingPage(stringAt(0), it) }
+                "visitProposalScrollingToAnchor" -> visitOptionsAt(1)?.let { visitProposalScrollingToAnchor(stringAt(0), it) }
+                "visitStarted" -> visitStarted(stringAt(0), booleanAt(1), booleanAt(2), stringAt(3))
+                "visitRequestStarted" -> visitRequestStarted(stringAt(0))
+                "visitRequestCompleted" -> visitRequestCompleted(stringAt(0))
+                "visitRequestFailedWithStatusCode" -> visitRequestFailedWithStatusCode(stringAt(0), stringAt(1), booleanAt(2), intAt(3))
+                "visitRequestFailedWithNonHttpStatusCode" -> visitRequestFailedWithNonHttpStatusCode(stringAt(0), stringAt(1), booleanAt(2))
+                "visitRequestFinished" -> visitRequestFinished(stringAt(0))
+                "pageLoaded" -> pageLoaded(stringAt(0))
+                "visitRendered" -> visitRendered(stringAt(0))
+                "visitCompleted" -> visitCompleted(stringAt(0), stringAt(1))
+                "formSubmissionStarted" -> formSubmissionStarted(stringAt(0))
+                "formSubmissionFinished" -> formSubmissionFinished(stringAt(0))
+                "pageInvalidated" -> pageInvalidated()
+                "turboIsReady" -> turboIsReady(booleanAt(0))
+                "turboFailedToLoad" -> turboFailedToLoad()
+                "elementTouchStarted" -> elementTouchStarted(booleanAt(0))
+                "elementTouchEnded" -> elementTouchEnded()
+                else -> logWarningEvent(
+                    "javascriptMessageUnknown",
+                    "channel" to turboSessionChannelName,
+                    "name" to message.name
+                )
+            }
         }
     }
 
