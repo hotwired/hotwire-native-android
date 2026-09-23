@@ -15,10 +15,10 @@ import dev.hotwire.core.config.Hotwire
  */
 object DefaultOriginTrustPolicy : OriginTrustPolicy {
     override fun isTrustedForNavigation(origin: Origin): Boolean {
-        return Hotwire.config.trustedOrigins.contains(origin)
+        return origin in Hotwire.config.registeredOrigins
     }
 
     override fun isTrustedForNativeAccess(origin: Origin): Boolean {
-        return Hotwire.config.trustedOrigins.contains(origin)
+        return origin in Hotwire.config.registeredOrigins
     }
 }

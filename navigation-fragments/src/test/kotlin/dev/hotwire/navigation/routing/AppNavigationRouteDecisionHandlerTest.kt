@@ -33,13 +33,12 @@ class AppNavigationRouteDecisionHandlerTest {
     @Before
     fun setup() {
         activity = buildActivity(TestActivity::class.java).get()
-        Hotwire.config.trustedOrigins.clear()
-        Hotwire.config.trustedOrigins.register(config.startLocation)
+        Hotwire.config.registerStartLocation(config.startLocation)
     }
 
     @After
     fun teardown() {
-        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.unregisterStartLocation(config.startLocation)
         Hotwire.config.originTrustPolicy = DefaultOriginTrustPolicy
     }
 

@@ -23,13 +23,13 @@ class DefaultOriginTrustPolicyTest {
 
     @Before
     fun setup() {
-        Hotwire.config.trustedOrigins.clear()
-        Hotwire.config.trustedOrigins.register("https://my.app.com/start")
+        Hotwire.config.startLocationRegistry.clear()
+        Hotwire.config.registerStartLocation("https://my.app.com/start")
     }
 
     @After
     fun teardown() {
-        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.startLocationRegistry.clear()
     }
 
     @Test
@@ -46,7 +46,7 @@ class DefaultOriginTrustPolicyTest {
 
     @Test
     fun `any registered origin grants native access, not just the first`() {
-        Hotwire.config.trustedOrigins.register("https://other.app.com/home")
+        Hotwire.config.registerStartLocation("https://other.app.com/home")
 
         assertTrue(isTrustedForNavigation("https://other.app.com/page"))
         assertTrue(isTrustedForNativeAccess("https://other.app.com/page"))
@@ -56,7 +56,7 @@ class DefaultOriginTrustPolicyTest {
 
     @Test
     fun `nothing is trusted when no start location is registered`() {
-        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.startLocationRegistry.clear()
 
         assertFalse(isTrustedForNavigation("https://my.app.com/page"))
         assertFalse(isTrustedForNativeAccess("https://my.app.com/page"))

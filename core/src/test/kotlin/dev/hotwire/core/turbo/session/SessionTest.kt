@@ -62,8 +62,8 @@ class SessionTest : BaseRepositoryTest() {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
-        Hotwire.config.trustedOrigins.clear()
-        Hotwire.config.trustedOrigins.register(baseUrl())
+        Hotwire.config.startLocationRegistry.clear()
+        Hotwire.config.registerStartLocation(baseUrl())
         session = Session("test", activity, webView)
         // Robolectric reports WebMessageListener as unsupported; the channel
         // is considered installed so tests reach the trust gates behind it.
@@ -89,8 +89,8 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @After
-    fun teardownTrustedOrigins() {
-        Hotwire.config.trustedOrigins.clear()
+    fun teardownRegisteredOrigins() {
+        Hotwire.config.startLocationRegistry.clear()
         Hotwire.config.originTrustPolicy = DefaultOriginTrustPolicy
     }
 

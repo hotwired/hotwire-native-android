@@ -7,11 +7,10 @@ import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.logging.DefaultHotwireLogger
 import dev.hotwire.core.logging.HotwireLogger
-import androidx.annotation.RestrictTo
 import dev.hotwire.core.security.DefaultOriginTrustPolicy
 import dev.hotwire.core.security.Origin
 import dev.hotwire.core.security.OriginTrustPolicy
-import dev.hotwire.core.security.TrustedOrigins
+import dev.hotwire.core.security.StartLocationRegistry
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -45,14 +44,28 @@ class HotwireConfig internal constructor() {
      */
     var logger: HotwireLogger = DefaultHotwireLogger
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    val trustedOrigins = TrustedOrigins()
+    internal val startLocationRegistry = StartLocationRegistry()
 
     /**
-     * The origins of the start locations of live navigator hosts.
+     * A live, read-only view of the origins of the registered start locations.
      */
     val registeredOrigins: Set<Origin>
-        get() = trustedOrigins.snapshot
+        get() = startLocationRegistry.origins
+
+    /**
+     * Registers the origin of [startLocation] for [DefaultOriginTrustPolicy].
+     * `NavigatorHost` registers its start location for you; call this only if
+     * you drive a [dev.hotwire.core.turbo.session.Session] without it.
+     * Registrations are counted, so balance each call with
+     * [unregisterStartLocation].
+     */
+    fun registerStartLocation(startLocation: String) {
+        startLocationRegistry.register(startLocation)
+    }
+
+    fun unregisterStartLocation(startLocation: String) {
+        startLocationRegistry.unregister(startLocation)
+    }
 
     /**
      * Decides which origins the library trusts. The default trusts only

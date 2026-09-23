@@ -47,13 +47,13 @@ class GeolocationPermissionDelegateTest : BaseRepositoryTest() {
         declareInManifest(ACCESS_FINE_LOCATION)
         session = Session("test", activity, webView)
 
-        Hotwire.config.trustedOrigins.clear()
-        Hotwire.config.trustedOrigins.register("https://37signals.com")
+        Hotwire.config.startLocationRegistry.clear()
+        Hotwire.config.registerStartLocation("https://37signals.com")
     }
 
     @After
-    fun teardownTrustedOrigins() {
-        Hotwire.config.trustedOrigins.clear()
+    fun teardownRegisteredOrigins() {
+        Hotwire.config.startLocationRegistry.clear()
     }
 
     @Test
@@ -92,7 +92,7 @@ class GeolocationPermissionDelegateTest : BaseRepositoryTest() {
         val origin = "https://37signals.com"
 
         session.geolocationPermissionDelegate.onRequestPermission(origin, callback)
-        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.startLocationRegistry.clear()
         session.geolocationPermissionDelegate.onActivityResult(isGranted = true)
 
         verify(callback).invoke(origin, false, false)

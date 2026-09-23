@@ -54,13 +54,13 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         context = ApplicationProvider.getApplicationContext()
         session = Session("test", activity, webView)
 
-        Hotwire.config.trustedOrigins.clear()
-        Hotwire.config.trustedOrigins.register("https://37signals.com")
+        Hotwire.config.startLocationRegistry.clear()
+        Hotwire.config.registerStartLocation("https://37signals.com")
     }
 
     @After
-    fun teardownTrustedOrigins() {
-        Hotwire.config.trustedOrigins.clear()
+    fun teardownRegisteredOrigins() {
+        Hotwire.config.startLocationRegistry.clear()
     }
 
     @Test
@@ -225,7 +225,7 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
         val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
 
         session.webViewPermissionDelegate.onRequest(request)
-        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.startLocationRegistry.clear()
         session.webViewPermissionDelegate.onActivityResult(mapOf(RECORD_AUDIO to true))
 
         verify(request, never()).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))

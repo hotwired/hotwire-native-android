@@ -40,8 +40,8 @@ class BridgeTest {
 
     @Before
     fun setup() {
-        Hotwire.config.trustedOrigins.clear()
-        Hotwire.config.trustedOrigins.register("https://37signals.com")
+        Hotwire.config.startLocationRegistry.clear()
+        Hotwire.config.registerStartLocation("https://37signals.com")
 
         bridge = Bridge(webView)
         bridge.delegate = delegate
@@ -50,7 +50,7 @@ class BridgeTest {
 
     @After
     fun teardown() {
-        Hotwire.config.trustedOrigins.clear()
+        Hotwire.config.startLocationRegistry.clear()
     }
 
     @Test

@@ -32,14 +32,14 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
 
     // onDestroy must withdraw exactly what was registered, even if the
     // configuration's start location changes in between.
-    private var trustedLocation: String? = null
+    private var registeredStartLocation: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         activity = requireActivity() as HotwireActivity
-        trustedLocation = configuration.startLocation.also {
-            Hotwire.config.trustedOrigins.register(it)
+        registeredStartLocation = configuration.startLocation.also {
+            Hotwire.config.registerStartLocation(it)
         }
         navigator = Navigator(this, configuration, activity)
         childFragmentManager.addFragmentOnAttachListener(this)
@@ -56,8 +56,8 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     }
 
     override fun onDestroy() {
-        trustedLocation?.let { Hotwire.config.trustedOrigins.unregister(it) }
-        trustedLocation = null
+        registeredStartLocation?.let { Hotwire.config.unregisterStartLocation(it) }
+        registeredStartLocation = null
         activity.delegate.unregisterNavigatorHost(this)
         super.onDestroy()
     }
