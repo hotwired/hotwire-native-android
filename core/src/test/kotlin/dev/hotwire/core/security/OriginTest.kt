@@ -7,17 +7,26 @@ import org.junit.Test
 class OriginTest {
     @Test
     fun `https without an explicit port defaults to 443`() {
-        assertEquals(Origin("https", "a.com", 443), Origin.parseOrNull("https://a.com/path"))
+        assertEquals(443, Origin.parse("https://a.com/path").port)
     }
 
     @Test
     fun `an explicit port is kept`() {
-        assertEquals(Origin("https", "a.com", 8443), Origin.parseOrNull("https://a.com:8443/path"))
+        assertEquals(8443, Origin.parse("https://a.com:8443/path").port)
     }
 
     @Test
     fun `http without an explicit port defaults to 80`() {
-        assertEquals(Origin("http", "a.com", 80), Origin.parseOrNull("http://a.com/path"))
+        assertEquals(80, Origin.parse("http://a.com/path").port)
+    }
+
+    @Test
+    fun `scheme and host are lowercased`() {
+        val origin = Origin.parse("HTTPS://My.App.COM/Path")
+
+        assertEquals("https", origin.scheme)
+        assertEquals("my.app.com", origin.host)
+        assertEquals(Origin.parse("https://my.app.com"), origin)
     }
 
     @Test
@@ -32,36 +41,40 @@ class OriginTest {
         assertNull(Origin.parseOrNull("not a url"))
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun `parse throws for a non-http location`() {
+        Origin.parse("javascript:alert(1)")
+    }
+
     @Test
     fun `path, query, and fragment are ignored`() {
-        val origin = Origin("https", "a.com", 443)
+        val origin = Origin.parse("https://a.com")
 
         assertEquals(origin, Origin.parseOrNull("https://a.com/path"))
         assertEquals(origin, Origin.parseOrNull("https://a.com/path?q=1"))
         assertEquals(origin, Origin.parseOrNull("https://a.com/path#fragment"))
-        assertEquals(origin, Origin.parseOrNull("https://a.com"))
     }
 
     @Test
     fun `equality holds across an implicit and an explicit default port`() {
-        assertEquals(Origin.parseOrNull("https://a.com"), Origin.parseOrNull("https://a.com:443/path"))
+        assertEquals(Origin.parse("https://a.com"), Origin.parse("https://a.com:443/path"))
     }
 
     @Test
     fun `toString omits a default port`() {
-        assertEquals("https://a.com", Origin("https", "a.com", 443).toString())
+        assertEquals("https://a.com", Origin.parse("https://a.com:443/path").toString())
     }
 
     @Test
     fun `toString keeps a non-default port`() {
-        assertEquals("https://a.com:8443", Origin("https", "a.com", 8443).toString())
+        assertEquals("https://a.com:8443", Origin.parse("https://a.com:8443/path").toString())
     }
 
     @Test
     fun `toString brackets an IPv6 host`() {
-        val origin = Origin.parseOrNull("https://[2001:db8::1]:8443/path")
+        val origin = Origin.parse("https://[2001:db8::1]:8443/path")
 
-        assertEquals(Origin("https", "2001:db8::1", 8443), origin)
+        assertEquals("2001:db8::1", origin.host)
         assertEquals("https://[2001:db8::1]:8443", origin.toString())
         assertEquals(origin, Origin.parseOrNull(origin.toString()))
     }

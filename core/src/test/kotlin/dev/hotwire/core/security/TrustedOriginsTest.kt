@@ -10,7 +10,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class TrustedOriginsTest {
     private val origins = TrustedOrigins()
-    private val myAppOrigin = Origin("https", "my.app.com", 443)
+    private val myAppOrigin = Origin.parse("https://my.app.com")
 
     @Test
     fun `a registered start location's origin is trusted`() {

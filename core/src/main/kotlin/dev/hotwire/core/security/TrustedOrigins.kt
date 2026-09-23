@@ -14,7 +14,7 @@ class TrustedOrigins {
     private val origins = ConcurrentHashMap<Origin, Int>()
 
     fun register(startLocation: String) {
-        val origin = startLocation.toOriginOrNull() ?: run {
+        val origin = Origin.parseOrNull(startLocation) ?: run {
             logError("startLocationNotTrustable", "Not an http(s) URL: $startLocation")
             return
         }
@@ -22,7 +22,7 @@ class TrustedOrigins {
     }
 
     fun unregister(startLocation: String) {
-        val origin = startLocation.toOriginOrNull() ?: return
+        val origin = Origin.parseOrNull(startLocation) ?: return
         origins.computeIfPresent(origin) { _, count -> (count - 1).takeIf { it > 0 } }
     }
 

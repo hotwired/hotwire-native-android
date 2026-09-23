@@ -14,11 +14,11 @@ class DefaultOriginTrustPolicyTest {
     private val policy = DefaultOriginTrustPolicy
 
     private fun isTrustedForNavigation(location: String): Boolean {
-        return location.toOriginOrNull()?.let { policy.isTrustedForNavigation(it) } ?: false
+        return Origin.parseOrNull(location)?.let { policy.isTrustedForNavigation(it) } ?: false
     }
 
     private fun isTrustedForNativeAccess(location: String): Boolean {
-        return location.toOriginOrNull()?.let { policy.isTrustedForNativeAccess(it) } ?: false
+        return Origin.parseOrNull(location)?.let { policy.isTrustedForNativeAccess(it) } ?: false
     }
 
     @Before
