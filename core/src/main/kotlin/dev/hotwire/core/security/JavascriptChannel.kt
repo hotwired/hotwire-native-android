@@ -26,21 +26,20 @@ internal class JavascriptChannel(
      * Must run before the page loads.
      */
     fun install(webView: WebView) {
-        if (!isFeatureSupported(WEB_MESSAGE_LISTENER)) {
+        if (isFeatureSupported(WEB_MESSAGE_LISTENER)) {
+            // "*" injects the channel into every frame; each message is gated
+            // on its browser-reported source origin instead.
+            WebViewCompat.addWebMessageListener(webView, name, setOf("*")) {
+                _, message, sourceOrigin, isMainFrame, _ ->
+                receive(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
+            }
+            isInstalled = true
+        } else {
             logError(
                 "webMessageListenerNotSupported",
                 "The WebView version on this device is not supported"
             )
-            return
         }
-
-        // "*" injects the channel into every frame; each message is gated on
-        // its browser-reported source origin instead.
-        WebViewCompat.addWebMessageListener(webView, name, setOf("*")) {
-            _, message, sourceOrigin, isMainFrame, _ ->
-            receive(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
-        }
-        isInstalled = true
     }
 
     /**
