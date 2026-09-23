@@ -1,9 +1,9 @@
 package dev.hotwire.core.turbo.http
 
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.security.hasSameOriginAs
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.withContext
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -44,11 +44,11 @@ internal class HttpRepository {
 
         val locationHeader = response.header("Location") ?: return null
         val requestUrl = response.request.url
-        val redirectUrl = requestUrl.resolve(locationHeader) ?: return null
+        val redirectLocation = requestUrl.resolve(locationHeader)?.toString() ?: return null
 
         return HttpRedirect(
-            location = redirectUrl.toString(),
-            isCrossOrigin = !redirectUrl.isSameOriginAs(requestUrl)
+            location = redirectLocation,
+            isCrossOrigin = !redirectLocation.hasSameOriginAs(requestUrl.toString())
         )
     }
 
@@ -76,8 +76,4 @@ internal class HttpRepository {
             .followSslRedirects(false)
             .build()
     }
-}
-
-private fun HttpUrl.isSameOriginAs(other: HttpUrl): Boolean {
-    return scheme == other.scheme && host == other.host && port == other.port
 }
