@@ -10,14 +10,14 @@ fun String.hasSameOriginAs(other: String): Boolean {
 }
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-fun isTrustedForNavigation(location: String): Boolean {
-    val origin = Origin.parseOrNull(location) ?: return false
+fun isTrustedForNavigation(location: String?): Boolean {
+    val origin = location?.let { Origin.parseOrNull(it) } ?: return false
     return Hotwire.config.originTrustPolicy.isTrustedForNavigation(origin)
 }
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-fun isTrustedForNativeAccess(location: String): Boolean {
-    val origin = Origin.parseOrNull(location) ?: return false
+fun isTrustedForNativeAccess(location: String?): Boolean {
+    val origin = location?.let { Origin.parseOrNull(it) } ?: return false
     val policy = Hotwire.config.originTrustPolicy
     return policy.isTrustedForNavigation(origin) && policy.isTrustedForNativeAccess(origin)
 }

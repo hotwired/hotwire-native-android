@@ -32,10 +32,10 @@ class GeolocationPermissionDelegate(private val session: Session) {
         requestOrigin = origin
         requestCallback = callback
 
-        if (origin != null && !isTrustedOrigin(origin)) {
-            logWarning("geolocationPermissionBlockedForUntrustedOrigin", origin)
+        if (!isTrustedForNativeAccess(origin)) {
+            logWarning("geolocationPermissionBlockedForUntrustedOrigin", listOf("origin" to origin.orEmpty()))
             permissionDenied()
-        } else if (requestOrigin == null || requestCallback == null || permissionToRequest == null) {
+        } else if (callback == null || permissionToRequest == null) {
             permissionDenied()
         } else if (hasLocationPermission(context)) {
             permissionGranted()
@@ -76,11 +76,6 @@ class GeolocationPermissionDelegate(private val session: Session) {
         }
     }
 
-    private fun isTrustedOrigin(origin: String?): Boolean {
-        return origin != null &&
-            isTrustedForNativeAccess(origin)
-    }
-
     private fun hasLocationPermission(context: Context): Boolean {
         return permissionToRequest?.let {
             ContextCompat.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
@@ -89,8 +84,8 @@ class GeolocationPermissionDelegate(private val session: Session) {
 
     private fun permissionGranted() {
         // The native permission dialog is asynchronous — re-verify the origin
-        // in case the verifier's answer changed while the dialog was up.
-        val allow = isTrustedOrigin(requestOrigin)
+        // in case the policy's answer changed while the dialog was up.
+        val allow = isTrustedForNativeAccess(requestOrigin)
         requestCallback?.invoke(requestOrigin, allow, allow)
         requestOrigin = null
         requestCallback = null

@@ -36,8 +36,8 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         // FileChooserParams carries no origin, so the page's location is the
         // best available authority for this gate.
         val pageLocation = session.webView.url
-        if (pageLocation == null || !isTrustedForNativeAccess(pageLocation)) {
-            logWarning("fileChooserBlockedForUntrustedOrigin", pageLocation.orEmpty())
+        if (!isTrustedForNativeAccess(pageLocation)) {
+            logWarning("fileChooserBlockedForUntrustedOrigin", listOf("location" to pageLocation.orEmpty()))
             filePathCallback.onReceiveValue(null)
             return true
         }
@@ -102,11 +102,9 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         // Re-verify the page — the WebView may have navigated while the
         // picker was open.
         val pageLocation = session.webView.url
-        val pageIsTrusted = pageLocation != null &&
-            isTrustedForNativeAccess(pageLocation)
 
-        if (results != null && !pageIsTrusted) {
-            logWarning("fileChooserResultBlockedForUntrustedOrigin", pageLocation.orEmpty())
+        if (results != null && !isTrustedForNativeAccess(pageLocation)) {
+            logWarning("fileChooserResultBlockedForUntrustedOrigin", listOf("location" to pageLocation.orEmpty()))
             uploadCallback?.onReceiveValue(null)
         } else {
             uploadCallback?.onReceiveValue(results)

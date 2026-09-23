@@ -15,6 +15,8 @@ class BridgeDelegate<D : BridgeDestination>(
 ) : DefaultLifecycleObserver {
     internal var bridge: Bridge? = null
     private var destinationIsActive: Boolean = false
+    // Null when no document is loaded, so trust checks fail closed: the
+    // destination's intended location is no evidence of what is loaded.
     private val currentLocation: String?
         get() = bridge?.webView?.url
     private val resolvedLocation: String
@@ -52,7 +54,7 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     fun replyWith(message: Message): Boolean {
-        if (!originIsTrustedForBridge()) {
+        if (!isTrustedForNativeAccess(currentLocation)) {
             logBlockedForUntrustedOrigin("bridgeReplyBlockedForUntrustedOrigin")
             return false
         }
@@ -81,7 +83,7 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     private fun loadBridge() {
-        if (!originIsTrustedForBridge()) {
+        if (!isTrustedForNativeAccess(currentLocation)) {
             logBlockedForUntrustedOrigin("bridgeLoadBlockedForUntrustedOrigin")
             return
         }
@@ -93,15 +95,8 @@ class BridgeDelegate<D : BridgeDestination>(
         return destination.bridgeWebViewIsReady() && bridge?.isReady() == false
     }
 
-    private fun originIsTrustedForBridge(): Boolean {
-        // No document — no bridge operations; the destination's intended
-        // location is not evidence of what is actually loaded.
-        val pageLocation = currentLocation ?: return false
-        return isTrustedForNativeAccess(pageLocation)
-    }
-
     private fun logBlockedForUntrustedOrigin(event: String) {
-        logWarning(event, listOf("location" to resolvedLocation))
+        logWarning(event, listOf("location" to currentLocation.orEmpty()))
     }
 
     // Lifecycle events

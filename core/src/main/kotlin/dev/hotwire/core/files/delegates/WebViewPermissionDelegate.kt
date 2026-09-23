@@ -41,8 +41,8 @@ class WebViewPermissionDelegate(private val session: Session) {
 
     fun onRequest(request: PermissionRequest) {
         val origin = request.origin?.toString()
-        if (origin == null || !isTrustedForNativeAccess(origin)) {
-            logWarning("webViewPermissionBlockedForUntrustedOrigin", origin.orEmpty())
+        if (!isTrustedForNativeAccess(origin)) {
+            logWarning("webViewPermissionBlockedForUntrustedOrigin", listOf("origin" to origin.orEmpty()))
             request.deny()
             return
         }
@@ -109,11 +109,8 @@ class WebViewPermissionDelegate(private val session: Session) {
         }
 
         // The runtime permission dialog is asynchronous — re-verify the origin
-        // in case the verifier's answer changed while the dialog was up.
-        val origin = request.origin?.toString()
-        val originIsTrusted = origin != null && isTrustedForNativeAccess(origin)
-
-        if (allGranted && originIsTrusted) {
+        // in case the policy's answer changed while the dialog was up.
+        if (allGranted && isTrustedForNativeAccess(request.origin?.toString())) {
             request.grant(resources.toTypedArray())
         } else {
             request.deny()
