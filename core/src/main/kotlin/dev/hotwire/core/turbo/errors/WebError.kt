@@ -12,7 +12,7 @@ import androidx.webkit.WebViewFeature.isFeatureSupported
  */
 sealed interface WebError : VisitError {
     val errorCode: Int
-    val description: String?
+    override val description: String?
 
     data object Unknown : WebError {
         override val errorCode = WebViewClientCompat.ERROR_UNKNOWN

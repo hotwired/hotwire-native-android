@@ -157,7 +157,7 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
     @SuppressLint("InflateParams")
     override fun createErrorView(error: VisitError): View {
         return layoutInflater.inflate(R.layout.hotwire_error, null).apply {
-            findViewById<TextView>(R.id.hotwire_error_description).text = error.description()
+            findViewById<TextView>(R.id.hotwire_error_description).text = error.description
         }
     }
 

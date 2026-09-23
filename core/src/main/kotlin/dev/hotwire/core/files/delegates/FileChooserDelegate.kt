@@ -11,6 +11,8 @@ import dev.hotwire.core.R
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.dispatcherProvider
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +33,16 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         filePathCallback: ValueCallback<Array<Uri>>,
         params: FileChooserParams
     ): Boolean {
+        // FileChooserParams has no origin, so gate on the page's URL.
+        val pageLocation = session.webView.url
+        if (!isTrustedForNativeAccess(pageLocation)) {
+            logWarning("fileChooserBlockedForUntrustedOrigin", listOf("location" to pageLocation.orEmpty()))
+            filePathCallback.onReceiveValue(null)
+            return true
+        }
+
+        // Answer a request still held from before; the WebView needs a verdict.
+        handleCancellation()
         uploadCallback = filePathCallback
 
         return openChooser(params).also { success ->
@@ -84,8 +96,16 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         }
     }
 
-    private fun sendResult(results: Array<Uri>?) {
-        uploadCallback?.onReceiveValue(results)
+    internal fun sendResult(results: Array<Uri>?) {
+        // The WebView may have navigated while the picker was open.
+        val pageLocation = session.webView.url
+
+        if (results != null && !isTrustedForNativeAccess(pageLocation)) {
+            logWarning("fileChooserResultBlockedForUntrustedOrigin", listOf("location" to pageLocation.orEmpty()))
+            uploadCallback?.onReceiveValue(null)
+        } else {
+            uploadCallback?.onReceiveValue(results)
+        }
         uploadCallback = null
     }
 

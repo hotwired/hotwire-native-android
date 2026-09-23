@@ -5,7 +5,7 @@ package dev.hotwire.core.turbo.errors
  * to load on a page.
  */
 sealed interface LoadError : VisitError {
-    val description: String
+    override val description: String
 
     data object NotPresent : LoadError {
         override val description = "Turbo Not Present"
@@ -13,5 +13,13 @@ sealed interface LoadError : VisitError {
 
     data object NotReady : LoadError {
         override val description = "Turbo Not Ready"
+    }
+
+    data class UntrustedOrigin(val location: String) : LoadError {
+        override val description = "Untrusted Origin"
+    }
+
+    data object WebViewNotSupported : LoadError {
+        override val description = "WebView Not Supported"
     }
 }

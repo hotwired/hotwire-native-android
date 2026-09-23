@@ -13,6 +13,8 @@ sealed interface HttpError : VisitError {
      * Errors representing HTTP client errors in the 400..499 range.
      */
     sealed interface ClientError : HttpError {
+        override val description: String? get() = reasonPhrase
+
         data object BadRequest : ClientError {
             override val statusCode = 400
             override val reasonPhrase = "Bad Request"
@@ -93,6 +95,8 @@ sealed interface HttpError : VisitError {
      * Errors representing HTTP server errors in the 500..599 range.
      */
     sealed interface ServerError : HttpError {
+        override val description: String? get() = reasonPhrase
+
         data object InternalServerError : ServerError {
             override val statusCode = 500
             override val reasonPhrase = "Internal Server Error"
@@ -132,7 +136,9 @@ sealed interface HttpError : VisitError {
     data class UnknownError(
         override val statusCode: Int,
         override val reasonPhrase: String?
-    ) : HttpError
+    ) : HttpError {
+        override val description: String? get() = reasonPhrase
+    }
 
     companion object {
         fun from(errorResponse: WebResourceResponse): HttpError {

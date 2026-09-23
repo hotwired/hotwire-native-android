@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.Companion.PROTECTED
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentOnAttachListener
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.security.hasSameOriginAs
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
 
@@ -30,10 +30,16 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     internal var isGraphInitialized = false
         private set
 
+    // The configuration's start location can change before onDestroy.
+    private var registeredStartLocation: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         activity = requireActivity() as HotwireActivity
+        registeredStartLocation = configuration.startLocation.also {
+            Hotwire.config.registerStartLocation(it)
+        }
         navigator = Navigator(this, configuration, activity)
         childFragmentManager.addFragmentOnAttachListener(this)
     }
@@ -49,6 +55,8 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     }
 
     override fun onDestroy() {
+        registeredStartLocation?.let { Hotwire.config.unregisterStartLocation(it) }
+        registeredStartLocation = null
         activity.delegate.unregisterNavigatorHost(this)
         super.onDestroy()
     }
@@ -100,7 +108,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
      * Google's Navigation library automatically navigates to deep links provided in the launching
      * Intent, which lets a malicious Intent open an arbitrary page in the WebView. Sanitize the
      * Intent's attacker-controllable deep-link arguments so the start location stays within the
-     * app's domain.
+     * app's origin.
      */
     @VisibleForTesting(otherwise = PROTECTED)
     fun ensureDeeplinkStartLocationValid() {
@@ -115,10 +123,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         val extrasBundle = intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
         val startLocation = extrasBundle.getString(LOCATION_KEY) ?: return
 
-        val deepLinkStartUri = startLocation.toUri()
-        val configStartUri = configuration.startLocation.toUri()
-
-        if (deepLinkStartUri.host != configStartUri.host) {
+        if (!startLocation.hasSameOriginAs(configuration.startLocation)) {
             extrasBundle.putString(LOCATION_KEY, configuration.startLocation)
             intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
         }
