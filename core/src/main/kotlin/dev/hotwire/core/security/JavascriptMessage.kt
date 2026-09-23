@@ -7,10 +7,6 @@ import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 
-/**
- * A `{name, args}` envelope posted by the library's bundled JavaScript
- * through a [JavascriptChannel].
- */
 @Serializable
 internal data class JavascriptMessage(
     val name: String,

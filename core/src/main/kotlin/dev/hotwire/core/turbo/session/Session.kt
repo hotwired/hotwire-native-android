@@ -677,8 +677,8 @@ class Session(
     }
 
     private fun installBridge(location: String) {
-        // Without the channel the injected scripts can never reach native
-        // code — fail the visit loudly instead of hanging.
+        // Without the channel Turbo can never report back, so fail instead of
+        // hanging.
         if (!turboSessionChannel.isInstalled) {
             logWarningEvent("bridgeInstallationBlockedForUnsupportedWebView")
             reset()

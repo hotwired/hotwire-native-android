@@ -48,14 +48,14 @@ class HotwireConfig internal constructor() {
     internal val startLocationRegistry = StartLocationRegistry()
 
     /**
-     * A live, read-only view of the origins of the start locations that
-     * `NavigatorHost` registers. [DefaultOriginTrustPolicy] trusts only these.
+     * A live view of the origins of the start locations that `NavigatorHost`
+     * registers.
      */
     val registeredOrigins: Set<Origin>
         get() = startLocationRegistry.origins
 
-    // Library-only: a public way to add origins would let an app on the
-    // default policy grant native access to a host by mistake.
+    // Not public: under the default policy, adding an origin grants it
+    // native access.
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     fun registerStartLocation(startLocation: String) {
         startLocationRegistry.register(startLocation)
@@ -67,10 +67,8 @@ class HotwireConfig internal constructor() {
     }
 
     /**
-     * Decides which origins the library trusts. The default,
-     * [DefaultOriginTrustPolicy], trusts only [registeredOrigins]. Set your
-     * own [OriginTrustPolicy] if your app trusts more, or if it does not use
-     * `NavigatorHost`.
+     * The default, [DefaultOriginTrustPolicy], trusts only [registeredOrigins].
+     * Set your own if your app trusts more or does not use `NavigatorHost`.
      */
     var originTrustPolicy: OriginTrustPolicy = DefaultOriginTrustPolicy
 

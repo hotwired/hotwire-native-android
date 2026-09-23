@@ -9,16 +9,14 @@ import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logWarning
 
 /**
- * The only way the library's bundled JavaScript reaches native code. Messages
- * can arrive from any frame of any page loaded in the WebView, so each one is
- * gated on its browser-reported source origin before it is decoded.
+ * The only way the library's bundled JavaScript reaches native code. Every
+ * message is gated on its source frame's origin before it is decoded.
  */
 internal class JavascriptChannel(
     private val name: String,
     private val onMessage: (JavascriptMessage) -> Unit
 ) {
-    // Robolectric reports WebMessageListener as unsupported, so tests set
-    // this directly to exercise the paths behind it.
+    // Robolectric lacks WebMessageListener, so tests set this directly.
     var isInstalled = false
         @VisibleForTesting set
 
@@ -27,8 +25,8 @@ internal class JavascriptChannel(
      */
     fun install(webView: WebView) {
         if (isFeatureSupported(WEB_MESSAGE_LISTENER)) {
-            // "*" injects the channel into every frame; each message is gated
-            // on its browser-reported source origin instead.
+            // The policy can change after install, so every frame gets the
+            // channel and receive() gates each message.
             WebViewCompat.addWebMessageListener(webView, name, setOf("*")) {
                 _, message, sourceOrigin, isMainFrame, _ ->
                 receive(message.data.orEmpty(), sourceOrigin.toString(), isMainFrame)
@@ -43,7 +41,7 @@ internal class JavascriptChannel(
     }
 
     /**
-     * Runs on the main thread — the message listener delivers there.
+     * Runs on the main thread, where the message listener delivers.
      */
     fun receive(data: String, sourceOrigin: String, isMainFrame: Boolean) {
         if (!isMainFrame || !isTrustedForNativeAccess(sourceOrigin)) {

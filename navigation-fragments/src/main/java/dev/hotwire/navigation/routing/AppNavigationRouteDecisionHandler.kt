@@ -6,11 +6,10 @@ import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 
 /**
- * Navigates urls through in-app routing when
+ * Navigates urls in-app when
  * [dev.hotwire.core.security.OriginTrustPolicy.isTrustedForNavigation] trusts
- * their origin. By default that is the origin of any registered start
- * location, so a navigator also opens other navigators' origins in-app, not
- * only its own.
+ * their origin. The default trusts every registered start location, so a
+ * navigator also opens other navigators' origins in-app.
  */
 class AppNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "app-navigation"

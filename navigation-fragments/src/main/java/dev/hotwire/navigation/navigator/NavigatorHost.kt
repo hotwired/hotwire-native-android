@@ -30,8 +30,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     internal var isGraphInitialized = false
         private set
 
-    // onDestroy must withdraw exactly what was registered, even if the
-    // configuration's start location changes in between.
+    // The configuration's start location can change before onDestroy.
     private var registeredStartLocation: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,7 +108,7 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
      * Google's Navigation library automatically navigates to deep links provided in the launching
      * Intent, which lets a malicious Intent open an arbitrary page in the WebView. Sanitize the
      * Intent's attacker-controllable deep-link arguments so the start location stays within the
-     * app's origin — same-host locations on another scheme or port don't qualify.
+     * app's origin.
      */
     @VisibleForTesting(otherwise = PROTECTED)
     fun ensureDeeplinkStartLocationValid() {

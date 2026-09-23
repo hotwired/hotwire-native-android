@@ -15,8 +15,8 @@ class BridgeDelegate<D : BridgeDestination>(
 ) : DefaultLifecycleObserver {
     internal var bridge: Bridge? = null
     private var destinationIsActive: Boolean = false
-    // Null when no document is loaded, so trust checks fail closed: the
-    // destination's intended location is no evidence of what is loaded.
+    // Trust checks use this, not resolvedLocation: the destination's intended
+    // location says nothing about what is loaded.
     private val currentLocation: String?
         get() = bridge?.webView?.url
     private val resolvedLocation: String

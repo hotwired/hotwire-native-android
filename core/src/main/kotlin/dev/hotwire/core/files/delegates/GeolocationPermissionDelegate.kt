@@ -25,8 +25,7 @@ class GeolocationPermissionDelegate(private val session: Session) {
         origin: String?,
         callback: GeolocationPermissions.Callback?
     ) {
-        // Answer any held request before replacing it — the WebView must
-        // always get a verdict.
+        // Answer a request still held from before; the WebView needs a verdict.
         permissionDenied()
 
         requestOrigin = origin
@@ -53,9 +52,9 @@ class GeolocationPermissionDelegate(private val session: Session) {
     }
 
     /**
-     * Forwarded from [android.webkit.WebChromeClient.onGeolocationPermissionsHidePrompt].
-     * The WebView no longer wants an answer — for example, the user navigated
-     * away mid-prompt — so drop the held request without answering it.
+     * Called from [android.webkit.WebChromeClient.onGeolocationPermissionsHidePrompt].
+     * The WebView no longer wants an answer, so the held request is dropped
+     * unanswered.
      */
     fun onHidePrompt() {
         requestOrigin = null
@@ -83,8 +82,7 @@ class GeolocationPermissionDelegate(private val session: Session) {
     }
 
     private fun permissionGranted() {
-        // The native permission dialog is asynchronous — re-verify the origin
-        // in case the policy's answer changed while the dialog was up.
+        // The policy's answer may have changed while the dialog was up.
         val allow = isTrustedForNativeAccess(requestOrigin)
         requestCallback?.invoke(requestOrigin, allow, allow)
         requestOrigin = null

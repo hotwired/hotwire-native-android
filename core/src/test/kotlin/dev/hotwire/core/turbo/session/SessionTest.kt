@@ -65,8 +65,6 @@ class SessionTest : BaseRepositoryTest() {
         Hotwire.config.startLocationRegistry.clear()
         Hotwire.config.registerStartLocation(baseUrl())
         session = Session("test", activity, webView)
-        // Robolectric reports WebMessageListener as unsupported; the channel
-        // is considered installed so tests reach the trust gates behind it.
         session.turboSessionChannel.isInstalled = true
         whenever(webView.url).thenReturn(baseUrl())
         visit = Visit(

@@ -108,8 +108,7 @@ class WebViewPermissionDelegate(private val session: Session) {
             grantResults[permission] == true || isGranted(permission)
         }
 
-        // The runtime permission dialog is asynchronous — re-verify the origin
-        // in case the policy's answer changed while the dialog was up.
+        // The policy's answer may have changed while the dialog was up.
         if (allGranted && isTrustedForNativeAccess(request.origin?.toString())) {
             request.grant(resources.toTypedArray())
         } else {
