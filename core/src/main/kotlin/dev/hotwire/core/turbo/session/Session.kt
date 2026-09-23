@@ -367,13 +367,12 @@ class Session(
         )
 
         activity.lifecycleScope.launch {
-            val result = httpRepository.fetch(location)
+            val redirect = httpRepository.fetchRedirect(location)
 
-            if (result != null && result.response.isSuccessful &&
-                result.redirect?.isCrossOrigin == true) {
+            if (redirect?.isCrossOrigin == true) {
                 visitProposedToCrossOriginRedirect(
                     location = location,
-                    redirectLocation = result.redirect.location,
+                    redirectLocation = redirect.location,
                     visitIdentifier = visitIdentifier
                 )
             } else {
