@@ -10,35 +10,21 @@ import okhttp3.Response
 
 internal class HttpRepository {
 
-    data class HttpRequestResult(
-        val response: Response,
-        val redirect: HttpRedirect?
-    )
-
     data class HttpRedirect(
         val location: String,
         val isCrossOrigin: Boolean
     )
 
-    suspend fun fetch(location: String): HttpRequestResult? {
+    /**
+     * Requests [location] without following redirects, so no credentialed request reaches the
+     * destination. Returns null when the response is not a redirect or the request fails.
+     */
+    suspend fun fetchRedirect(location: String): HttpRedirect? {
         return withContext(dispatcherProvider.io) {
-            val response = issueRequest(location)
-
-            if (response != null) {
-                HttpRequestResult(
-                    response = response,
-                    redirect = redirectFrom(response)
-                )
-            } else {
-                null
-            }
+            issueRequest(location)?.use { redirectFrom(it) }
         }
     }
 
-    /**
-     * Resolves an unfollowed redirect from its `Location` header, so the caller can detect a
-     * cross-origin destination without a credentialed request ever reaching it.
-     */
     private fun redirectFrom(response: Response): HttpRedirect? {
         if (!response.isRedirect) return null
 
