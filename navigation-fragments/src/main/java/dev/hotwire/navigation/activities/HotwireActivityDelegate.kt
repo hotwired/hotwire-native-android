@@ -86,7 +86,7 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
     internal fun registerNavigatorHost(host: NavigatorHost) {
         logDebug("navigatorRegistered", listOf("navigator" to host.navigator.configuration.name))
 
-        if (navigatorHosts[host.id] == null) {
+        if (navigatorHosts[host.id] !== host) {
             navigatorHosts[host.id] = host
             listenToDestinationChanges(host)
 
@@ -105,7 +105,11 @@ class HotwireActivityDelegate(val activity: HotwireActivity) {
 
     internal fun unregisterNavigatorHost(host: NavigatorHost) {
         logDebug("navigatorUnregistered", listOf("navigator" to host.navigator.configuration.name))
-        navigatorHosts.remove(host.id)
+
+        // A newer host instance can take over the same ID before this one is destroyed.
+        if (navigatorHosts[host.id] === host) {
+            navigatorHosts.remove(host.id)
+        }
     }
 
     internal fun onNavigatorHostReady(host: NavigatorHost) {
