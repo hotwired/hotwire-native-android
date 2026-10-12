@@ -2,11 +2,16 @@ package dev.hotwire.core.config
 
 import android.content.Context
 import android.webkit.WebView
+import androidx.annotation.RestrictTo
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeComponentJsonConverter
 import dev.hotwire.core.logging.DefaultHotwireLogger
 import dev.hotwire.core.logging.HotwireLogger
+import dev.hotwire.core.security.DefaultOriginTrustPolicy
+import dev.hotwire.core.security.Origin
+import dev.hotwire.core.security.OriginTrustPolicy
+import dev.hotwire.core.security.StartLocationRegistry
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.offline.OfflineRequestHandler
 import dev.hotwire.core.turbo.webview.HotwireWebView
@@ -39,6 +44,33 @@ class HotwireConfig internal constructor() {
      * If you'd like to change this behavior, provide your own implementation of [HotwireLogger].
      */
     var logger: HotwireLogger = DefaultHotwireLogger
+
+    internal val startLocationRegistry = StartLocationRegistry()
+
+    /**
+     * A live view of the origins of the start locations that `NavigatorHost`
+     * registers.
+     */
+    val registeredOrigins: Set<Origin>
+        get() = startLocationRegistry.origins
+
+    // Not public: under the default policy, adding an origin grants it
+    // native access.
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun registerStartLocation(startLocation: String) {
+        startLocationRegistry.register(startLocation)
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun unregisterStartLocation(startLocation: String) {
+        startLocationRegistry.unregister(startLocation)
+    }
+
+    /**
+     * The default, [DefaultOriginTrustPolicy], trusts only [registeredOrigins].
+     * Set your own if your app trusts more or does not use `NavigatorHost`.
+     */
+    var originTrustPolicy: OriginTrustPolicy = DefaultOriginTrustPolicy
 
     /**
      * Enables/disables debugging of web contents loaded into WebViews.

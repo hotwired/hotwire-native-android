@@ -97,6 +97,8 @@ interface HotwireWebFragmentCallback {
 
     /**
      * Called when the WebView has received an HTTP authentication request.
+     * [host] can be any server the page loads resources from, and it receives
+     * the credentials you pass to [HttpAuthHandler.proceed], so check it first.
      */
     fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
         handler.cancel()

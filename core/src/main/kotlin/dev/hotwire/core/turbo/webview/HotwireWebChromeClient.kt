@@ -11,7 +11,6 @@ import android.webkit.WebView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dev.hotwire.core.R
 import dev.hotwire.core.turbo.session.Session
-import dev.hotwire.core.turbo.util.toJson
 import dev.hotwire.core.turbo.visit.VisitOptions
 
 open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
@@ -84,7 +83,7 @@ open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
         message.data.getString("url")?.let {
             session.visitProposedToLocation(
                 location = it,
-                optionsJson = VisitOptions().toJson()
+                options = VisitOptions()
             )
         }
 
@@ -96,6 +95,10 @@ open class HotwireWebChromeClient(val session: Session) : WebChromeClient() {
         callback: GeolocationPermissions.Callback?
     ) {
         session.geolocationPermissionDelegate.onRequestPermission(origin, callback)
+    }
+
+    override fun onGeolocationPermissionsHidePrompt() {
+        session.geolocationPermissionDelegate.onHidePrompt()
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {

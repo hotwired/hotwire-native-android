@@ -10,6 +10,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_GEOLOCATION_PERMISSION
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.session.Session
 
 class GeolocationPermissionDelegate(private val session: Session) {
@@ -23,10 +25,16 @@ class GeolocationPermissionDelegate(private val session: Session) {
         origin: String?,
         callback: GeolocationPermissions.Callback?
     ) {
+        // Answer a request still held from before; the WebView needs a verdict.
+        permissionDenied()
+
         requestOrigin = origin
         requestCallback = callback
 
-        if (requestOrigin == null || requestCallback == null || permissionToRequest == null) {
+        if (!isTrustedForNativeAccess(origin)) {
+            logWarning("geolocationPermissionBlockedForUntrustedOrigin", listOf("origin" to origin.orEmpty()))
+            permissionDenied()
+        } else if (callback == null || permissionToRequest == null) {
             permissionDenied()
         } else if (hasLocationPermission(context)) {
             permissionGranted()
@@ -41,6 +49,16 @@ class GeolocationPermissionDelegate(private val session: Session) {
         } else {
             permissionDenied()
         }
+    }
+
+    /**
+     * Called from [android.webkit.WebChromeClient.onGeolocationPermissionsHidePrompt].
+     * The WebView no longer wants an answer, so the held request is dropped
+     * unanswered.
+     */
+    fun onHidePrompt() {
+        requestOrigin = null
+        requestCallback = null
     }
 
     private fun startPermissionRequest() {
@@ -64,7 +82,9 @@ class GeolocationPermissionDelegate(private val session: Session) {
     }
 
     private fun permissionGranted() {
-        requestCallback?.invoke(requestOrigin, true, true)
+        // The policy's answer may have changed while the dialog was up.
+        val allow = isTrustedForNativeAccess(requestOrigin)
+        requestCallback?.invoke(requestOrigin, allow, allow)
         requestOrigin = null
         requestCallback = null
     }
