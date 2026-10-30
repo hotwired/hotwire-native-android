@@ -83,7 +83,7 @@ class GeolocationPermissionDelegateTest : BaseRepositoryTest() {
         session.geolocationPermissionDelegate.onRequestPermission(origin, callback)
         session.geolocationPermissionDelegate.onActivityResult(isGranted = true)
 
-        verify(callback).invoke(origin, true, true)
+        verify(callback).invoke(origin, true, false)
     }
 
     @Test

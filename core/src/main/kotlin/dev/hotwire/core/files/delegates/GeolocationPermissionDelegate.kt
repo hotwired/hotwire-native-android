@@ -82,9 +82,10 @@ class GeolocationPermissionDelegate(private val session: Session) {
     }
 
     private fun permissionGranted() {
-        // The policy's answer may have changed while the dialog was up.
+        // The policy's answer may have changed while the dialog was up. Don't
+        // retain the grant: the WebView would reuse it after trust is withdrawn.
         val allow = isTrustedForNativeAccess(requestOrigin)
-        requestCallback?.invoke(requestOrigin, allow, allow)
+        requestCallback?.invoke(requestOrigin, allow, false)
         requestOrigin = null
         requestCallback = null
     }
