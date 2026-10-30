@@ -54,16 +54,17 @@ class BridgeDelegate<D : BridgeDestination>(
     }
 
     fun replyWith(message: Message): Boolean {
+        val bridge = bridge ?: run {
+            logWarning("bridgeMessageFailedToReply", "bridge is not available")
+            return false
+        }
+
         if (!isTrustedForNativeAccess(currentLocation)) {
             logBlockedForUntrustedOrigin("bridgeReplyBlockedForUntrustedOrigin")
             return false
         }
 
-        bridge?.replyWith(message) ?: run {
-            logWarning("bridgeMessageFailedToReply", "bridge is not available")
-            return false
-        }
-
+        bridge.replyWith(message)
         return true
     }
 
