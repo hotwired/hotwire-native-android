@@ -3,9 +3,12 @@ package dev.hotwire.core.files.delegates
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.app.Activity
 import android.os.Build
+import android.os.Looper
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
@@ -19,10 +22,12 @@ import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.session.SessionCallback
+import dev.hotwire.core.turbo.util.dispatcherProvider
 import dev.hotwire.core.turbo.visit.Visit
 import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -34,8 +39,11 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.Robolectric.buildActivity
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicReference
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
@@ -124,6 +132,35 @@ class FileChooserDelegateTest : BaseRepositoryTest() {
         session.fileChooserDelegate.sendResult(arrayOf(Uri.parse("content://files/1")))
 
         verify(callback).onReceiveValue(null)
+    }
+
+    @Test
+    fun `picker results from the browse delegate are delivered on the main thread`() {
+        // The browse delegate builds its result off the main thread, like production.
+        dispatcherProvider.io = Dispatchers.IO
+        whenever(webView.url).thenReturn("https://37signals.com/page")
+        wireDestinationWithLauncher()
+        val deliveredOn = AtomicReference<Looper?>()
+        val delivered = CountDownLatch(1)
+        val callback = ValueCallback<Array<Uri>> {
+            deliveredOn.set(Looper.myLooper())
+            delivered.countDown()
+        }
+        val picked = File.createTempFile("picked", ".txt", context.cacheDir).apply { writeText("picked") }
+
+        session.fileChooserDelegate.onShowFileChooser(callback, params())
+        session.fileChooserDelegate.onActivityResult(
+            ActivityResult(Activity.RESULT_OK, Intent().apply { data = Uri.fromFile(picked) })
+        )
+
+        val deadline = System.currentTimeMillis() + 5_000
+        while (delivered.count > 0 && System.currentTimeMillis() < deadline) {
+            shadowOf(Looper.getMainLooper()).idle()
+            Thread.sleep(10)
+        }
+
+        assertThat(delivered.count).isZero()
+        assertThat(deliveredOn.get()).isSameAs(Looper.getMainLooper())
     }
 
     @Test

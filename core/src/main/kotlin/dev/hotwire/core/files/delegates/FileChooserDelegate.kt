@@ -15,6 +15,7 @@ import dev.hotwire.core.logging.logWarning
 import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.dispatcherProvider
+import dev.hotwire.core.turbo.util.runOnUiThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -91,9 +92,14 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
 
     private fun handleResult(intent: Intent?) {
         when (intent.containsFileResult()) {
-            true -> browseFilesDelegate.handleResult(intent) { sendResult(it) }
-            else -> cameraCaptureDelegate.handleResult { sendResult(it) }
+            true -> browseFilesDelegate.handleResult(intent) { deliverResult(it) }
+            else -> cameraCaptureDelegate.handleResult { deliverResult(it) }
         }
+    }
+
+    // Browse results arrive on the IO dispatcher; WebView calls must run on main.
+    private fun deliverResult(results: Array<Uri>?) {
+        context.runOnUiThread { sendResult(results) }
     }
 
     internal fun sendResult(results: Array<Uri>?) {
