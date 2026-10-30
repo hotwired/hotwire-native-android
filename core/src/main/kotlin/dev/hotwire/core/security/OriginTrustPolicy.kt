@@ -4,16 +4,19 @@ package dev.hotwire.core.security
  * Decides which origins the library trusts. Set via
  * [dev.hotwire.core.config.HotwireConfig.originTrustPolicy].
  *
- * To add to the default, call [DefaultOriginTrustPolicy]. Compare full
- * origins, not hosts, so a partner's `http://` pages or other ports stay
- * untrusted:
+ * To add to the default, call [DefaultOriginTrustPolicy]. Navigation trust
+ * on its own is for locations the path configuration routes to a native
+ * fragment. A web destination also needs native access, or its visit fails
+ * with `LoadError.UntrustedOrigin`. Compare full origins, not hosts, so a
+ * CDN's `http://` urls or other ports stay untrusted:
  *
  * ```
- * private val partner = Origin.parse("https://partner.example.com")
+ * private val imageCdn = Origin.parse("https://images.example.com")
  *
  * Hotwire.config.originTrustPolicy = object : OriginTrustPolicy() {
+ *     // Lets a native image viewer open CDN images in-app.
  *     override fun isTrustedForNavigation(origin: Origin) =
- *         origin == partner || DefaultOriginTrustPolicy.isTrustedForNavigation(origin)
+ *         origin == imageCdn || DefaultOriginTrustPolicy.isTrustedForNavigation(origin)
  *
  *     override fun isTrustedForNativeAccess(origin: Origin) =
  *         DefaultOriginTrustPolicy.isTrustedForNativeAccess(origin)
