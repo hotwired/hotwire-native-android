@@ -1,5 +1,6 @@
 package dev.hotwire.navigation.routing
 
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfigurationProperties
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.visit.VisitProposal
@@ -8,6 +9,7 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,6 +30,12 @@ class SystemNavigationRouteDecisionHandlerTest {
     @Before
     fun setup() {
         activity = buildActivity(TestActivity::class.java).get()
+        Hotwire.config.registerStartLocation(config.startLocation)
+    }
+
+    @After
+    fun teardown() {
+        Hotwire.config.unregisterStartLocation(config.startLocation)
     }
 
     @Test
@@ -52,6 +60,18 @@ class SystemNavigationRouteDecisionHandlerTest {
     fun `url on app domain does not match`() {
         val url = "https://my.app.com/page"
         assertFalse(route.matches(proposal(url), config))
+    }
+
+    @Test
+    fun `http url on the app host matches`() {
+        val url = "http://my.app.com/page"
+        assertTrue(route.matches(proposal(url), config))
+    }
+
+    @Test
+    fun `url on another port of the app host matches`() {
+        val url = "https://my.app.com:8443/page"
+        assertTrue(route.matches(proposal(url), config))
     }
 
     @Test
