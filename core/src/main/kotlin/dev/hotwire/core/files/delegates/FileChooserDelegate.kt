@@ -34,6 +34,9 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         filePathCallback: ValueCallback<Array<Uri>>,
         params: FileChooserParams
     ): Boolean {
+        // Answer a request still held from before; the WebView needs a verdict.
+        handleCancellation()
+
         // FileChooserParams has no origin, so gate on the page's URL.
         val pageLocation = session.webView.url
         if (!isTrustedForNativeAccess(pageLocation)) {
@@ -42,8 +45,6 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
             return true
         }
 
-        // Answer a request still held from before; the WebView needs a verdict.
-        handleCancellation()
         uploadCallback = filePathCallback
 
         return openChooser(params).also { success ->

@@ -135,6 +135,21 @@ class FileChooserDelegateTest : BaseRepositoryTest() {
     }
 
     @Test
+    fun `a request from an untrusted page still answers the held one`() {
+        whenever(webView.url).thenReturn("https://37signals.com/page")
+        wireDestinationWithLauncher()
+        val held = mock<ValueCallback<Array<Uri>>>()
+        session.fileChooserDelegate.onShowFileChooser(held, params())
+
+        whenever(webView.url).thenReturn("https://evil.attacker.com/page")
+        val blocked = mock<ValueCallback<Array<Uri>>>()
+        session.fileChooserDelegate.onShowFileChooser(blocked, params())
+
+        verify(held).onReceiveValue(null)
+        verify(blocked).onReceiveValue(null)
+    }
+
+    @Test
     fun `picker results from the browse delegate are delivered on the main thread`() {
         // The browse delegate builds its result off the main thread, like production.
         dispatcherProvider.io = Dispatchers.IO
