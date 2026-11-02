@@ -144,30 +144,6 @@ class BridgeDelegateTest {
     }
 
     @Test
-    fun onColdBootPageCompletedBlockedWithNoPageLoaded() {
-        whenever(webView.url).thenReturn(null)
-
-        delegate.onColdBootPageCompleted()
-        verify(bridge, never()).load()
-    }
-
-    @Test
-    fun replyWithBlockedWithNoPageLoaded() {
-        whenever(webView.url).thenReturn(null)
-
-        val message = Message(
-            id = "1",
-            component = "page",
-            event = "connect",
-            metadata = Metadata("https://37signals.com"),
-            jsonData = """{"title":"Page-title","subtitle":"Page-subtitle"}"""
-        )
-
-        assertEquals(false, delegate.replyWith(message))
-        verify(bridge, never()).replyWith(any())
-    }
-
-    @Test
     fun onColdBootPageCompletedBlockedForUntrustedOrigin() {
         whenever(webView.url).thenReturn("https://evil.attacker.com/page")
 

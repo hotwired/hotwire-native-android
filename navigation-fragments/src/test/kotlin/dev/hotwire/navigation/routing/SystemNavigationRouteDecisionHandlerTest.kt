@@ -63,15 +63,9 @@ class SystemNavigationRouteDecisionHandlerTest {
     }
 
     @Test
-    fun `http url on the app host matches`() {
-        val url = "http://my.app.com/page"
-        assertTrue(route.matches(proposal(url), config))
-    }
-
-    @Test
-    fun `url on another port of the app host matches`() {
-        val url = "https://my.app.com:8443/page"
-        assertTrue(route.matches(proposal(url), config))
+    fun `http url or another port on the app host matches`() {
+        assertTrue(route.matches(proposal("http://my.app.com/page"), config))
+        assertTrue(route.matches(proposal("https://my.app.com:8443/page"), config))
     }
 
     @Test

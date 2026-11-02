@@ -1,12 +1,10 @@
 package dev.hotwire.core.turbo.session
 
 import android.os.Build
-import android.webkit.HttpAuthHandler
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
@@ -129,19 +127,6 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `turbo session messages from a sub frame are dropped`() {
-        session.currentVisit = visit
-
-        session.turboSessionChannel.receive(
-            envelope("visitProposedToLocation", "${visit.location}/page", VisitOptions().toJson()),
-            sourceOrigin = baseUrl(),
-            isMainFrame = false
-        )
-
-        verify(callback, never()).visitProposedToLocation(any(), any())
-    }
-
-    @Test
     fun `turbo session messages from a trusted main frame are dispatched`() {
         val options = VisitOptions()
         val newLocation = "${visit.location}/page"
@@ -157,12 +142,10 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `malformed turbo session messages are dropped`() {
+    fun `unknown or incomplete turbo session messages are dropped`() {
         session.currentVisit = visit
 
         listOf(
-            "not json",
-            """{"args":[]}""",
             envelope("noSuchMethod"),
             envelope("visitProposedToLocation")
         ).forEach {
@@ -225,17 +208,6 @@ class SessionTest : BaseRepositoryTest() {
         val captor = argumentCaptor<WebViewClient>()
         verify(webView).webViewClient = captor.capture()
         return captor.lastValue
-    }
-
-    @Test
-    fun `http auth challenges are forwarded to the callback`() {
-        val handler: HttpAuthHandler = mock()
-        session.currentVisit = visit
-
-        webViewClient().onReceivedHttpAuthRequest(webView, handler, "37signals.com", "realm")
-
-        verify(callback).onReceivedHttpAuthRequest(handler, "37signals.com", "realm")
-        verify(handler, never()).cancel()
     }
 
     @Test

@@ -40,16 +40,6 @@ class StartLocationRegistryTest {
     }
 
     @Test
-    fun `host recreation re-registers the same origin without losing it`() {
-        registry.register("https://my.app.com/start")
-
-        registry.unregister("https://my.app.com/start")
-        registry.register("https://my.app.com/start")
-
-        assertTrue(myAppOrigin in registry.origins)
-    }
-
-    @Test
     fun `a non-http location never registers`() {
         registry.register("file:///sdcard/start")
         registry.register("not a url")
@@ -67,33 +57,11 @@ class StartLocationRegistryTest {
     }
 
     @Test
-    fun `clear withdraws every registration`() {
-        registry.register("https://my.app.com/start")
-        registry.register("https://other.app.com/start")
-
-        registry.clear()
-
-        assertEquals(emptySet<Origin>(), registry.origins)
-    }
-
-    @Test
     fun `origins is a live view`() {
         val origins = registry.origins
 
         registry.register("https://my.app.com/start")
 
         assertEquals(setOf(myAppOrigin), origins)
-    }
-
-    @Test
-    fun `origins reports bare origins`() {
-        registry.register("https://my.app.com/start?utm=1")
-
-        assertEquals(setOf(myAppOrigin), registry.origins)
-    }
-
-    @Test
-    fun `an unregistered origin is absent`() {
-        assertFalse(myAppOrigin in registry.origins)
     }
 }

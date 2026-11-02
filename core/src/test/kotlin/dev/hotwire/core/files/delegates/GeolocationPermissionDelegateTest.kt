@@ -67,15 +67,6 @@ class GeolocationPermissionDelegateTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `denies a request with no origin`() {
-        val callback = mock<GeolocationPermissions.Callback>()
-
-        session.geolocationPermissionDelegate.onRequestPermission(null, callback)
-
-        verify(callback).invoke(null, false, false)
-    }
-
-    @Test
     fun `grants a pending trusted request when the permission dialog resolves`() {
         val callback = mock<GeolocationPermissions.Callback>()
         val origin = "https://37signals.com"

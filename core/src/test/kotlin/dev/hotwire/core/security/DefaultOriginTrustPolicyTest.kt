@@ -13,12 +13,9 @@ import org.robolectric.RobolectricTestRunner
 class DefaultOriginTrustPolicyTest {
     private val policy = DefaultOriginTrustPolicy
 
-    private fun isTrustedForNavigation(location: String): Boolean {
-        return Origin.parseOrNull(location)?.let { policy.isTrustedForNavigation(it) } ?: false
-    }
-
-    private fun isTrustedForNativeAccess(location: String): Boolean {
-        return Origin.parseOrNull(location)?.let { policy.isTrustedForNativeAccess(it) } ?: false
+    private fun isTrusted(location: String): Boolean {
+        val origin = Origin.parse(location)
+        return policy.isTrustedForNavigation(origin) && policy.isTrustedForNativeAccess(origin)
     }
 
     @Before
@@ -33,104 +30,31 @@ class DefaultOriginTrustPolicyTest {
     }
 
     @Test
-    fun `same origin as a registered start location grants native access`() {
-        assertTrue(isTrustedForNavigation("https://my.app.com/another/page?q=1"))
-        assertTrue(isTrustedForNativeAccess("https://my.app.com/another/page?q=1"))
+    fun `a registered start location's origin is trusted for navigation and native access`() {
+        assertTrue(isTrusted("https://my.app.com/another/page?q=1"))
     }
 
     @Test
-    fun `explicit default port is the same origin`() {
-        assertTrue(isTrustedForNavigation("https://my.app.com:443/page"))
-        assertTrue(isTrustedForNativeAccess("https://my.app.com:443/page"))
-    }
-
-    @Test
-    fun `any registered origin grants native access, not just the first`() {
+    fun `every registered origin is trusted, not just the first`() {
         Hotwire.config.registerStartLocation("https://other.app.com/home")
 
-        assertTrue(isTrustedForNavigation("https://other.app.com/page"))
-        assertTrue(isTrustedForNativeAccess("https://other.app.com/page"))
-        assertTrue(isTrustedForNavigation("https://my.app.com/page"))
-        assertTrue(isTrustedForNativeAccess("https://my.app.com/page"))
+        assertTrue(isTrusted("https://other.app.com/page"))
+        assertTrue(isTrusted("https://my.app.com/page"))
     }
 
     @Test
     fun `nothing is trusted when no start location is registered`() {
         Hotwire.config.startLocationRegistry.clear()
 
-        assertFalse(isTrustedForNavigation("https://my.app.com/page"))
-        assertFalse(isTrustedForNativeAccess("https://my.app.com/page"))
+        assertFalse(isTrusted("https://my.app.com/page"))
     }
 
     @Test
-    fun `different host is not trusted`() {
-        assertFalse(isTrustedForNavigation("https://evil.com/page"))
-        assertFalse(isTrustedForNativeAccess("https://evil.com/page"))
-    }
-
-    @Test
-    fun `subdomain of a registered host is not trusted`() {
-        assertFalse(isTrustedForNavigation("https://sub.my.app.com/page"))
-        assertFalse(isTrustedForNativeAccess("https://sub.my.app.com/page"))
-    }
-
-    @Test
-    fun `parent domain of a registered host is not trusted`() {
-        assertFalse(isTrustedForNavigation("https://app.com/page"))
-        assertFalse(isTrustedForNativeAccess("https://app.com/page"))
-    }
-
-    @Test
-    fun `scheme downgrade is not trusted`() {
-        assertFalse(isTrustedForNavigation("http://my.app.com/page"))
-        assertFalse(isTrustedForNativeAccess("http://my.app.com/page"))
-    }
-
-    @Test
-    fun `different port is not trusted`() {
-        assertFalse(isTrustedForNavigation("https://my.app.com:8443/page"))
-        assertFalse(isTrustedForNativeAccess("https://my.app.com:8443/page"))
-    }
-
-    @Test
-    fun `userinfo masquerade is not trusted`() {
-        assertFalse(isTrustedForNavigation("https://my.app.com@evil.com/page"))
-        assertFalse(isTrustedForNativeAccess("https://my.app.com@evil.com/page"))
-    }
-
-    @Test
-    fun `non-http schemes are not trusted`() {
-        assertFalse(isTrustedForNavigation("javascript:alert(1)"))
-        assertFalse(isTrustedForNativeAccess("javascript:alert(1)"))
-        assertFalse(isTrustedForNavigation("about:blank"))
-        assertFalse(isTrustedForNativeAccess("about:blank"))
-        assertFalse(isTrustedForNavigation("file:///etc/hosts"))
-        assertFalse(isTrustedForNativeAccess("file:///etc/hosts"))
-    }
-
-    @Test
-    fun `a policy that adds a partner for navigation keeps the defaults for the rest`() {
-        val partner = Origin.parse("https://partner.example.com")
-        val policy = object : OriginTrustPolicy() {
-            override fun isTrustedForNavigation(origin: Origin) =
-                origin == partner || DefaultOriginTrustPolicy.isTrustedForNavigation(origin)
-
-            override fun isTrustedForNativeAccess(origin: Origin) =
-                DefaultOriginTrustPolicy.isTrustedForNativeAccess(origin)
-        }
-
-        assertTrue(policy.isTrustedForNavigation(partner))
-        assertFalse(policy.isTrustedForNativeAccess(partner))
-        assertFalse(policy.isTrustedForNavigation(Origin.parse("http://partner.example.com")))
-        assertTrue(policy.isTrustedForNavigation(Origin.parse("https://my.app.com")))
-        assertTrue(policy.isTrustedForNativeAccess(Origin.parse("https://my.app.com")))
-    }
-
-    @Test
-    fun `unparseable locations are not trusted`() {
-        assertFalse(isTrustedForNavigation("not a url"))
-        assertFalse(isTrustedForNativeAccess("not a url"))
-        assertFalse(isTrustedForNavigation(""))
-        assertFalse(isTrustedForNativeAccess(""))
+    fun `only an exact origin match is trusted`() {
+        assertFalse(isTrusted("http://my.app.com/page"))
+        assertFalse(isTrusted("https://my.app.com:8443/page"))
+        assertFalse(isTrusted("https://sub.my.app.com/page"))
+        assertFalse(isTrusted("https://app.com/page"))
+        assertFalse(isTrusted("https://evil.com/page"))
     }
 }

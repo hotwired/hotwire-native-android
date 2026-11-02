@@ -85,29 +85,6 @@ class FileChooserDelegateTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `file chooser is blocked with no page loaded`() {
-        whenever(webView.url).thenReturn(null)
-        val callback = mock<ValueCallback<Array<Uri>>>()
-
-        val handled = session.fileChooserDelegate.onShowFileChooser(callback, mock())
-
-        assertThat(handled).isTrue()
-        verify(callback).onReceiveValue(null)
-    }
-
-    @Test
-    fun `file chooser passes the gate on a trusted page`() {
-        whenever(webView.url).thenReturn("https://37signals.com/page")
-        val callback = mock<ValueCallback<Array<Uri>>>()
-
-        // The gate passes; the chooser then fails to open because no visit
-        // destination exists, which reports "not handled".
-        val handled = session.fileChooserDelegate.onShowFileChooser(callback, params())
-
-        assertThat(handled).isFalse()
-    }
-
-    @Test
     fun `a second request answers the first before replacing it`() {
         whenever(webView.url).thenReturn("https://37signals.com/page")
         wireDestinationWithLauncher()

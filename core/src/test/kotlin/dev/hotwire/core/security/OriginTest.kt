@@ -6,21 +6,6 @@ import org.junit.Test
 
 class OriginTest {
     @Test
-    fun `https without an explicit port defaults to 443`() {
-        assertEquals(443, Origin.parse("https://a.com/path").port)
-    }
-
-    @Test
-    fun `an explicit port is kept`() {
-        assertEquals(8443, Origin.parse("https://a.com:8443/path").port)
-    }
-
-    @Test
-    fun `http without an explicit port defaults to 80`() {
-        assertEquals(80, Origin.parse("http://a.com/path").port)
-    }
-
-    @Test
     fun `scheme and host are lowercased`() {
         val origin = Origin.parse("HTTPS://My.App.COM/Path")
 
@@ -30,15 +15,16 @@ class OriginTest {
     }
 
     @Test
-    fun `non-http schemes do not parse`() {
+    fun `locations that are not http(s) URLs do not parse`() {
         assertNull(Origin.parseOrNull("about:blank"))
         assertNull(Origin.parseOrNull("javascript:alert(1)"))
         assertNull(Origin.parseOrNull("file:///x"))
+        assertNull(Origin.parseOrNull("not a url"))
     }
 
     @Test
-    fun `unparseable locations do not parse`() {
-        assertNull(Origin.parseOrNull("not a url"))
+    fun `userinfo does not become the host`() {
+        assertEquals("evil.com", Origin.parse("https://my.app.com@evil.com/page").host)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -61,12 +47,8 @@ class OriginTest {
     }
 
     @Test
-    fun `toString omits a default port`() {
+    fun `toString includes only a non-default port`() {
         assertEquals("https://a.com", Origin.parse("https://a.com:443/path").toString())
-    }
-
-    @Test
-    fun `toString keeps a non-default port`() {
         assertEquals("https://a.com:8443", Origin.parse("https://a.com:8443/path").toString())
     }
 

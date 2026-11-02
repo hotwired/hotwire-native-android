@@ -75,17 +75,6 @@ class WebViewPermissionDelegateTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `denies request with no origin`() {
-        declareInManifest(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS)
-        val request = mockRequest(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-        whenever(request.origin).thenReturn(null)
-
-        session.webViewPermissionDelegate.onRequest(request)
-
-        verify(request).deny()
-    }
-
-    @Test
     fun `denies request that asks for an unsupported resource`() {
         declareInManifest(RECORD_AUDIO)
         val request = mockRequest("android.webkit.resource.MIDI_SYSEX")

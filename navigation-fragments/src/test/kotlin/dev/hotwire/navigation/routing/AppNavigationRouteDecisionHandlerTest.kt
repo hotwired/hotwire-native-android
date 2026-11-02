@@ -67,15 +67,9 @@ class AppNavigationRouteDecisionHandlerTest {
     }
 
     @Test
-    fun `http url on the app domain does not match`() {
-        val url = "http://my.app.com/page"
-        assertFalse(route.matches(proposal(url), config))
-    }
-
-    @Test
-    fun `url on another port does not match`() {
-        val url = "https://my.app.com:8443/page"
-        assertFalse(route.matches(proposal(url), config))
+    fun `http url or another port on the app host does not match`() {
+        assertFalse(route.matches(proposal("http://my.app.com/page"), config))
+        assertFalse(route.matches(proposal("https://my.app.com:8443/page"), config))
     }
 
     @Test

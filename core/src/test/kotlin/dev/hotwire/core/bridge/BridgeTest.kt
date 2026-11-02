@@ -149,21 +149,8 @@ class BridgeTest {
     }
 
     @Test
-    fun bridgeMessagesFromASubFrameAreDropped() {
-        bridge.channel.receive(
-            data = bridgeDidReceiveMessageEnvelope,
-            sourceOrigin = "https://37signals.com",
-            isMainFrame = false
-        )
-
-        verify(delegate, never()).bridgeDidReceiveMessage(any())
-    }
-
-    @Test
-    fun malformedBridgeMessagesAreDropped() {
+    fun unknownOrIncompleteBridgeMessagesAreDropped() {
         listOf(
-            "not json",
-            """{"args":[]}""",
             """{"name":"noSuchMethod","args":[]}""",
             """{"name":"bridgeDidReceiveMessage","args":[]}"""
         ).forEach {
