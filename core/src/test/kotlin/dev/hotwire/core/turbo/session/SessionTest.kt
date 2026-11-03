@@ -249,19 +249,20 @@ class SessionTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `visit request failed with non http status code calls adapter for cross origin redirect`() {
-        val redirectLocation = "https://example.com/"
+    fun `visit request failed with non http status code follows same origin redirects to a cross origin redirect`() {
+        val redirectLocation = "https://example.com/auth"
         val visitIdentifier = "12345"
 
         enqueueResponse(
             fileName = "empty-body.json",
-            responseCode = 301,
-            headers = mapOf("Location" to redirectLocation)
+            responseCode = 302,
+            headers = mapOf("Location" to "/login")
         )
 
         enqueueResponse(
             fileName = "empty-body.json",
-            responseCode = 200
+            responseCode = 302,
+            headers = mapOf("Location" to redirectLocation)
         )
 
         session.currentVisit = visit.copy(identifier = visitIdentifier)
@@ -275,24 +276,6 @@ class SessionTest : BaseRepositoryTest() {
         enqueueResponse(
             fileName = "empty-body.json",
             responseCode = 404
-        )
-
-        val visitIdentifier = "12345"
-
-        session.currentVisit = visit.copy(identifier = visitIdentifier)
-        session.visitRequestFailedWithNonHttpStatusCode(visit.location, visitIdentifier, true)
-
-        verify(callback).requestFailedWithError(
-            visitHasCachedSnapshot = true,
-            error = HttpError.from(WebError.Unknown.errorCode)
-        )
-    }
-
-    @Test
-    fun `visit request failed with non http status code calls adapter without redirect fails visit`() {
-        enqueueResponse(
-            fileName = "empty-body.json",
-            responseCode = 200
         )
 
         val visitIdentifier = "12345"

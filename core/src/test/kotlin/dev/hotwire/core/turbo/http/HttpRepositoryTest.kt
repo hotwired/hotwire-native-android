@@ -3,7 +3,6 @@ package dev.hotwire.core.turbo.http
 import android.os.Build
 import android.webkit.CookieManager
 import dev.hotwire.core.turbo.BaseRepositoryTest
-import dev.hotwire.core.turbo.http.HttpRepository.HttpRedirect
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -24,7 +23,7 @@ class HttpRepositoryTest : BaseRepositoryTest() {
     override fun setup() {
         super.setup()
         crossOriginServer.start()
-        seedSessionCookie()
+        CookieManager.getInstance().setCookie(baseUrl(), "session=test-cookie")
     }
 
     override fun teardown() {
@@ -33,97 +32,79 @@ class HttpRepositoryTest : BaseRepositoryTest() {
         CookieManager.getInstance().removeAllCookies(null)
     }
 
-    // Both mock servers run on the same loopback host, so this covers a redirect that crosses
-    // origin by port. `flags an off-host redirect location as cross-origin` covers the host.
     @Test
-    fun `does not forward credentials to a cross-origin redirect destination`() {
-        val crossOriginUrl = crossOriginServer.url("/attacker").toString()
-
+    fun `returns a cross-origin redirect location without requesting it`() {
+        val crossOriginUrl = crossOriginServer.url("/destination").toString()
         server.enqueue(redirectResponse(crossOriginUrl))
-        crossOriginServer.enqueue(MockResponse().setResponseCode(200))
 
-        val redirect = runBlocking { repository.fetchRedirect(baseUrl()) }
-
+        assertThat(fetch()).isEqualTo(crossOriginUrl)
         assertThat(crossOriginServer.requestCount).isEqualTo(0)
-
-        val firstPartyRequest = server.takeRequest()
-        assertThat(firstPartyRequest.headers["Cookie"]).contains("session=test-cookie")
-
-        assertThat(redirect).isEqualTo(HttpRedirect(location = crossOriginUrl, isCrossOrigin = true))
+        assertThat(server.takeRequest().headers["Cookie"]).contains("session=test-cookie")
     }
 
     @Test
-    fun `flags an off-host redirect location as cross-origin`() {
+    fun `follows same-origin redirects to a cross-origin redirect`() {
+        server.enqueue(redirectResponse("/login"))
         server.enqueue(redirectResponse(OFF_HOST_LOCATION))
 
-        val redirect = runBlocking { repository.fetchRedirect(baseUrl()) }
+        assertThat(fetch()).isEqualTo(OFF_HOST_LOCATION)
+        assertThat(server.requestCount).isEqualTo(2)
 
-        assertThat(redirect).isEqualTo(HttpRedirect(location = OFF_HOST_LOCATION, isCrossOrigin = true))
-
-        // Nothing is sent on to the off-host destination. Were the redirect followed, the host
-        // wouldn't resolve and the fetch would fail rather than report the redirect.
-        assertThat(server.requestCount).isEqualTo(1)
+        server.takeRequest()
+        val sameOriginHop = server.takeRequest()
+        assertThat(sameOriginHop.path).isEqualTo("/login")
+        assertThat(sameOriginHop.headers["Cookie"]).contains("session=test-cookie")
     }
 
     @Test
-    fun `flags a redirect that changes only the scheme as cross-origin`() {
-        val otherSchemeUrl = server.url("/redirected").newBuilder().scheme("https").build().toString()
-
-        server.enqueue(redirectResponse(otherSchemeUrl))
-
-        val redirect = runBlocking { repository.fetchRedirect(baseUrl()) }
-
-        assertThat(redirect).isEqualTo(HttpRedirect(location = otherSchemeUrl, isCrossOrigin = true))
-    }
-
-    @Test
-    fun `detects a same-origin redirect without flagging it cross-origin`() {
-        val sameOriginUrl = server.url("/redirected").toString()
-
-        server.enqueue(redirectResponse(sameOriginUrl))
-
-        val redirect = runBlocking { repository.fetchRedirect(baseUrl()) }
-
-        assertThat(redirect).isEqualTo(HttpRedirect(location = sameOriginUrl, isCrossOrigin = false))
-
-        // Same-origin redirects aren't followed either, so the destination is never fetched.
-        assertThat(server.requestCount).isEqualTo(1)
-    }
-
-    @Test
-    fun `resolves a relative redirect location against the request origin as same-origin`() {
+    fun `returns null for same-origin redirects that end in a response`() {
         server.enqueue(redirectResponse("/relative/path"))
-
-        val redirect = runBlocking { repository.fetchRedirect(baseUrl()) }
-
-        assertThat(redirect).isEqualTo(
-            HttpRedirect(location = server.url("/relative/path").toString(), isCrossOrigin = false)
-        )
-    }
-
-    @Test
-    fun `reports no redirect for a direct successful response`() {
         server.enqueue(MockResponse().setResponseCode(200))
 
-        val redirect = runBlocking { repository.fetchRedirect(baseUrl()) }
+        assertThat(fetch()).isNull()
+        assertThat(server.requestCount).isEqualTo(2)
 
-        assertThat(redirect).isNull()
+        server.takeRequest()
+        assertThat(server.takeRequest().path).isEqualTo("/relative/path")
+    }
+
+    @Test
+    fun `stops following a same-origin redirect loop`() {
+        repeat(21) { server.enqueue(redirectResponse("/loop")) }
+
+        assertThat(fetch()).isNull()
+        assertThat(server.requestCount).isEqualTo(20)
+    }
+
+    @Test
+    fun `returns null for a redirect with an empty location`() {
+        server.enqueue(redirectResponse(""))
+
+        assertThat(fetch()).isNull()
         assertThat(server.requestCount).isEqualTo(1)
     }
 
     @Test
-    fun `closes the response so the connection is reused`() {
-        repeat(2) {
-            server.enqueue(redirectResponse("/next").setBody("You are being redirected."))
-        }
+    fun `returns null for a redirect to a non-http location`() {
+        server.enqueue(redirectResponse("javascript:alert(1)"))
 
-        runBlocking {
-            repository.fetchRedirect(baseUrl())
-            repository.fetchRedirect(baseUrl())
-        }
+        assertThat(fetch()).isNull()
+    }
+
+    @Test
+    fun `closes each response so the connection is reused`() {
+        server.enqueue(redirectResponse("/next").setBody("You are being redirected."))
+        server.enqueue(redirectResponse(OFF_HOST_LOCATION).setBody("You are being redirected."))
+
+        fetch()
+        assertThat(server.requestCount).isEqualTo(2)
 
         assertThat(server.takeRequest().sequenceNumber).isEqualTo(0)
         assertThat(server.takeRequest().sequenceNumber).isEqualTo(1)
+    }
+
+    private fun fetch(): String? {
+        return runBlocking { repository.fetchCrossOriginRedirect(baseUrl()) }
     }
 
     private fun redirectResponse(location: String): MockResponse {
@@ -132,11 +113,7 @@ class HttpRepositoryTest : BaseRepositoryTest() {
             .addHeader("Location", location)
     }
 
-    private fun seedSessionCookie() {
-        CookieManager.getInstance().setCookie(baseUrl(), "session=test-cookie")
-    }
-
     companion object {
-        private const val OFF_HOST_LOCATION = "https://redirect-destination.example/steal"
+        private const val OFF_HOST_LOCATION = "https://redirect-destination.example/auth"
     }
 }
