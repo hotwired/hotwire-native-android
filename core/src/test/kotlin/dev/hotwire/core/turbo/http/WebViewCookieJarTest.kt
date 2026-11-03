@@ -135,6 +135,24 @@ class WebViewCookieJarTest {
         assertThat(server.takeRequest().getHeader("Cookie")).isEqualTo("flavor=oatmeal")
     }
 
+    @Test
+    fun `cookies are not sent to a different host after a redirect`() {
+        val url = server.url("/")
+        val otherHostUrl = url.newBuilder().host("127.0.0.1").encodedPath("/next").build()
+        cookieManager.setCookie(url.toString(), "flavor=oatmeal")
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(302)
+                .addHeader("Location", otherHostUrl)
+        )
+        server.enqueue(MockResponse())
+
+        client().newCall(Request.Builder().url(url).build()).execute()
+
+        assertThat(server.takeRequest().getHeader("Cookie")).isEqualTo("flavor=oatmeal")
+        assertThat(server.takeRequest().getHeader("Cookie")).isNull()
+    }
+
     private fun client(): OkHttpClient {
         return OkHttpClient.Builder()
             .cookieJar(cookieJar)
