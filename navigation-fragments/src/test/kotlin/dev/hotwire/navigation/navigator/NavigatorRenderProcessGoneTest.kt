@@ -1,6 +1,8 @@
 package dev.hotwire.navigation.navigator
 
 import android.content.Context
+import android.net.http.SslCertificate
+import android.net.http.SslError
 import android.os.Bundle
 import android.os.Looper
 import android.view.LayoutInflater
@@ -8,10 +10,12 @@ import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.SslErrorHandler
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.test.core.app.ApplicationProvider
+import com.nhaarman.mockito_kotlin.mock
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.core.turbo.webview.HotwireWebChromeClient
@@ -248,6 +252,23 @@ class NavigatorRenderProcessGoneTest {
             assertThat(it.parent).isNull()
             assertThat(shadowOf(it).wasDestroyCalled()).isTrue()
         }
+    }
+
+    @Test
+    fun `doesn't notify the recovered destination from the previous session`() {
+        val destination = navigator.currentDestination
+        renderProcessGone()
+        val goneWebView = goneWebViews.first()
+
+        @Suppress("DEPRECATION")
+        val certificate = SslCertificate("example.com", "example.com", "", "")
+        val error = SslError(SslError.SSL_UNTRUSTED, certificate, START_LOCATION)
+        goneWebView.webViewClient.onReceivedSslError(goneWebView, mock<SslErrorHandler>(), error)
+        idle()
+
+        val errorContainer = requireNotNull(destination).fragment.requireView()
+            .findViewById<ViewGroup>(R.id.hotwire_error_container)
+        assertThat(errorContainer.childCount).isEqualTo(0)
     }
 
     private fun renderProcessGone(idle: Boolean = true) {
