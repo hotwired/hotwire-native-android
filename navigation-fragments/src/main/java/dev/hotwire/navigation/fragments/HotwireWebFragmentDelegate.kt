@@ -243,9 +243,9 @@ internal class HotwireWebFragmentDelegate(
     override fun onRenderProcessGone() {
         // Detach the WebView right away so the navigator can replace its
         // session, then visit this destination's location with the new WebView.
-        val webView = webView
-        (webView.parent as? ViewGroup)?.removeView(webView)
-        callback.onWebViewDetached(webView)
+        val goneWebView = webView
+        (goneWebView.parent as? ViewGroup)?.removeView(goneWebView)
+        callback.onWebViewDetached(goneWebView)
 
         initNavigationVisit()
         initWebChromeClient()
