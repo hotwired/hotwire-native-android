@@ -70,10 +70,6 @@ class Navigator(
     var session = createNewSession()
         private set
 
-    /**
-     * Replaces the [Session] with a new instance, such as when the WebView's
-     * render process is gone, and destroys the previous session's WebView.
-     */
     internal fun replaceSession() {
         val previousSession = session
         session = createNewSession()
@@ -81,8 +77,8 @@ class Navigator(
     }
 
     /**
-     * Destroys the current session's WebView. The session can't be used
-     * afterwards, so only call this when its [NavigatorHost] is destroyed.
+     * The session can't be used afterwards, so only call this when its
+     * [NavigatorHost] is destroyed.
      */
     internal fun destroySession() {
         session.destroyWebView()

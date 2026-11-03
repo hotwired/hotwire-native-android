@@ -24,8 +24,8 @@ class Bridge internal constructor(webView: WebView) {
     internal val webView: WebView? get() = webViewRef.get()
     internal var repository = Repository()
 
-    // Bridge instances are held statically, so hold the delegate (and
-    // its destination) weakly to avoid leaking a destroyed destination.
+    // Bridge instances are held statically, so a strong reference here
+    // would keep a destroyed destination alive.
     internal var delegate: BridgeDelegate<*>?
         get() = delegateRef.get()
         set(value) { delegateRef = WeakReference(value) }

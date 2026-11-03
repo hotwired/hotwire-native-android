@@ -301,9 +301,9 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private fun initNavigationVisit() {
-        // The render process can be gone while this destination's view is kept, such as
-        // when a native dialog was shown over it. The kept view can't lay out a new WebView,
-        // so route to this location again to recreate the destination with a new session.
+        // The render process can die while a native dialog covers this destination. The kept
+        // view can't lay out a new WebView (SwipeRefreshLayout caches its first child), so
+        // recreate the destination instead of replacing the session in place.
         if (session.isRenderProcessGone) {
             onRenderProcessGone()
             return

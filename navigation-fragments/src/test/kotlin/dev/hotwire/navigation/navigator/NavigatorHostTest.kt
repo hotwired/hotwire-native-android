@@ -103,8 +103,7 @@ class NavigatorHostTest {
         assertThat(survivingArgs).doesNotContain(ATTACKER_URL)
     }
 
-    // Bridge instances are held statically and are only created when bridge components
-    // are registered.
+    // A Bridge is only created when bridge components are registered.
     @Test
     fun `recreating the activity releases the previous activity`() {
         Hotwire.registerBridgeComponents(BridgeComponentFactory("test", ::TestComponent))
@@ -122,8 +121,6 @@ class NavigatorHostTest {
         assertThat(oldActivity.get()).isNull()
     }
 
-    // Every host instance creates its own Navigator, Session and WebView, including the host
-    // that the FragmentManager restores when the Activity is recreated.
     @Test
     fun `recreating the activity destroys the previous host's WebView`() {
         val controller = Robolectric.buildActivity(HostActivity::class.java).setup()
@@ -137,8 +134,8 @@ class NavigatorHostTest {
         assertThat(shadowOf(newWebView).wasDestroyCalled()).isFalse()
     }
 
-    // A WebView whose render process is gone can't be used again. The current destination
-    // routes to its location again, and the new destination view replaces the session.
+    // The current destination routes to its own location, and the new destination's view
+    // replaces the session.
     @Test
     fun `losing the render process replaces the session`() {
         val controller = Robolectric.buildActivity(HostActivity::class.java).setup()
@@ -155,10 +152,8 @@ class NavigatorHostTest {
         assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
     }
 
-    // A native dialog shown over a web destination keeps the destination's view. When the
-    // render process is gone while the dialog is open, no destination is listening to the
-    // session. The kept view can't lay out a new WebView, so canceling the dialog has to
-    // recreate the destination instead of reattaching it.
+    // prepareNavigation() is what showing a native dialog does to the destination below it:
+    // it detaches the WebView and stops listening to the session, but keeps the view.
     @Test
     fun `canceling a dialog after losing the render process recreates the destination`() {
         val controller = Robolectric.buildActivity(HostActivity::class.java).setup()

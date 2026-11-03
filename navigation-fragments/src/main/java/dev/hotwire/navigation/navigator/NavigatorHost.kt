@@ -59,9 +59,8 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         registeredStartLocation = null
         activity.delegate.unregisterNavigatorHost(this)
 
-        // Every host instance creates its own WebView, which is never used again once the
-        // host is destroyed (including when the Activity is recreated). Destroy it so its page
-        // stops running now, rather than whenever the WebView is garbage collected.
+        // Each host owns its WebView, so nothing uses it after the host is destroyed, including
+        // after an Activity recreation. Destroy it now so its page stops running.
         navigator.destroySession()
 
         super.onDestroy()
