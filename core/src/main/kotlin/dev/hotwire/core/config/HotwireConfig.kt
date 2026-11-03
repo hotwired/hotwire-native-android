@@ -95,6 +95,16 @@ class HotwireConfig internal constructor() {
      * identity as the WebAuthn origin (`android:apk-key-hash:<hash>`), so your
      * server has to accept it in addition to its web origin.
      *
+     * Only enable this if your WebViews load nothing but your own sites. Because
+     * the requests carry your app's identity, not the page's origin, any page in
+     * the WebView can request passkeys for your associated sites. That includes
+     * cross-origin iframes your pages allow `publickey-credentials-get` or
+     * `publickey-credentials-create`.
+     *
+     * Set this in `Application.onCreate()`, before any WebView is created. Each
+     * WebView reads it once when it's created, so changing it later doesn't
+     * affect existing WebViews.
+     *
      * Requires Android System WebView 121 or later; on older versions this
      * setting has no effect.
      */
