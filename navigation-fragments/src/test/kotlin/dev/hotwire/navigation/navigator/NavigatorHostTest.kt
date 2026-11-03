@@ -16,6 +16,7 @@ import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.config.registerBridgeComponents
 import dev.hotwire.navigation.destinations.HotwireDestination
+import dev.hotwire.navigation.fragments.HotwireWebFragment
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -135,6 +136,33 @@ class NavigatorHostTest {
         shadowOf(Looper.getMainLooper()).idle()
         val newSession = navigator.session
 
+        assertThat(newSession).isNotSameAs(oldSession)
+        assertThat(shadowOf(oldSession.webView).wasDestroyCalled()).isTrue()
+        assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
+    }
+
+    // A native dialog shown over a web destination keeps the destination's view. When the
+    // render process is gone while the dialog is open, no destination is listening to the
+    // session. The kept view can't lay out a new WebView, so canceling the dialog has to
+    // recreate the destination instead of reattaching it.
+    @Test
+    fun `canceling a dialog after losing the render process recreates the destination`() {
+        val controller = Robolectric.buildActivity(HostActivity::class.java).setup()
+        shadowOf(Looper.getMainLooper()).idle()
+        val host = controller.get().navigatorHost
+        val destination = host.childFragmentManager.primaryNavigationFragment as HotwireWebFragment
+        val oldSession = host.navigator.session
+
+        destination.prepareNavigation {}
+        oldSession.webView.webViewClient.onRenderProcessGone(oldSession.webView, crashedRenderProcess)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertThat(host.navigator.session).isSameAs(oldSession)
+
+        destination.onStartAfterDialogCancel()
+        shadowOf(Looper.getMainLooper()).idle()
+        val newSession = host.navigator.session
+
+        assertThat(host.childFragmentManager.primaryNavigationFragment).isNotSameAs(destination)
         assertThat(newSession).isNotSameAs(oldSession)
         assertThat(shadowOf(oldSession.webView).wasDestroyCalled()).isTrue()
         assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
