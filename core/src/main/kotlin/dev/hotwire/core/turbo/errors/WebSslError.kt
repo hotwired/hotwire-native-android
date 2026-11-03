@@ -9,7 +9,7 @@ import android.net.http.SslError
  */
 sealed interface WebSslError : VisitError {
     val errorCode: Int
-    val description: String?
+    override val description: String?
 
     data object NotYetValid : WebSslError {
         override val errorCode = SslError.SSL_NOTYETVALID
