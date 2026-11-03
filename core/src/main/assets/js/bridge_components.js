@@ -1,4 +1,10 @@
 (() => {
+  // BridgeComponentsChannel is injected by the native side via WebViewCompat.addWebMessageListener().
+  const BridgeComponentsNative = new Proxy({}, {
+    get: (_, name) => (...args) =>
+      window.BridgeComponentsChannel.postMessage(JSON.stringify({ name, args }))
+  })
+
   // This represents the adapter that is installed on the webBridge
   // All adapters implement the same interface so the web doesn't need to
   // know anything specific about the client platform

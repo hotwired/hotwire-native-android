@@ -1,18 +1,31 @@
 package dev.hotwire.core.bridge
 
 import android.content.Context
+import android.os.Build
 import android.webkit.WebView
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.config.Hotwire
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.verify
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.lang.ref.WeakReference
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.R])
 class BridgeTest {
     private lateinit var bridge: Bridge
     private val webView: WebView = mock()
@@ -20,11 +33,26 @@ class BridgeTest {
     private val repository: Repository = mock()
     private val delegate: BridgeDelegate<TestData.AppBridgeDestination> = mock()
 
+    private val bridgeDidReceiveMessageEnvelope = buildJsonObject {
+        put("name", "bridgeDidReceiveMessage")
+        putJsonArray("args") {
+            add("""{"id":"1","component":"page","event":"connect","data":{"metadata":{"url":"https://37signals.com"},"title":"Page title","subtitle":"Page subtitle"}}""")
+        }
+    }.toString()
+
     @Before
     fun setup() {
+        Hotwire.config.startLocationRegistry.clear()
+        Hotwire.config.registerStartLocation("https://37signals.com")
+
         bridge = Bridge(webView)
         bridge.delegate = delegate
         bridge.repository = repository
+    }
+
+    @After
+    fun teardown() {
+        Hotwire.config.startLocationRegistry.clear()
     }
 
     @Test
@@ -71,18 +99,22 @@ class BridgeTest {
         whenever(repository.getUserScript(context)).thenReturn("")
 
         bridge.load()
-        verify(webView).addJavascriptInterface(eq(bridge), any())
+        verify(webView).evaluateJavascript(eq(""), any())
     }
 
     @Test
     fun bridgeDidInitialize() {
-        bridge.bridgeDidInitialize()
+        bridge.channel.receive(
+            data = """{"name":"bridgeDidInitialize","args":[]}""",
+            sourceOrigin = "https://37signals.com",
+            isMainFrame = true
+        )
+
         verify(delegate).bridgeDidInitialize()
     }
 
     @Test
     fun bridgeDidReceiveMessage() {
-        val json = """{"id":"1","component":"page","event":"connect","data":{"metadata":{"url":"https://37signals.com"},"title":"Page title","subtitle":"Page subtitle"}}"""
         val data = """{"metadata":{"url":"https://37signals.com"},"title":"Page title","subtitle":"Page subtitle"}"""
         val message = Message(
             id = "1",
@@ -92,7 +124,12 @@ class BridgeTest {
             jsonData = data
         )
 
-        bridge.bridgeDidReceiveMessage(json)
+        bridge.channel.receive(
+            data = bridgeDidReceiveMessageEnvelope,
+            sourceOrigin = "https://37signals.com",
+            isMainFrame = true
+        )
+
         verify(delegate).bridgeDidReceiveMessage(message)
     }
 
@@ -105,6 +142,35 @@ class BridgeTest {
         }
 
         assertNull(bridge.delegate)
+    }
+
+    @Test
+    fun bridgeMessagesFromAnUntrustedOriginAreDropped() {
+        bridge.channel.receive(
+            data = bridgeDidReceiveMessageEnvelope,
+            sourceOrigin = "https://evil.attacker.com",
+            isMainFrame = true
+        )
+        bridge.channel.receive(
+            data = """{"name":"bridgeDidInitialize","args":[]}""",
+            sourceOrigin = "https://evil.attacker.com",
+            isMainFrame = true
+        )
+
+        verify(delegate, never()).bridgeDidReceiveMessage(any())
+        verify(delegate, never()).bridgeDidInitialize()
+    }
+
+    @Test
+    fun unknownOrIncompleteBridgeMessagesAreDropped() {
+        listOf(
+            """{"name":"noSuchMethod","args":[]}""",
+            """{"name":"bridgeDidReceiveMessage","args":[]}"""
+        ).forEach {
+            bridge.channel.receive(it, sourceOrigin = "https://37signals.com", isMainFrame = true)
+        }
+
+        verify(delegate, never()).bridgeDidReceiveMessage(any())
     }
 
     @Test

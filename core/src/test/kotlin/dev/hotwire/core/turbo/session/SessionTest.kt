@@ -1,10 +1,15 @@
 package dev.hotwire.core.turbo.session
 
 import android.os.Build
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
+import dev.hotwire.core.config.Hotwire
+import dev.hotwire.core.security.DefaultOriginTrustPolicy
 import dev.hotwire.core.turbo.BaseRepositoryTest
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.HttpError.ServerError
@@ -17,7 +22,12 @@ import dev.hotwire.core.turbo.visit.VisitDestination
 import dev.hotwire.core.turbo.visit.VisitOptions
 import dev.hotwire.core.turbo.webview.HotwireWebView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,7 +60,11 @@ class SessionTest : BaseRepositoryTest() {
         MockitoAnnotations.openMocks(this)
 
         activity = buildActivity(TurboTestActivity::class.java).get()
+        Hotwire.config.startLocationRegistry.clear()
+        Hotwire.config.registerStartLocation(baseUrl())
         session = Session("test", activity, webView)
+        session.turboSessionChannel.isInstalled = true
+        whenever(webView.url).thenReturn(baseUrl())
         visit = Visit(
             location = baseUrl(),
             destinationIdentifier = 1,
@@ -70,6 +84,12 @@ class SessionTest : BaseRepositoryTest() {
         whenever(callback.visitDestination()).thenReturn(visitDestination)
     }
 
+    @After
+    fun teardownRegisteredOrigins() {
+        Hotwire.config.startLocationRegistry.clear()
+        Hotwire.config.originTrustPolicy = DefaultOriginTrustPolicy
+    }
+
     @Test
     fun `session is always new instance`() {
         val session = Session("test", activity, webView)
@@ -84,9 +104,110 @@ class SessionTest : BaseRepositoryTest() {
         val newLocation = "${visit.location}/page"
 
         session.currentVisit = visit
-        session.visitProposedToLocation(newLocation, options.toJson())
+        session.visitProposedToLocation(newLocation, options)
 
         verify(callback).visitProposedToLocation(newLocation, options)
+    }
+
+    @Test
+    fun `turbo session messages from an untrusted origin are dropped`() {
+        session.currentVisit = visit
+
+        listOf(
+            envelope("visitProposedToLocation", "${visit.location}/page", VisitOptions().toJson()),
+            envelope("turboIsReady", true),
+            envelope("visitStarted", "12345", true, false, visit.location)
+        ).forEach {
+            session.turboSessionChannel.receive(it, sourceOrigin = "https://evil.attacker.com", isMainFrame = true)
+        }
+
+        verify(callback, never()).visitProposedToLocation(any(), any())
+        assertThat(session.isReady).isFalse()
+        assertThat(session.currentVisit?.identifier).isEmpty()
+    }
+
+    @Test
+    fun `turbo session messages from a trusted main frame are dispatched`() {
+        val options = VisitOptions()
+        val newLocation = "${visit.location}/page"
+        session.currentVisit = visit
+
+        session.turboSessionChannel.receive(
+            envelope("visitProposedToLocation", newLocation, options.toJson()),
+            sourceOrigin = baseUrl(),
+            isMainFrame = true
+        )
+
+        verify(callback).visitProposedToLocation(newLocation, options)
+    }
+
+    @Test
+    fun `unknown or incomplete turbo session messages are dropped`() {
+        session.currentVisit = visit
+
+        listOf(
+            envelope("noSuchMethod"),
+            envelope("visitProposedToLocation")
+        ).forEach {
+            session.turboSessionChannel.receive(it, sourceOrigin = baseUrl(), isMainFrame = true)
+        }
+
+        verify(callback, never()).visitProposedToLocation(any(), any())
+    }
+
+    private fun envelope(name: String, vararg args: Any): String {
+        return buildJsonObject {
+            put("name", name)
+            putJsonArray("args") {
+                args.forEach {
+                    when (it) {
+                        is Boolean -> add(it)
+                        is Number -> add(it)
+                        else -> add(it.toString())
+                    }
+                }
+            }
+        }.toString()
+    }
+
+    @Test
+    fun `cold boot page finished on an untrusted origin surfaces an error and resets`() {
+        session.currentVisit = visit
+        session.isColdBooting = true
+
+        webViewClient().onPageFinished(webView, "https://evil.attacker.com/page")
+
+        verify(callback).onReceivedError(LoadError.UntrustedOrigin("https://evil.attacker.com/page"))
+        assertThat(session.isColdBooting).isFalse()
+        assertThat(session.coldBootVisitIdentifier).isEmpty()
+    }
+
+    @Test
+    fun `cold boot without the message channel surfaces an unsupported error`() {
+        session.turboSessionChannel.isInstalled = false
+        session.currentVisit = visit
+        session.isColdBooting = true
+
+        webViewClient().onPageFinished(webView, "${visit.location}/page")
+
+        verify(callback).onReceivedError(LoadError.WebViewNotSupported)
+        assertThat(session.isColdBooting).isFalse()
+    }
+
+    @Test
+    fun `cold boot page finished on a trusted origin does not surface an error`() {
+        session.currentVisit = visit
+        session.isColdBooting = true
+
+        webViewClient().onPageFinished(webView, "${visit.location}/page")
+
+        verify(callback, never()).onReceivedError(any())
+    }
+
+    private fun webViewClient(): WebViewClient {
+        val captor = argumentCaptor<WebViewClient>()
+        verify(webView).webViewClient = captor.capture()
+        return captor.lastValue
     }
 
     @Test

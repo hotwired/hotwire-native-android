@@ -11,8 +11,11 @@ import dev.hotwire.core.R
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_FILES
 import dev.hotwire.core.files.util.HotwireFileProvider
 import dev.hotwire.core.logging.logError
+import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.session.Session
 import dev.hotwire.core.turbo.util.dispatcherProvider
+import dev.hotwire.core.turbo.util.runOnUiThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -31,6 +34,17 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
         filePathCallback: ValueCallback<Array<Uri>>,
         params: FileChooserParams
     ): Boolean {
+        // Answer a request still held from before; the WebView needs a verdict.
+        handleCancellation()
+
+        // FileChooserParams has no origin, so gate on the page's URL.
+        val pageLocation = session.webView.url
+        if (!isTrustedForNativeAccess(pageLocation)) {
+            logWarning("fileChooserBlockedForUntrustedOrigin", listOf("location" to pageLocation.orEmpty()))
+            filePathCallback.onReceiveValue(null)
+            return true
+        }
+
         uploadCallback = filePathCallback
 
         return openChooser(params).also { success ->
@@ -79,13 +93,26 @@ class FileChooserDelegate(val session: Session) : CoroutineScope {
 
     private fun handleResult(intent: Intent?) {
         when (intent.containsFileResult()) {
-            true -> browseFilesDelegate.handleResult(intent) { sendResult(it) }
-            else -> cameraCaptureDelegate.handleResult { sendResult(it) }
+            true -> browseFilesDelegate.handleResult(intent) { deliverResult(it) }
+            else -> cameraCaptureDelegate.handleResult { deliverResult(it) }
         }
     }
 
-    private fun sendResult(results: Array<Uri>?) {
-        uploadCallback?.onReceiveValue(results)
+    // Browse results arrive on the IO dispatcher; WebView calls must run on main.
+    private fun deliverResult(results: Array<Uri>?) {
+        context.runOnUiThread { sendResult(results) }
+    }
+
+    internal fun sendResult(results: Array<Uri>?) {
+        // The WebView may have navigated while the picker was open.
+        val pageLocation = session.webView.url
+
+        if (results != null && !isTrustedForNativeAccess(pageLocation)) {
+            logWarning("fileChooserResultBlockedForUntrustedOrigin", listOf("location" to pageLocation.orEmpty()))
+            uploadCallback?.onReceiveValue(null)
+        } else {
+            uploadCallback?.onReceiveValue(results)
+        }
         uploadCallback = null
     }
 
