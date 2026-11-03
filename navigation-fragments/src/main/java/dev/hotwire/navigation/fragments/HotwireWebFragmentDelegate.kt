@@ -380,7 +380,7 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private fun title(): String {
-        return webView.title ?: ""
+        return displayTitle(webView.title, webView.url)
     }
 
     private fun registerFileChooserLauncher(): ActivityResultLauncher<Intent> {
