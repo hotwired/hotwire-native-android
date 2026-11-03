@@ -84,7 +84,7 @@ internal class HotwireWebFragmentDelegate(
      */
     fun onViewCreated() {
         if (session.isRenderProcessGone) {
-            navigator.createNewSession()
+            navigator.replaceSession()
         }
     }
 

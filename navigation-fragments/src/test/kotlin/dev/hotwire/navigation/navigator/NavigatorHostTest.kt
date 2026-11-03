@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
+import android.webkit.RenderProcessGoneDetail
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentContainerView
 import dev.hotwire.core.bridge.BridgeComponent
@@ -121,9 +122,32 @@ class NavigatorHostTest {
         assertThat(shadowOf(newWebView).wasDestroyCalled()).isFalse()
     }
 
+    // A WebView whose render process is gone can't be used again. The current destination
+    // routes to its location again, and the new destination view replaces the session.
+    @Test
+    fun `losing the render process replaces the session`() {
+        val controller = Robolectric.buildActivity(HostActivity::class.java).setup()
+        shadowOf(Looper.getMainLooper()).idle()
+        val navigator = controller.get().navigatorHost.navigator
+        val oldSession = navigator.session
+
+        oldSession.webView.webViewClient.onRenderProcessGone(oldSession.webView, crashedRenderProcess)
+        shadowOf(Looper.getMainLooper()).idle()
+        val newSession = navigator.session
+
+        assertThat(newSession).isNotSameAs(oldSession)
+        assertThat(shadowOf(oldSession.webView).wasDestroyCalled()).isTrue()
+        assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
+    }
+
     companion object {
         private const val ATTACKER_URL = "https://attacker.example/steal"
         private val HOST_ID = View.generateViewId()
+
+        private val crashedRenderProcess = object : RenderProcessGoneDetail() {
+            override fun didCrash() = true
+            override fun rendererPriorityAtExit() = 0
+        }
     }
 
     private class TestActivity : HotwireActivity() {
