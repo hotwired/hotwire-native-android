@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
 
 // A screen that hosts a nested NavigatorHost can be replaced by a new instance of itself. The new
 // nested host is created before the old one is destroyed, and both use the same view ID.
@@ -46,6 +47,19 @@ class HotwireActivityDelegateTest {
 
         assertThat(activity.delegate.findNavigatorHost(NESTED_HOST_ID))
             .isSameAs(newScreen.navigatorHost)
+    }
+
+    @Test
+    fun `destroying the old nested host only destroys its own WebView`() {
+        val oldScreen = addScreen(CONTAINER_A_ID)
+        val newScreen = addScreen(CONTAINER_B_ID)
+        val oldWebView = oldScreen.navigatorHost.navigator.session.webView
+        val newWebView = newScreen.navigatorHost.navigator.session.webView
+
+        activity.supportFragmentManager.beginTransaction().remove(oldScreen).commitNow()
+
+        assertThat(shadowOf(oldWebView).wasDestroyCalled()).isTrue()
+        assertThat(shadowOf(newWebView).wasDestroyCalled()).isFalse()
     }
 
     private fun addScreen(containerId: Int): NestedHostScreen {

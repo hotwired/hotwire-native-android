@@ -5,6 +5,7 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.google.android.material.R
+import dev.hotwire.core.security.isTrustedForNavigation
 import dev.hotwire.core.turbo.visit.VisitProposal
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.logging.logError
@@ -12,9 +13,10 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.util.colorFromThemeAttr
 
 /**
- * Opens external HTTP/S urls via a browser Custom Tab so the user
- * stays in-app. If the device default browser does not support
- * Custom Tabs, the url will open directly in the default browser.
+ * Opens HTTP/S urls that [dev.hotwire.core.security.OriginTrustPolicy.isTrustedForNavigation]
+ * does not trust via a browser Custom Tab so the user stays in-app. If the
+ * device default browser does not support Custom Tabs, the url will open
+ * directly in the default browser.
  *
  * https://developer.chrome.com/docs/android/custom-tabs
  */
@@ -25,10 +27,9 @@ class BrowserTabRouteDecisionHandler : Router.RouteDecisionHandler {
         proposal: VisitProposal,
         configuration: NavigatorConfiguration
     ): Boolean {
-        val locationUri = proposal.location.toUri()
+        val scheme = proposal.location.toUri().scheme?.lowercase()
 
-        return configuration.startLocation.toUri().host != locationUri.host &&
-                (locationUri.scheme?.lowercase() == "https" || locationUri.scheme?.lowercase() == "http")
+        return !isTrustedForNavigation(proposal.location) && (scheme == "https" || scheme == "http")
     }
 
     override fun handle(

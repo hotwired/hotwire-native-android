@@ -71,19 +71,32 @@ class Navigator(
         private set
 
     /**
-     * A WebView whose render process is gone cannot be reused. Removes it from
-     * its parent, destroys it, and replaces the [Session] with a new instance.
+     * A WebView whose render process is gone cannot be reused, so replace the
+     * [Session] and destroy the previous session's WebView.
      */
     internal fun replaceSessionIfRenderProcessGone() {
         if (!session.isRenderProcessGone) return
 
         logEvent("replaceSessionIfRenderProcessGone")
 
-        val webView = session.webView
-        (webView.parent as? ViewGroup)?.removeView(webView)
-        webView.destroy()
-
+        val previousSession = session
         session = createNewSession()
+        previousSession.destroyWebView()
+    }
+
+    /**
+     * The session can't be used afterwards, so only call this when its
+     * [NavigatorHost] is destroyed.
+     */
+    internal fun destroySession() {
+        session.destroyWebView()
+    }
+
+    private fun Session.destroyWebView() {
+        webView.apply {
+            (parent as? ViewGroup)?.removeView(this)
+            destroy()
+        }
     }
 
     private fun createNewSession() = Session(

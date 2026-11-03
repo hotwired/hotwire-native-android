@@ -11,6 +11,7 @@ import androidx.core.content.PermissionChecker
 import dev.hotwire.core.files.util.HOTWIRE_REQUEST_CODE_WEBVIEW_PERMISSION
 import dev.hotwire.core.logging.logError
 import dev.hotwire.core.logging.logWarning
+import dev.hotwire.core.security.isTrustedForNativeAccess
 import dev.hotwire.core.turbo.session.Session
 
 /**
@@ -39,6 +40,13 @@ class WebViewPermissionDelegate(private val session: Session) {
     private var pendingRequest: PermissionRequest? = null
 
     fun onRequest(request: PermissionRequest) {
+        val origin = request.origin?.toString()
+        if (!isTrustedForNativeAccess(origin)) {
+            logWarning("webViewPermissionBlockedForUntrustedOrigin", listOf("origin" to origin.orEmpty()))
+            request.deny()
+            return
+        }
+
         val requestedResources = request.resources?.toList().orEmpty()
         val supportedResources = requestedResources.filter { it in SUPPORTED_RESOURCES }
 
@@ -100,7 +108,8 @@ class WebViewPermissionDelegate(private val session: Session) {
             grantResults[permission] == true || isGranted(permission)
         }
 
-        if (allGranted) {
+        // The policy's answer may have changed while the dialog was up.
+        if (allGranted && isTrustedForNativeAccess(request.origin?.toString())) {
             request.grant(resources.toTypedArray())
         } else {
             request.deny()

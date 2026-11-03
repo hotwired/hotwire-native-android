@@ -3,13 +3,15 @@ package dev.hotwire.navigation.routing
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.core.net.toUri
+import dev.hotwire.core.security.isTrustedForNavigation
 import dev.hotwire.core.turbo.visit.VisitProposal
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.logging.logError
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 
 /**
- * Opens external urls via a new Activity intent. Non-HTTP/S schemes are supported.
+ * Opens urls that [dev.hotwire.core.security.OriginTrustPolicy.isTrustedForNavigation]
+ * does not trust via a new Activity intent. Non-HTTP/S schemes are supported.
  */
 class SystemNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
     override val name = "system-navigation"
@@ -18,7 +20,7 @@ class SystemNavigationRouteDecisionHandler : Router.RouteDecisionHandler {
         proposal: VisitProposal,
         configuration: NavigatorConfiguration
     ): Boolean {
-        return configuration.startLocation.toUri().host != proposal.location.toUri().host
+        return !isTrustedForNavigation(proposal.location)
     }
 
     override fun handle(
