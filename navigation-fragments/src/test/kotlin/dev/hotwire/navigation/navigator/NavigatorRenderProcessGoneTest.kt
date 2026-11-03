@@ -28,6 +28,7 @@ import dev.hotwire.navigation.destinations.HotwireDestinationDeepLink
 import dev.hotwire.navigation.fragments.HotwireBottomSheetFragment
 import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
 import dev.hotwire.navigation.fragments.HotwireWebFragment
+import dev.hotwire.navigation.views.HotwireSwipeRefreshLayout
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Assert.fail
@@ -319,7 +320,9 @@ class NavigatorRenderProcessGoneTest {
     }
 
     private fun container(destination: HotwireDestination?): ViewGroup {
-        return requireNotNull(destination).fragment.requireView().findViewById(R.id.hotwire_webView_container)
+        val container = requireNotNull(destination).fragment.requireView()
+            .findViewById<ViewGroup>(R.id.hotwire_webView_container)
+        return (container as? HotwireSwipeRefreshLayout)?.webViewContainer ?: container
     }
 
     private fun navigator(hostId: Int): Navigator {

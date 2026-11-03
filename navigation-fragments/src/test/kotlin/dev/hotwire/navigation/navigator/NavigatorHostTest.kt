@@ -18,6 +18,7 @@ import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.config.registerBridgeComponents
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.fragments.HotwireWebFragment
+import dev.hotwire.navigation.views.HotwireSwipeRefreshLayout
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -173,8 +174,8 @@ class NavigatorHostTest {
 
         assertThat(host.childFragmentManager.primaryNavigationFragment).isSameAs(destination)
         assertThat(newSession).isNotSameAs(oldSession)
-        assertThat(newSession.webView.parent)
-            .isSameAs(destination.requireView().findViewById(R.id.hotwire_webView_container))
+        val refreshLayout = destination.requireView().findViewById<HotwireSwipeRefreshLayout>(R.id.hotwire_webView_container)
+        assertThat(newSession.webView.parent).isSameAs(refreshLayout.webViewContainer)
         assertThat(shadowOf(oldSession.webView).wasDestroyCalled()).isTrue()
         assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
     }
