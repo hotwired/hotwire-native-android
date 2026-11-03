@@ -12,11 +12,13 @@ import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.bridge.Message
 import dev.hotwire.core.config.Hotwire
+import dev.hotwire.navigation.R
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
 import dev.hotwire.navigation.config.registerBridgeComponents
 import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.fragments.HotwireWebFragment
+import dev.hotwire.navigation.views.HotwireSwipeRefreshLayout
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -134,28 +136,10 @@ class NavigatorHostTest {
         assertThat(shadowOf(newWebView).wasDestroyCalled()).isFalse()
     }
 
-    // The current destination routes to its own location, and the new destination's view
-    // replaces the session.
-    @Test
-    fun `losing the render process replaces the session`() {
-        val controller = Robolectric.buildActivity(HostActivity::class.java).setup()
-        shadowOf(Looper.getMainLooper()).idle()
-        val navigator = controller.get().navigatorHost.navigator
-        val oldSession = navigator.session
-
-        oldSession.webView.webViewClient.onRenderProcessGone(oldSession.webView, crashedRenderProcess)
-        shadowOf(Looper.getMainLooper()).idle()
-        val newSession = navigator.session
-
-        assertThat(newSession).isNotSameAs(oldSession)
-        assertThat(shadowOf(oldSession.webView).wasDestroyCalled()).isTrue()
-        assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
-    }
-
     // prepareNavigation() is what showing a native dialog does to the destination below it:
     // it detaches the WebView and stops listening to the session, but keeps the view.
     @Test
-    fun `canceling a dialog after losing the render process recreates the destination`() {
+    fun `canceling a dialog after losing the render process recovers the destination in place`() {
         val controller = Robolectric.buildActivity(HostActivity::class.java).setup()
         shadowOf(Looper.getMainLooper()).idle()
         val host = controller.get().navigatorHost
@@ -171,8 +155,10 @@ class NavigatorHostTest {
         shadowOf(Looper.getMainLooper()).idle()
         val newSession = host.navigator.session
 
-        assertThat(host.childFragmentManager.primaryNavigationFragment).isNotSameAs(destination)
+        assertThat(host.childFragmentManager.primaryNavigationFragment).isSameAs(destination)
         assertThat(newSession).isNotSameAs(oldSession)
+        val refreshLayout = destination.requireView().findViewById<HotwireSwipeRefreshLayout>(R.id.hotwire_webView_container)
+        assertThat(newSession.webView.parent).isSameAs(refreshLayout.webViewContainer)
         assertThat(shadowOf(oldSession.webView).wasDestroyCalled()).isTrue()
         assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
     }

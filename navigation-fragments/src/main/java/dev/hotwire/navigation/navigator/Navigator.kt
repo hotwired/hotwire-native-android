@@ -65,14 +65,28 @@ class Navigator(
 
     /**
      * The [Session] instance that is shared with all destinations that are
-     * hosted inside this [NavigatorHost].
+     * hosted inside this [NavigatorHost]. It's replaced with a new instance
+     * when its WebView's render process is gone, so don't keep a reference to
+     * it or its WebView.
      */
     var session = createNewSession()
         private set
 
-    internal fun replaceSession() {
+    /**
+     * A WebView whose render process is gone cannot be reused, so replace the
+     * [Session] and destroy the previous session's WebView.
+     */
+    internal fun replaceSessionIfRenderProcessGone() {
+        if (!session.isRenderProcessGone) return
+
+        logEvent("replaceSessionIfRenderProcessGone")
+
         val previousSession = session
         session = createNewSession()
+
+        // Work the previous session started, such as a pending request, can
+        // still finish, so don't let it notify the current destination.
+        previousSession.currentVisit?.callback = null
         previousSession.destroyWebView()
     }
 

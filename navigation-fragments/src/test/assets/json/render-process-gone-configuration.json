@@ -1,0 +1,41 @@
+{
+  "settings": {},
+  "rules": [
+    {
+      "patterns": [
+        ".*"
+      ],
+      "properties": {
+        "context": "default",
+        "uri": "hotwire://fragment/web",
+        "pull_to_refresh_enabled": true
+      }
+    },
+    {
+      "patterns": [
+        "/start$"
+      ],
+      "properties": {
+        "presentation": "clear_all"
+      }
+    },
+    {
+      "patterns": [
+        "/web-sheet$"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "hotwire://fragment/web/modal/sheet"
+      }
+    },
+    {
+      "patterns": [
+        "/native-sheet$"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "hotwire://fragment/native/sheet"
+      }
+    }
+  ]
+}

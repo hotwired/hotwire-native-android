@@ -23,12 +23,16 @@ import dev.hotwire.navigation.R
 class HotwireView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr) {
 
-    private val webViewContainer: ViewGroup get() = findViewById(R.id.hotwire_webView_container)
+    private val webViewContainer: ViewGroup
+        get() = findViewById<ViewGroup>(R.id.hotwire_webView_container).let {
+            (it as? HotwireSwipeRefreshLayout)?.webViewContainer ?: it
+        }
     private val progressContainer: ViewGroup get() = findViewById(R.id.hotwire_progress_container)
     private val errorContainer: ViewGroup get() = findViewById(R.id.hotwire_error_container)
     private val screenshotView: ImageView get() = findViewById(R.id.hotwire_screenshot)
 
-    internal val webViewRefresh: SwipeRefreshLayout? get() = webViewContainer as? SwipeRefreshLayout
+    internal val webViewRefresh: SwipeRefreshLayout?
+        get() = findViewById<View>(R.id.hotwire_webView_container) as? SwipeRefreshLayout
     internal val errorRefresh: SwipeRefreshLayout? get() = findViewById(R.id.hotwire_error_refresh)
 
     internal fun attachWebView(webView: WebView, onAttachedToNewDestination: (Boolean) -> Unit) {

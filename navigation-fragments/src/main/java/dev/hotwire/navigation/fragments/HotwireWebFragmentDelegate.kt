@@ -1,6 +1,7 @@
 package dev.hotwire.navigation.fragments
 
 import android.content.Intent
+import android.view.ViewGroup
 import android.webkit.HttpAuthHandler
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
@@ -76,16 +77,6 @@ internal class HotwireWebFragmentDelegate(
     fun prepareNavigation(onReady: () -> Unit) {
         session.removeCallback(this)
         detachWebView(onReady)
-    }
-
-    /**
-     * Should be called by the implementing Fragment during
-     * [androidx.fragment.app.Fragment.onViewCreated].
-     */
-    fun onViewCreated() {
-        if (session.isRenderProcessGone) {
-            navigator.replaceSession()
-        }
     }
 
     /**
@@ -250,7 +241,14 @@ internal class HotwireWebFragmentDelegate(
     }
 
     override fun onRenderProcessGone() {
-        navigator.route(location, VisitOptions(action = VisitAction.REPLACE))
+        // Detach the WebView right away so the navigator can replace its
+        // session, then visit this destination's location with the new WebView.
+        val goneWebView = webView
+        (goneWebView.parent as? ViewGroup)?.removeView(goneWebView)
+        callback.onWebViewDetached(goneWebView)
+
+        initNavigationVisit()
+        initWebChromeClient()
     }
 
     override fun requestFailedWithError(visitHasCachedSnapshot: Boolean, error: VisitError) {
@@ -301,14 +299,7 @@ internal class HotwireWebFragmentDelegate(
     }
 
     private fun initNavigationVisit() {
-        // The render process can die while a native dialog covers this destination. The kept
-        // view can't lay out a new WebView (SwipeRefreshLayout caches its first child), so
-        // recreate the destination instead of replacing the session in place.
-        if (session.isRenderProcessGone) {
-            onRenderProcessGone()
-            return
-        }
-
+        navigator.replaceSessionIfRenderProcessGone()
         initView()
         attachWebViewAndVisit()
     }

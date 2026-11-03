@@ -52,7 +52,6 @@ open class HotwireWebBottomSheetFragment : HotwireBottomSheetFragment(), Hotwire
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        webDelegate.onViewCreated()
         bridgeDelegate.forEachInitializedComponent<BridgeComponentFragmentLifecycle> {
             it.onViewCreated()
         }
