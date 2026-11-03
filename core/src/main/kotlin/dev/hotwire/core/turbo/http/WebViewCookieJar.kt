@@ -6,7 +6,7 @@ import okhttp3.CookieJar
 import okhttp3.HttpUrl
 
 internal class WebViewCookieJar : CookieJar {
-    private val cookieManager = CookieManager.getInstance()
+    private val cookieManager get() = CookieManager.getInstance()
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
         val header = cookieManager.getCookie(url.toString()) ?: return emptyList()
