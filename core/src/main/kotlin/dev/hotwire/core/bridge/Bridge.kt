@@ -19,10 +19,16 @@ private const val bridgeChannelName = "BridgeComponentsChannel"
 class Bridge internal constructor(webView: WebView) {
     private var componentsAreRegistered: Boolean = false
     private val webViewRef: WeakReference<WebView>
+    private var delegateRef = WeakReference<BridgeDelegate<*>>(null)
 
     internal val webView: WebView? get() = webViewRef.get()
     internal var repository = Repository()
-    internal var delegate: BridgeDelegate<*>? = null
+
+    // Bridge instances are held statically, so a strong reference here
+    // would keep a destroyed destination alive.
+    internal var delegate: BridgeDelegate<*>?
+        get() = delegateRef.get()
+        set(value) { delegateRef = WeakReference(value) }
     internal val channel = JavascriptChannel(bridgeChannelName, ::dispatchBridgeMessage)
 
     init {

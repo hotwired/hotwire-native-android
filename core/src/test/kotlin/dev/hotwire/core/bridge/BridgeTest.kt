@@ -15,12 +15,14 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.verify
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.lang.ref.WeakReference
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.R])
@@ -132,6 +134,17 @@ class BridgeTest {
     }
 
     @Test
+    fun delegateIsNotRetained() {
+        val delegateRef = setNewDelegate()
+
+        repeat(10) {
+            if (delegateRef.get() != null) System.gc()
+        }
+
+        assertNull(bridge.delegate)
+    }
+
+    @Test
     fun bridgeMessagesFromAnUntrustedOriginAreDropped() {
         bridge.channel.receive(
             data = bridgeDidReceiveMessageEnvelope,
@@ -198,5 +211,17 @@ class BridgeTest {
     @Test
     fun sanitizeFunctionName() {
         assertEquals(bridge.sanitizeFunctionName("replyWith()"), "replyWith")
+    }
+
+    // Creates the delegate in its own function, so no local variable
+    // in the test keeps it reachable.
+    private fun setNewDelegate(): WeakReference<BridgeDelegate<*>> {
+        val delegate = BridgeDelegate(
+            location = "https://37signals.com",
+            destination = TestData.AppBridgeDestination(),
+            componentFactories = emptyList()
+        )
+        bridge.delegate = delegate
+        return WeakReference(delegate)
     }
 }

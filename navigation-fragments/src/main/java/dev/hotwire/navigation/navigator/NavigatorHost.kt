@@ -58,6 +58,11 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
         registeredStartLocation?.let { Hotwire.config.unregisterStartLocation(it) }
         registeredStartLocation = null
         activity.delegate.unregisterNavigatorHost(this)
+
+        // Each host owns its WebView, so nothing uses it after the host is destroyed, including
+        // after an Activity recreation. Destroy it now so its page stops running.
+        navigator.destroySession()
+
         super.onDestroy()
     }
 
