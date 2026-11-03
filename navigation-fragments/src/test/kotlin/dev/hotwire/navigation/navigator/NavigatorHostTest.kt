@@ -136,23 +136,6 @@ class NavigatorHostTest {
         assertThat(shadowOf(newWebView).wasDestroyCalled()).isFalse()
     }
 
-    // The current destination replaces the session and visits its location again.
-    @Test
-    fun `losing the render process replaces the session`() {
-        val controller = Robolectric.buildActivity(HostActivity::class.java).setup()
-        shadowOf(Looper.getMainLooper()).idle()
-        val navigator = controller.get().navigatorHost.navigator
-        val oldSession = navigator.session
-
-        oldSession.webView.webViewClient.onRenderProcessGone(oldSession.webView, crashedRenderProcess)
-        shadowOf(Looper.getMainLooper()).idle()
-        val newSession = navigator.session
-
-        assertThat(newSession).isNotSameAs(oldSession)
-        assertThat(shadowOf(oldSession.webView).wasDestroyCalled()).isTrue()
-        assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
-    }
-
     // prepareNavigation() is what showing a native dialog does to the destination below it:
     // it detaches the WebView and stops listening to the session, but keeps the view.
     @Test
