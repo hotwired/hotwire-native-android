@@ -105,7 +105,8 @@ class HotwireConfig internal constructor() {
      * WebView reads it once when it's created, so changing it later doesn't
      * affect existing WebViews.
      *
-     * Requires Android System WebView 121 or later; on older versions this
+     * The device's WebView must support
+     * [androidx.webkit.WebViewFeature.WEB_AUTHENTICATION]; otherwise this
      * setting has no effect.
      */
     var webAuthenticationEnabled = false
