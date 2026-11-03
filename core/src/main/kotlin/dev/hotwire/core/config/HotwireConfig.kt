@@ -85,6 +85,33 @@ class HotwireConfig internal constructor() {
         }
 
     /**
+     * Enables WebAuthn (passkey) requests from every WebView instance, using the
+     * embedding app's identity. Disabled by default, which matches the WebView's
+     * own default behavior.
+     *
+     * Your app must be associated with your website through
+     * [Digital Asset Links](https://developers.google.com/digital-asset-links),
+     * otherwise the requests are rejected. Note that the WebView reports the app's
+     * identity as the WebAuthn origin (`android:apk-key-hash:<hash>`), so your
+     * server has to accept it in addition to its web origin.
+     *
+     * Only enable this if your WebViews load nothing but your own sites. Because
+     * the requests carry your app's identity, not the page's origin, any page in
+     * the WebView can request passkeys for your associated sites. That includes
+     * cross-origin iframes your pages allow `publickey-credentials-get` or
+     * `publickey-credentials-create`.
+     *
+     * Set this in `Application.onCreate()`, before any WebView is created. Each
+     * WebView reads it once when it's created, so changing it later doesn't
+     * affect existing WebViews.
+     *
+     * The device's WebView must support
+     * [androidx.webkit.WebViewFeature.WEB_AUTHENTICATION]; otherwise this
+     * setting has no effect.
+     */
+    var webAuthenticationEnabled = false
+
+    /**
      * Called whenever a new WebView instance needs to be (re)created. Provide
      * your own implementation and subclass [HotwireWebView] if you need
      * custom behaviors.
