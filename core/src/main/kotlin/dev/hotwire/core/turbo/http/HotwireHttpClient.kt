@@ -57,6 +57,8 @@ object HotwireHttpClient {
             .readTimeout(30L, TimeUnit.SECONDS)
             .writeTimeout(30L, TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
+            // A network interceptor sees every redirect hop, not only the first request.
+            .addNetworkInterceptor(CrossOriginCredentialInterceptor())
 
         cache?.let {
             builder.cache(it)
