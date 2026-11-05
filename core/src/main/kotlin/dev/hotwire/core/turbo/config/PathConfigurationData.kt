@@ -1,6 +1,7 @@
 package dev.hotwire.core.turbo.config
 
 import com.google.gson.annotations.SerializedName
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -40,13 +41,23 @@ data class PathConfigurationData internal constructor(
         val url = try {
             URL(location)
         } catch (e: MalformedURLException) {
-            return ""
+            null
         }
 
-        return if (url.query == null) {
-            url.path
-        } else {
-            "${url.path}?${url.query}"
+        // Match http(s) urls the way the WebView and OkHttp load them: tabs and newlines removed,
+        // backslashes read as slashes, and dot segments resolved. java.net.URL keeps all of these
+        // as written. A url without a path keeps its empty path, so rules for "/" still don't
+        // match a bare host.
+        location.toHttpUrlOrNull()?.let { httpUrl ->
+            val hasNoPath = url?.path?.isEmpty() == true && httpUrl.encodedPath == "/"
+            val path = if (hasNoPath) "" else httpUrl.encodedPath
+            return httpUrl.encodedQuery?.let { "$path?$it" } ?: path
+        }
+
+        return when {
+            url == null -> ""
+            url.query == null -> url.path
+            else -> "${url.path}?${url.query}"
         }
     }
 }
