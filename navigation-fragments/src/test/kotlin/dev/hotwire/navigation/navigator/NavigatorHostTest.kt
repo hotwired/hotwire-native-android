@@ -1,12 +1,18 @@
 package dev.hotwire.navigation.navigator
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import android.webkit.RenderProcessGoneDetail
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.FragmentFactory
+import androidx.navigation.NavHostController
+import androidx.navigation.fragment.DialogFragmentNavigator
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeDelegate
@@ -21,7 +27,6 @@ import dev.hotwire.navigation.fragments.HotwireWebFragment
 import dev.hotwire.navigation.views.HotwireSwipeRefreshLayout
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -32,77 +37,82 @@ import java.lang.ref.WeakReference
 @RunWith(RobolectricTestRunner::class)
 class NavigatorHostTest {
 
-    private lateinit var activity: TestActivity
-    private lateinit var host: NavigatorHost
-
-    @Before
-    fun setUp() {
-        host = NavigatorHost()
-    }
-
     @After
     fun tearDown() {
         HotwireNavigation.registeredBridgeComponentFactories = emptyList()
     }
 
     @Test
-    fun `reverts to config start location when deep link host differs`() {
-        val intent = Intent().apply {
-            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf(LOCATION_KEY to "https://other.com/path"))
-        }
-        activity = Robolectric.buildActivity(TestActivity::class.java, intent).get()
+    fun `doesn't navigate to a destination matching the launching Intent's data`() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(SHEET_DEEP_LINK))
 
-        host.activity = activity
-        host.ensureDeeplinkStartLocationValid()
+        val activity = launch(intent)
 
-        assertThat(activity.intent.getBundleExtra(DEEPLINK_EXTRAS_KEY)?.getString(LOCATION_KEY))
-            .isEqualTo("https://example.com/start")
+        assertThat(activity.navigatorHost.destinations()).containsExactly(START_LOCATION)
     }
 
     @Test
-    fun `does not change start location when deep link host matches config`() {
-        val intent = Intent().apply {
-            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf(LOCATION_KEY to "https://example.com/path"))
+    fun `doesn't navigate to the destination and location in the launching Intent's extras`() {
+        val (graphId, sheetId) = launch(Intent()).navigatorHost.navController.graph.let { graph ->
+            graph.id to graph.single { it is DialogFragmentNavigator.Destination }.id
         }
-        activity = Robolectric.buildActivity(TestActivity::class.java, intent).get()
+        val intent = Intent().apply {
+            putExtra(DEEPLINK_IDS_KEY, intArrayOf(graphId, sheetId))
+            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf("location" to OTHER_LOCATION))
+            putParcelableArrayListExtra(DEEPLINK_ARGS_KEY, arrayListOf(Bundle(), bundleOf("location" to OTHER_LOCATION)))
+        }
 
-        host.activity = activity
-        host.ensureDeeplinkStartLocationValid()
+        val activity = launch(intent)
 
-        assertThat(activity.intent.getBundleExtra(DEEPLINK_EXTRAS_KEY)?.getString(LOCATION_KEY))
-            .isEqualTo("https://example.com/path")
+        assertThat(activity.navigatorHost.destinations()).containsExactly(START_LOCATION)
     }
 
     @Test
-    fun `reverts to config start location when deep link downgrades the scheme`() {
-        val intent = Intent().apply {
-            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf(LOCATION_KEY to "http://example.com/path"))
+    fun `leaves the launching Intent unchanged`() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(SHEET_DEEP_LINK)).apply {
+            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf("location" to OTHER_LOCATION))
+            putExtra("app_extra", "kept")
         }
-        activity = Robolectric.buildActivity(TestActivity::class.java, intent).get()
 
-        host.activity = activity
-        host.ensureDeeplinkStartLocationValid()
+        val activity = launch(intent)
 
-        assertThat(activity.intent.getBundleExtra(DEEPLINK_EXTRAS_KEY)?.getString(LOCATION_KEY))
-            .isEqualTo("https://example.com/start")
+        assertThat(activity.intent.data).isEqualTo(Uri.parse(SHEET_DEEP_LINK))
+        assertThat(activity.intent.getBundleExtra(DEEPLINK_EXTRAS_KEY)?.getString("location")).isEqualTo(OTHER_LOCATION)
+        assertThat(activity.intent.getStringExtra("app_extra")).isEqualTo("kept")
     }
 
-    // NavController merges deepLinkArgs over deepLinkExtras (last write wins); the intent's args
-    // must not survive to override the validated start location.
     @Test
-    fun `empties deepLinkArgs so they cannot override the start location`() {
-        val intent = Intent().apply {
-            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf(LOCATION_KEY to "https://example.com/ok"))
-            putParcelableArrayListExtra(DEEPLINK_ARGS_KEY, arrayListOf(bundleOf(LOCATION_KEY to ATTACKER_URL)))
+    fun `app code sees the launching Intent without its deep link while the graph is set`() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(SHEET_DEEP_LINK)).apply {
+            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf("location" to OTHER_LOCATION))
+            putExtra("app_extra", "kept")
         }
-        activity = Robolectric.buildActivity(TestActivity::class.java, intent).get()
+        val seen = mutableListOf<Intent>()
+        FactoryHostActivity.onInstantiate = { activity -> seen += Intent(activity.intent) }
 
-        host.activity = activity
-        host.ensureDeeplinkStartLocationValid()
+        Robolectric.buildActivity(FactoryHostActivity::class.java, intent).setup()
+        shadowOf(Looper.getMainLooper()).idle()
 
-        val survivingArgs = activity.intent.getParcelableArrayListExtra<Bundle>(DEEPLINK_ARGS_KEY)
-            ?.mapNotNull { it.getString(LOCATION_KEY) }.orEmpty()
-        assertThat(survivingArgs).doesNotContain(ATTACKER_URL)
+        assertThat(seen).isNotEmpty
+        assertThat(seen.first().action).isEqualTo(Intent.ACTION_VIEW)
+        assertThat(seen.first().getStringExtra("app_extra")).isEqualTo("kept")
+        assertThat(seen.first().data).isNull()
+        assertThat(seen.first().hasExtra(DEEPLINK_EXTRAS_KEY)).isFalse()
+    }
+
+    // NavHostFragment.onCreate() sets a graph supplied through its arguments or XML, and creates
+    // its NavController just before. That graph can match a deep link by action alone.
+    @Test
+    fun `hides the launching Intent's deep link from NavHostFragment's own setup`() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(SHEET_DEEP_LINK))
+        RecordingHostActivity.seen.clear()
+
+        val activity = Robolectric.buildActivity(RecordingHostActivity::class.java, intent).setup().get()
+
+        assertThat(RecordingHostActivity.seen).hasSize(1)
+        assertThat(RecordingHostActivity.seen.first().data).isNull()
+        assertThat(RecordingHostActivity.seen.first().action).isNull()
+        assertThat(activity.intent.data).isEqualTo(Uri.parse(SHEET_DEEP_LINK))
     }
 
     // A Bridge is only created when bridge components are registered.
@@ -163,8 +173,23 @@ class NavigatorHostTest {
         assertThat(shadowOf(newSession.webView).wasDestroyCalled()).isFalse()
     }
 
+    private fun launch(intent: Intent): HostActivity {
+        val activity = Robolectric.buildActivity(HostActivity::class.java, intent).setup().get()
+        shadowOf(Looper.getMainLooper()).idle()
+        return activity
+    }
+
+    private fun NavigatorHost.destinations() = childFragmentManager.fragments
+        .filterIsInstance<HotwireDestination>()
+        .map { it.location }
+
     companion object {
-        private const val ATTACKER_URL = "https://attacker.example/steal"
+        private const val START_LOCATION = "https://example.com/start"
+        private const val OTHER_LOCATION = "https://example.com/other"
+        private const val SHEET_DEEP_LINK = "hotwire://fragment/web/modal/sheet"
+        private const val DEEPLINK_IDS_KEY = "android-support-nav:controller:deepLinkIds"
+        private const val DEEPLINK_EXTRAS_KEY = "android-support-nav:controller:deepLinkExtras"
+        private const val DEEPLINK_ARGS_KEY = "android-support-nav:controller:deepLinkArgs"
         private val HOST_ID = View.generateViewId()
 
         private val crashedRenderProcess = object : RenderProcessGoneDetail() {
@@ -173,14 +198,36 @@ class NavigatorHostTest {
         }
     }
 
-    private class TestActivity : HotwireActivity() {
-        private val navConfig = NavigatorConfiguration(
-            name = "test",
-            startLocation = "https://example.com/start",
-            navigatorHostId = 0
-        )
+    class RecordingNavigatorHost : NavigatorHost() {
+        override fun onCreateNavHostController(navHostController: NavHostController) {
+            super.onCreateNavHostController(navHostController)
+            RecordingHostActivity.seen += Intent(requireActivity().intent)
+        }
+    }
 
-        override fun navigatorConfigurations(): List<NavigatorConfiguration> = listOf(navConfig)
+    class RecordingHostActivity : HostActivity() {
+        override fun createNavigatorHost() = RecordingNavigatorHost()
+
+        companion object {
+            val seen = mutableListOf<Intent>()
+        }
+    }
+
+    class FactoryHostActivity : HostActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            val activity = this
+            supportFragmentManager.fragmentFactory = object : FragmentFactory() {
+                override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
+                    if (className == HotwireWebFragment::class.java.name) onInstantiate(activity)
+                    return super.instantiate(classLoader, className)
+                }
+            }
+            super.onCreate(savedInstanceState)
+        }
+
+        companion object {
+            var onInstantiate: (Activity) -> Unit = {}
+        }
     }
 
     class TestComponent(name: String, delegate: BridgeDelegate<HotwireDestination>) :
@@ -188,7 +235,7 @@ class NavigatorHostTest {
         override fun onReceive(message: Message) {}
     }
 
-    class HostActivity : HotwireActivity() {
+    open class HostActivity : HotwireActivity() {
         val navigatorHost get() = supportFragmentManager.findFragmentById(HOST_ID) as NavigatorHost
 
         override fun navigatorConfigurations() = listOf(
@@ -199,13 +246,15 @@ class NavigatorHostTest {
             )
         )
 
+        open fun createNavigatorHost() = NavigatorHost()
+
         override fun onCreate(savedInstanceState: Bundle?) {
             setTheme(androidx.appcompat.R.style.Theme_AppCompat_Light_NoActionBar)
             super.onCreate(savedInstanceState)
             setContentView(FragmentContainerView(this).apply { id = HOST_ID })
 
             if (savedInstanceState == null) {
-                supportFragmentManager.beginTransaction().add(HOST_ID, NavigatorHost()).commitNow()
+                supportFragmentManager.beginTransaction().add(HOST_ID, createNavigatorHost()).commitNow()
             }
         }
     }

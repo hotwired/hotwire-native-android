@@ -1,22 +1,16 @@
 package dev.hotwire.navigation.navigator
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.Companion.PROTECTED
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentOnAttachListener
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import dev.hotwire.core.config.Hotwire
-import dev.hotwire.core.security.hasSameOriginAs
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.config.HotwireNavigation
-
-internal const val DEEPLINK_EXTRAS_KEY = "android-support-nav:controller:deepLinkExtras"
-internal const val DEEPLINK_ARGS_KEY = "android-support-nav:controller:deepLinkArgs"
-internal const val LOCATION_KEY = "location"
 
 open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     internal lateinit var activity: HotwireActivity
@@ -34,9 +28,14 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     private var registeredStartLocation: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         activity = requireActivity() as HotwireActivity
+
+        // NavHostFragment sets a graph supplied through its arguments or XML here. That graph can
+        // match a deep link by the Intent's action alone, so it gets an empty Intent.
+        withoutLaunchIntentNavigation(launchIntentCopy = { Intent() }) {
+            super.onCreate(savedInstanceState)
+        }
+
         registeredStartLocation = configuration.startLocation.also {
             Hotwire.config.registerStartLocation(it)
         }
@@ -95,43 +94,61 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
 
     private fun initControllerGraph() {
         isGraphInitialized = true
-        ensureDeeplinkStartLocationValid()
 
-        navController.apply {
-            graph = NavigatorGraphBuilder(
-                navigatorName = configuration.name,
-                startLocation = configuration.startLocation,
-                pathConfiguration = Hotwire.config.pathConfiguration,
-                navController = findNavController()
-            ).build(
-                registeredFragments = HotwireNavigation.registeredFragmentDestinations
-            )
+        val graph = NavigatorGraphBuilder(
+            navigatorName = configuration.name,
+            startLocation = configuration.startLocation,
+            pathConfiguration = Hotwire.config.pathConfiguration,
+            navController = findNavController()
+        ).build(
+            registeredFragments = HotwireNavigation.registeredFragmentDestinations
+        )
+
+        withoutLaunchIntentNavigation {
+            navController.graph = graph
         }
     }
 
     /**
-     * Google's Navigation library automatically navigates to deep links provided in the launching
-     * Intent, which lets a malicious Intent open an arbitrary page in the WebView. Sanitize the
-     * Intent's attacker-controllable deep-link arguments so the start location stays within the
-     * app's origin.
+     * Google's Navigation library navigates to the launching Intent's deep link when a graph is
+     * set: to the destination and arguments in its deep-link extras, or to the destination whose
+     * deep link matches its data. Hotwire navigates from the configuration's start location and
+     * its own visits instead, so a graph is only set while the Activity holds a copy of its
+     * launching Intent without the deep link. Hotwire's own graph only has deep links by uri, so
+     * the copy keeps the Intent's action and the app's extras for app code that runs meanwhile.
+     * The Activity gets its launching Intent back right after, unchanged.
      */
-    @VisibleForTesting(otherwise = PROTECTED)
-    fun ensureDeeplinkStartLocationValid() {
-        val intent = activity.intent
+    private inline fun withoutLaunchIntentNavigation(
+        launchIntentCopy: (Intent) -> Intent = { it.withoutDeepLink() },
+        setGraph: () -> Unit
+    ) {
+        val launchIntent: Intent? = activity.intent
+        activity.intent = launchIntent?.let(launchIntentCopy) ?: Intent()
 
-        // NavController merges deepLinkArgs over the validated deepLinkExtras (last write wins), so
-        // empty each per-destination bundle to stop it overriding the validated start location.
-        intent.extras?.getParcelableArrayList<Bundle>(DEEPLINK_ARGS_KEY)?.let { args ->
-            intent.putParcelableArrayListExtra(DEEPLINK_ARGS_KEY, ArrayList(args.map { Bundle() }))
+        try {
+            setGraph()
+        } finally {
+            activity.intent = launchIntent
         }
+    }
 
-        val extrasBundle = intent.extras?.getBundle(DEEPLINK_EXTRAS_KEY) ?: return
-        val startLocation = extrasBundle.getString(LOCATION_KEY) ?: return
-
-        if (!startLocation.hasSameOriginAs(configuration.startLocation)) {
-            extrasBundle.putString(LOCATION_KEY, configuration.startLocation)
-            intent.putExtra(DEEPLINK_EXTRAS_KEY, extrasBundle)
+    private fun Intent.withoutDeepLink() = try {
+        Intent(this).apply {
+            setDataAndType(null, null)
+            DEEP_LINK_EXTRAS.forEach { removeExtra(it) }
         }
+    } catch (e: RuntimeException) {
+        // Reading the extras unparcels them, which fails for a value whose class the app doesn't
+        // have. Hide the whole Intent then.
+        Intent()
+    }
+
+    private companion object {
+        val DEEP_LINK_EXTRAS = listOf(
+            "android-support-nav:controller:deepLinkIds",
+            "android-support-nav:controller:deepLinkArgs",
+            "android-support-nav:controller:deepLinkExtras"
+        )
     }
 
     private val configuration get() = activity.navigatorConfigurations().firstOrNull {
