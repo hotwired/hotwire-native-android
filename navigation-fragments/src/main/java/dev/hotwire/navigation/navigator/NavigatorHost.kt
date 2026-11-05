@@ -30,8 +30,9 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         activity = requireActivity() as HotwireActivity
 
-        // NavHostFragment sets a graph supplied through its arguments or XML here.
-        withoutLaunchIntentNavigation {
+        // NavHostFragment sets a graph supplied through its arguments or XML here. That graph can
+        // match a deep link by the Intent's action alone, so it gets an empty Intent.
+        withoutLaunchIntentNavigation(launchIntentCopy = { Intent() }) {
             super.onCreate(savedInstanceState)
         }
 
@@ -113,12 +114,16 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
      * set: to the destination and arguments in its deep-link extras, or to the destination whose
      * deep link matches its data. Hotwire navigates from the configuration's start location and
      * its own visits instead, so a graph is only set while the Activity holds a copy of its
-     * launching Intent without the deep link. The Activity gets its launching Intent back right
-     * after, unchanged.
+     * launching Intent without the deep link. Hotwire's own graph only has deep links by uri, so
+     * the copy keeps the Intent's action and the app's extras for app code that runs meanwhile.
+     * The Activity gets its launching Intent back right after, unchanged.
      */
-    private inline fun withoutLaunchIntentNavigation(setGraph: () -> Unit) {
+    private inline fun withoutLaunchIntentNavigation(
+        launchIntentCopy: (Intent) -> Intent = { it.withoutDeepLink() },
+        setGraph: () -> Unit
+    ) {
         val launchIntent: Intent? = activity.intent
-        activity.intent = launchIntent?.withoutDeepLink() ?: Intent()
+        activity.intent = launchIntent?.let(launchIntentCopy) ?: Intent()
 
         try {
             setGraph()

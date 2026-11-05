@@ -101,7 +101,7 @@ class NavigatorHostTest {
     }
 
     // NavHostFragment.onCreate() sets a graph supplied through its arguments or XML, and creates
-    // its NavController just before.
+    // its NavController just before. That graph can match a deep link by action alone.
     @Test
     fun `hides the launching Intent's deep link from NavHostFragment's own setup`() {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(SHEET_DEEP_LINK))
@@ -111,6 +111,7 @@ class NavigatorHostTest {
 
         assertThat(RecordingHostActivity.seen).hasSize(1)
         assertThat(RecordingHostActivity.seen.first().data).isNull()
+        assertThat(RecordingHostActivity.seen.first().action).isNull()
         assertThat(activity.intent.data).isEqualTo(Uri.parse(SHEET_DEEP_LINK))
     }
 
