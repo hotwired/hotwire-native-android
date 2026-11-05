@@ -38,26 +38,36 @@ data class PathConfigurationData internal constructor(
     }
 
     private fun path(location: String): String {
+        // Match http(s) urls the way the WebView loads them. It drops tabs and newlines anywhere
+        // in the url, then reads backslashes as slashes and resolves dot segments, like OkHttp.
+        // java.net.URL keeps all of these as written.
+        val httpLocation = location.filterNot { it == '\t' || it == '\n' || it == '\r' }.trim { it <= ' ' }
+        if (httpLocation.isHttpUrl()) {
+            val url = httpLocation.toHttpUrlOrNull() ?: return ""
+            val path = if (httpLocation.hasNoPath()) "" else url.encodedPath
+            return url.encodedQuery?.let { "$path?$it" } ?: path
+        }
+
         val url = try {
             URL(location)
         } catch (e: MalformedURLException) {
-            null
+            return ""
         }
 
-        // Match http(s) urls the way the WebView and OkHttp load them: tabs and newlines removed,
-        // backslashes read as slashes, and dot segments resolved. java.net.URL keeps all of these
-        // as written. A url without a path keeps its empty path, so rules for "/" still don't
-        // match a bare host.
-        location.toHttpUrlOrNull()?.let { httpUrl ->
-            val hasNoPath = url?.path?.isEmpty() == true && httpUrl.encodedPath == "/"
-            val path = if (hasNoPath) "" else httpUrl.encodedPath
-            return httpUrl.encodedQuery?.let { "$path?$it" } ?: path
-        }
-
-        return when {
-            url == null -> ""
-            url.query == null -> url.path
-            else -> "${url.path}?${url.query}"
+        return if (url.query == null) {
+            url.path
+        } else {
+            "${url.path}?${url.query}"
         }
     }
+
+    private fun String.isHttpUrl() = startsWith("http:", ignoreCase = true) ||
+        startsWith("https:", ignoreCase = true)
+
+    // A url without a path, like "https://example.com" or "https://example.com?q=1", keeps an
+    // empty path, so rules for "/" don't match a bare host.
+    private fun String.hasNoPath() = substringAfter(':')
+        .trimStart('/', '\\')
+        .takeWhile { it != '?' && it != '#' }
+        .none { it == '/' || it == '\\' }
 }

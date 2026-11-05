@@ -25,6 +25,22 @@ class PathConfigurationDataTest {
     }
 
     @Test
+    fun `matches a url with a tab or newline in its host the way it loads`() {
+        assertThat(data.matched("https://app.exa\tmple.com/other/../files/1")).containsExactly("files")
+        assertThat(data.matched("https://app.example.com\n/files/1")).containsExactly("files")
+    }
+
+    @Test
+    fun `matches a url with leading and trailing whitespace the way it loads`() {
+        assertThat(data.matched(" https://app.example.com/other/../files/1 ")).containsExactly("files")
+    }
+
+    @Test
+    fun `matches nothing for an http url the WebView can't load`() {
+        assertThat(data.matched("https://app exa mple.com/files/1")).isEmpty()
+    }
+
+    @Test
     fun `matches a url with backslashes the way it loads`() {
         assertThat(data.matched("https://app.example.com\\files\\1")).containsExactly("files")
     }
@@ -49,6 +65,12 @@ class PathConfigurationDataTest {
     fun `keeps an empty path for a url without one`() {
         assertThat(data.matched("https://app.example.com")).isEmpty()
         assertThat(data.matched("https://app.example.com?q=report.pdf")).containsExactly("query")
+        assertThat(data.matched("https://app.example.com#top")).isEmpty()
+    }
+
+    @Test
+    fun `matches a bare host followed by a backslash as the root path`() {
+        assertThat(data.matched("https://app.example.com\\")).containsExactly("root")
     }
 
     @Test
