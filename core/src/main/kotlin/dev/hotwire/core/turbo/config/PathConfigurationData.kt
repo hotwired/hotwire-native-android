@@ -40,8 +40,12 @@ data class PathConfigurationData internal constructor(
     private fun path(location: String): String {
         // Match http(s) urls the way the WebView loads them. It drops tabs and newlines anywhere
         // in the url, then reads backslashes as slashes and resolves dot segments, like OkHttp.
-        // java.net.URL keeps all of these as written.
-        val httpLocation = location.filterNot { it == '\t' || it == '\n' || it == '\r' }.trim { it <= ' ' }
+        // java.net.URL keeps all of these as written. OkHttp also drops a form feed, which the
+        // WebView percent-encodes instead, so encode it first.
+        val httpLocation = location
+            .filterNot { it == '\t' || it == '\n' || it == '\r' }
+            .trim { it <= ' ' }
+            .replace("\u000C", "%0C")
         if (httpLocation.isHttpUrl()) {
             val url = httpLocation.toHttpUrlOrNull() ?: return ""
             val path = if (httpLocation.hasNoPath()) "" else url.encodedPath

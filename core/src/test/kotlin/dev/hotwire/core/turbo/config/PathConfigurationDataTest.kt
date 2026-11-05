@@ -31,6 +31,11 @@ class PathConfigurationDataTest {
     }
 
     @Test
+    fun `matches a url with a form feed in its path the way it loads`() {
+        assertThat(data.matched("https://app.example.com/files/\u000C../other")).containsExactly("files")
+    }
+
+    @Test
     fun `matches a url with leading and trailing whitespace the way it loads`() {
         assertThat(data.matched(" https://app.example.com/other/../files/1 ")).containsExactly("files")
     }
