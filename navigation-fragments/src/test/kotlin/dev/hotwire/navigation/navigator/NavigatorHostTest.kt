@@ -1,5 +1,6 @@
 package dev.hotwire.navigation.navigator
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -7,7 +8,10 @@ import android.os.Looper
 import android.view.View
 import android.webkit.RenderProcessGoneDetail
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.FragmentFactory
+import androidx.navigation.NavHostController
 import androidx.navigation.fragment.DialogFragmentNavigator
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
@@ -75,6 +79,39 @@ class NavigatorHostTest {
         assertThat(activity.intent.data).isEqualTo(Uri.parse(SHEET_DEEP_LINK))
         assertThat(activity.intent.getBundleExtra(DEEPLINK_EXTRAS_KEY)?.getString("location")).isEqualTo(OTHER_LOCATION)
         assertThat(activity.intent.getStringExtra("app_extra")).isEqualTo("kept")
+    }
+
+    @Test
+    fun `app code sees the launching Intent without its deep link while the graph is set`() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(SHEET_DEEP_LINK)).apply {
+            putExtra(DEEPLINK_EXTRAS_KEY, bundleOf("location" to OTHER_LOCATION))
+            putExtra("app_extra", "kept")
+        }
+        val seen = mutableListOf<Intent>()
+        FactoryHostActivity.onInstantiate = { activity -> seen += Intent(activity.intent) }
+
+        Robolectric.buildActivity(FactoryHostActivity::class.java, intent).setup()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertThat(seen).isNotEmpty
+        assertThat(seen.first().action).isEqualTo(Intent.ACTION_VIEW)
+        assertThat(seen.first().getStringExtra("app_extra")).isEqualTo("kept")
+        assertThat(seen.first().data).isNull()
+        assertThat(seen.first().hasExtra(DEEPLINK_EXTRAS_KEY)).isFalse()
+    }
+
+    // NavHostFragment.onCreate() sets a graph supplied through its arguments or XML, and creates
+    // its NavController just before.
+    @Test
+    fun `hides the launching Intent's deep link from NavHostFragment's own setup`() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(SHEET_DEEP_LINK))
+        RecordingHostActivity.seen.clear()
+
+        val activity = Robolectric.buildActivity(RecordingHostActivity::class.java, intent).setup().get()
+
+        assertThat(RecordingHostActivity.seen).hasSize(1)
+        assertThat(RecordingHostActivity.seen.first().data).isNull()
+        assertThat(activity.intent.data).isEqualTo(Uri.parse(SHEET_DEEP_LINK))
     }
 
     // A Bridge is only created when bridge components are registered.
@@ -160,12 +197,44 @@ class NavigatorHostTest {
         }
     }
 
+    class RecordingNavigatorHost : NavigatorHost() {
+        override fun onCreateNavHostController(navHostController: NavHostController) {
+            super.onCreateNavHostController(navHostController)
+            RecordingHostActivity.seen += Intent(requireActivity().intent)
+        }
+    }
+
+    class RecordingHostActivity : HostActivity() {
+        override fun createNavigatorHost() = RecordingNavigatorHost()
+
+        companion object {
+            val seen = mutableListOf<Intent>()
+        }
+    }
+
+    class FactoryHostActivity : HostActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            val activity = this
+            supportFragmentManager.fragmentFactory = object : FragmentFactory() {
+                override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
+                    if (className == HotwireWebFragment::class.java.name) onInstantiate(activity)
+                    return super.instantiate(classLoader, className)
+                }
+            }
+            super.onCreate(savedInstanceState)
+        }
+
+        companion object {
+            var onInstantiate: (Activity) -> Unit = {}
+        }
+    }
+
     class TestComponent(name: String, delegate: BridgeDelegate<HotwireDestination>) :
         BridgeComponent<HotwireDestination>(name, delegate) {
         override fun onReceive(message: Message) {}
     }
 
-    class HostActivity : HotwireActivity() {
+    open class HostActivity : HotwireActivity() {
         val navigatorHost get() = supportFragmentManager.findFragmentById(HOST_ID) as NavigatorHost
 
         override fun navigatorConfigurations() = listOf(
@@ -176,13 +245,15 @@ class NavigatorHostTest {
             )
         )
 
+        open fun createNavigatorHost() = NavigatorHost()
+
         override fun onCreate(savedInstanceState: Bundle?) {
             setTheme(androidx.appcompat.R.style.Theme_AppCompat_Light_NoActionBar)
             super.onCreate(savedInstanceState)
             setContentView(FragmentContainerView(this).apply { id = HOST_ID })
 
             if (savedInstanceState == null) {
-                supportFragmentManager.beginTransaction().add(HOST_ID, NavigatorHost()).commitNow()
+                supportFragmentManager.beginTransaction().add(HOST_ID, createNavigatorHost()).commitNow()
             }
         }
     }

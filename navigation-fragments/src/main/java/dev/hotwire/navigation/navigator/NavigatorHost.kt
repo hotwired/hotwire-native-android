@@ -28,9 +28,13 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     private var registeredStartLocation: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         activity = requireActivity() as HotwireActivity
+
+        // NavHostFragment sets a graph supplied through its arguments or XML here.
+        withoutLaunchIntentNavigation {
+            super.onCreate(savedInstanceState)
+        }
+
         registeredStartLocation = configuration.startLocation.also {
             Hotwire.config.registerStartLocation(it)
         }
@@ -105,21 +109,41 @@ open class NavigatorHost : NavHostFragment(), FragmentOnAttachListener {
     }
 
     /**
-     * Google's Navigation library navigates to the launching Intent's deep link when the graph is
+     * Google's Navigation library navigates to the launching Intent's deep link when a graph is
      * set: to the destination and arguments in its deep-link extras, or to the destination whose
      * deep link matches its data. Hotwire navigates from the configuration's start location and
-     * its own visits instead, so the graph is set while the Activity holds an empty Intent. The
-     * Activity gets its launching Intent back right after, unchanged.
+     * its own visits instead, so a graph is only set while the Activity holds a copy of its
+     * launching Intent without the deep link. The Activity gets its launching Intent back right
+     * after, unchanged.
      */
     private inline fun withoutLaunchIntentNavigation(setGraph: () -> Unit) {
-        val launchIntent = activity.intent
-        activity.intent = Intent()
+        val launchIntent: Intent? = activity.intent
+        activity.intent = launchIntent?.withoutDeepLink() ?: Intent()
 
         try {
             setGraph()
         } finally {
             activity.intent = launchIntent
         }
+    }
+
+    private fun Intent.withoutDeepLink() = try {
+        Intent(this).apply {
+            setDataAndType(null, null)
+            DEEP_LINK_EXTRAS.forEach { removeExtra(it) }
+        }
+    } catch (e: RuntimeException) {
+        // Reading the extras unparcels them, which fails for a value whose class the app doesn't
+        // have. Hide the whole Intent then.
+        Intent()
+    }
+
+    private companion object {
+        val DEEP_LINK_EXTRAS = listOf(
+            "android-support-nav:controller:deepLinkIds",
+            "android-support-nav:controller:deepLinkArgs",
+            "android-support-nav:controller:deepLinkExtras"
+        )
     }
 
     private val configuration get() = activity.navigatorConfigurations().firstOrNull {
