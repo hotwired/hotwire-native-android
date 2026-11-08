@@ -3,6 +3,7 @@ package dev.hotwire.navigation.navigator
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.annotation.IdRes
+import androidx.lifecycle.Lifecycle.State.DESTROYED
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -271,11 +272,21 @@ class Navigator(
     }
 
     private fun navigateWhenReady(onReady: () -> Unit) {
+        if (!host.isAdded || host.lifecycle.currentState == DESTROYED) return
+        val hostView = host.view
         val destination = currentDestination
 
         if (destination != null) {
+            val viewOwner = destination.fragment.viewLifecycleOwnerLiveData.value
             destination.onBeforeNavigation()
-            destination.prepareNavigation(onReady)
+            destination.prepareNavigation {
+                // Preparation may post WebView detachment outside its lifecycle coroutine.
+                // Preserve cleanup, but don't resume navigation for an obsolete view.
+                if (host.isAdded && host.lifecycle.currentState != DESTROYED &&
+                    host.view === hostView && viewOwner?.lifecycle?.currentState != DESTROYED &&
+                    currentDestination === destination
+                ) onReady()
+            }
         } else {
             onReady()
         }
