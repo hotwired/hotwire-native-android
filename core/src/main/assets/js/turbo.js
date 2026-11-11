@@ -219,11 +219,21 @@
 
   // Touch detection, allowing vertically scrollable elements
   // to scroll properly without triggering pull-to-refresh.
+  // Every active touch is considered, so a multi-touch gesture
+  // is prevented for as long as any of its touches should be.
 
-  const elementTouchStart = (event) => {
-    if (!event.target) return
+  const touchesChanged = (event) => {
+    const touches = Array.from(event.touches)
 
-    var element = event.target
+    if (touches.length === 0) {
+      TurboSession.elementTouchEnded()
+    } else {
+      TurboSession.elementTouchStarted(touches.some(touchPreventsPullToRefresh))
+    }
+  }
+
+  const touchPreventsPullToRefresh = (touch) => {
+    var element = touch.target
 
     while (element) {
       const canScroll = element.scrollHeight > element.clientHeight
@@ -232,20 +242,13 @@
       const preventPullToRefresh = !!element.closest("[data-native-prevent-pull-to-refresh]")
 
       if (isScrollable || preventPullToRefresh) {
-        TurboSession.elementTouchStarted(true)
-        break
+        return true
       }
 
       element = element.parentElement
     }
 
-    if (!element) {
-      TurboSession.elementTouchStarted(false)
-    }
-  }
-
-  const elementTouchEnd = () => {
-    TurboSession.elementTouchEnded()
+    return false
   }
 
   // Setup and register adapter
@@ -259,8 +262,9 @@
     document.removeEventListener("turbo:load", setup)
     document.removeEventListener("turbolinks:load", setup)
 
-    document.addEventListener("touchstart", elementTouchStart)
-    document.addEventListener("touchend", elementTouchEnd)
+    document.addEventListener("touchstart", touchesChanged)
+    document.addEventListener("touchend", touchesChanged)
+    document.addEventListener("touchcancel", touchesChanged)
   }
 
   const setupOnLoad = () => {

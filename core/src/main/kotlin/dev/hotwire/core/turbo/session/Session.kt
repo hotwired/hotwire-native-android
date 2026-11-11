@@ -547,14 +547,15 @@ class Session(
     }
 
     /**
-     * Called when a touched element event has started.
+     * Called when a touch starts, or when a touch ends while others are
+     * still active, with whether any active touch prevents pull-to-refresh.
      */
     internal fun elementTouchStarted(preventsPullsToRefresh: Boolean) {
         webView.elementTouchPreventsPullsToRefresh = preventsPullsToRefresh
     }
 
     /**
-     * Called when a touched element event has ended.
+     * Called when the last active touch has ended or was canceled.
      */
     internal fun elementTouchEnded() {
         webView.elementTouchPreventsPullsToRefresh = false
